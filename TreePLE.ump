@@ -1,0 +1,110 @@
+namespace ca.mcgill.ecse321.treeple.model;
+
+class Tree
+{
+  autounique treeId;
+  int height;
+  int diameter;
+  String address;
+  Land land;
+  Status status;
+  Date datePlanted;
+  Ownership ownership;
+  * -> 1 Species species;
+  * -> 1 Location location;
+  * -> 1 Municipality municipality;
+  * -> * SurveyReport reports;
+
+  enum Land {
+    ParkLand,
+    ResidentialLand,
+    InstitutionalLand,
+    MunicipalLand
+  }
+
+  enum Status {
+    Planted,
+    Diseased,
+    MarkedForCutdown,
+    Cutdown
+  };
+
+  enum Ownership {
+    Private,
+    Public
+  }
+
+  static boolean setNextTreeId(int minTreeId) {
+    boolean wasSet = false;
+    nextTreeId = minTreeId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class Species
+{
+  unique String name;
+  String species;
+  String genus;
+}
+
+class Location
+{
+  autounique locationId;
+  Double longitude;
+  Double latitude;
+
+  static boolean setNextLocationId(int minLocationId) {
+    boolean wasSet = false;
+    nextLocationId = minLocationId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class Municipality
+{
+  unique String name;
+  int totalTrees;
+  * -> * Location borders;
+}
+
+class SurveyReport
+{
+  autounique reportId;
+  Date reportDate;
+  String reportingUser;
+
+  static boolean setNextReportId(int minReportId) {
+    boolean wasSet = false;
+    nextReportId = minReportId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class User
+{
+  unique String username;
+  String password;
+  UserRole role;
+  String[] myAddresses;
+  Integer[] myTrees;
+
+  enum UserRole {
+    Resident,
+    Scientist
+  }
+}
+
+class SustainabilityCalculator
+{
+  * -> 1 Tree tree;
+  * -> 1 Municipality municipality;
+  int getShadeSize(this.tree);
+  int getCO2Reduced(this.tree);
+  int getEnergyConserved(this.tree);
+  int getStormWaterIntercepted(this.tree);
+  int getBioDiversityIndex(this.tree);
+}
