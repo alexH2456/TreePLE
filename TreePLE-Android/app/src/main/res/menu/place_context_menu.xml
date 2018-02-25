@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <item
+        android:id="@+id/place_name"
+        android:title="@string/place_name" />
+    <item
+        android:id="@+id/place_address"
+        android:title="@string/place_address"/>
+    <item
+        android:id="@+id/place_wait"
+        android:title="@string/place_wait"/>
+    <item
+        android:id="@+id/option_checkin"
+        android:title="@string/option_checkin"/>
+    <item
+        android:id="@+id/option_checkout"
+        android:title="@string/option_checkout"/>
+    <item
+        android:id="@+id/option_add_favorites"
+        android:title="@string/option_add_favorites"/>
+</menu>
