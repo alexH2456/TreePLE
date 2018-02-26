@@ -1,0 +1,145 @@
+namespace ca.mcgill.ecse321.treeple.model;
+
+class Tree
+{
+  autounique treeId;
+  int height;
+  int diameter;
+  String address;
+  Date datePlanted;
+  Land land;
+  Status status;
+  Ownership ownership;
+  * -> 1 Species species;
+  * -> 1 Location location;
+  * -> 1 Municipality municipality;
+  * -> * SurveyReport reports;
+
+  enum Land {
+    Park,
+    Residential,
+    Institutional,
+    Municipal
+  }
+
+  enum Status {
+    Planted,
+    Diseased,
+    MarkedForCutdown,
+    Cutdown
+  };
+
+  enum Ownership {
+    Private,
+    Public
+  }
+
+  public Tree(int aHeight, int aDiameter, String aAddress, Date aDatePlanted, Land aLand,
+              Status aStatus, Ownership aOwnership, Species aSpecies, Location aLocation,
+              Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aSurveyReports) {
+    height = aHeight;
+    diameter = aDiameter;
+    address = aAddress;
+    datePlanted = aDatePlanted;
+    land = aLand;
+    status = aStatus;
+    ownership = aOwnership;
+    treeId = aTreeId;
+    reports = aSurveyReports;
+    if (!setSpecies(aSpecies)) {
+    throw new RuntimeException("Unable to create Tree due to aSpecies");
+    }
+    if (!setLocation(aLocation)) {
+    throw new RuntimeException("Unable to create Tree due to aLocation");
+    }
+    if (!setMunicipality(aMunicipality)) {
+    throw new RuntimeException("Unable to create Tree due to aMunicipality");
+    }
+  }
+
+  public static boolean setNextTreeId(int minTreeId) {
+    boolean wasSet = false;
+    nextTreeId = minTreeId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class Species
+{
+  unique String name;
+  String species;
+  String genus;
+}
+
+class Location
+{
+  autounique locationId;
+  Double latitude;
+  Double longitude;
+
+  public Location(double aLatitude, double aLongitude, int aLocationId) {
+    latitude = aLatitude;
+    longitude = aLongitude;
+    locationId = aLocationId;
+  }
+
+  public static boolean setNextLocationId(int minLocationId) {
+    boolean wasSet = false;
+    nextLocationId = minLocationId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class Municipality
+{
+  unique String name;
+  int totalTrees;
+  * -> * Location borders;
+}
+
+class SurveyReport
+{
+  autounique reportId;
+  Date reportDate;
+  String reportingUser;
+
+  public SurveyReport(Date aReportDate, String aReportingUser, int aReportId) {
+    reportDate = aReportDate;
+    reportingUser = aReportingUser;
+    reportId = aReportId;
+  }
+
+  public static boolean setNextReportId(int minReportId) {
+    boolean wasSet = false;
+    nextReportId = minReportId;
+    wasSet = true;
+    return wasSet;
+  }
+}
+
+class User
+{
+  unique String username;
+  String password;
+  UserRole role;
+  String[] myAddresses;
+  Integer[] myTrees;
+
+  enum UserRole {
+    Resident,
+    Scientist
+  }
+}
+
+class SustainabilityCalculator
+{
+  * -> 1 Tree tree;
+  * -> 1 Municipality municipality;
+  int getShadeSize(this.tree);
+  int getCO2Reduced(this.tree);
+  int getEnergyConserved(this.tree);
+  int getStormWaterIntercepted(this.tree);
+  int getBioDiversityIndex(this.tree);
+}

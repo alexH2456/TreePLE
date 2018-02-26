@@ -1,0 +1,59 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.9.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
+
+group = 'ca.mcgill.ecse321'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+
+war {
+	baseName = 'treeple'
+	version = '0.0.1-SNAPSHOT'
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	providedRuntime
+}
+
+dependencies {
+	compile('org.json:json:20171018')
+	compile('com.google.guava:guava:23.5-jre')
+	compile('org.apache.commons:commons-lang3:3.7')
+	compile('org.apache.httpcomponents:httpclient:4.5.5')
+	compile('org.modelmapper:modelmapper:1.1.1')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework:spring-webmvc:4.2.6.RELEASE')
+	compile('com.thoughtworks.xstream:xstream:1.4.7')
+	compile('org.xerial:sqlite-jdbc:3.21.0')
+	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+eclipse {
+    classpath {
+         containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+         containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
