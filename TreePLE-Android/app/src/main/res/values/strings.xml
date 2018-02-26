@@ -36,4 +36,36 @@
     <string name="option_checkin">Check in</string>
     <string name="option_checkout">Check out</string>
     <string name="title_activity_data_input">Information</string>
+    <string name="prompt_height">Height(in cm)</string>
+    <string name="prompt_diameter">Diameter(in cm)</string>
+    <string name="prompt_date">YYYY-MM-DD</string>
+    <string name="date_first">Select Date</string>
+    <string name="date_label">Date Planted</string>
+    <string name="prompt_land">Land Type</string>
+    <string name="prompt_status">Status</string>
+    <string name="prompt_ownership">Ownership</string>
+    <string name="prompt_species">Species</string>
+    <string name="tree_coords">coord_placeholder</string>
+    <string name="tree_coords_prompt">Coordinates</string>
+    <string name="species">Species</string>
+    <string name="height">Height</string>
+    <string name="diameter">Diameter</string>
+    <string name="add_tree_button">Plant Tree</string>
+    <string-array name="land_enum">
+        <item>Park</item>
+        <item>Residential</item>
+        <item>Institutional</item>
+        <item>Municipal</item>
+    </string-array>
+    <string-array name="status_enum">
+        <item>Planted</item>
+        <item>Diseased</item>
+        <item>MarkedForCutdown</item>
+        <item>Cutdown</item>
+    </string-array>
+    <string-array name="ownership_enum">
+        <item>Private</item>
+        <item>Public</item>
+    </string-array>
+
 </resources>

@@ -6,4 +6,6 @@
     <color name="Background">#91cacf</color>
     <color name="button">#7fa2a9</color>
     <color name="ActivityBG">#3ce6c5a7</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

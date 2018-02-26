@@ -44,9 +44,6 @@ import cz.msebera.android.httpclient.Header;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class RegisterActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
@@ -347,28 +344,29 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            HttpUtils.get("/users/", new RequestParams(), new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            users.add(response.getJSONObject(i));
-                        } catch (Exception e) {
-                            error += e.getMessage();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    try {
-                        error += errorResponse.get("message").toString();
-                    } catch (JSONException e) {
-                        error += e.getMessage();
-                    }
-                }
-            });
+            // TODO Update to Volley
+//            HttpUtils.get("/users/", new RequestParams(), new JsonHttpResponseHandler() {
+//                @Override
+//                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+//
+//                    for (int i = 0; i < response.length(); i++) {
+//                        try {
+//                            users.add(response.getJSONObject(i));
+//                        } catch (Exception e) {
+//                            error += e.getMessage();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                    try {
+//                        error += errorResponse.get("message").toString();
+//                    } catch (JSONException e) {
+//                        error += e.getMessage();
+//                    }
+//                }
+//            });
 
             if (users != null) {
                 for (JSONObject user : users) {
@@ -383,20 +381,21 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 }
             }
 
-            HttpUtils.post(String.format("/users/%s?password=%s&age=%s", mUsername, mPassword, mAge), new RequestParams(), new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    try {
-                        error += errorResponse.get("message").toString();
-                    } catch (JSONException e) {
-                        error += e.getMessage();
-                    }
-                }
-            });
+            //TODO Update to Volley
+//            HttpUtils.post(String.format("/users/%s?password=%s&age=%s", mUsername, mPassword, mAge), new RequestParams(), new JsonHttpResponseHandler() {
+//                @Override
+//                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+//                }
+//
+//                @Override
+//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                    try {
+//                        error += errorResponse.get("message").toString();
+//                    } catch (JSONException e) {
+//                        error += e.getMessage();
+//                    }
+//                }
+//            });
 
             username = mUsername;
             return true;

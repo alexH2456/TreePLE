@@ -2,14 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/option_search_place"
-        android:title="@string/option_search_place"
-        app:showAsAction="always" />
-    <!--<item-->
-        <!--android:id="@+id/option_get_place"-->
-        <!--android:title="@string/option_get_place"-->
-        <!--app:showAsAction="always" />-->
-    <item
         android:id="@+id/option_clear_markers"
         android:title="@string/clear_markers"
         app:showAsAction="always" />
