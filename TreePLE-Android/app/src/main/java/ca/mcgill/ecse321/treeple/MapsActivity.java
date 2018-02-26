@@ -21,9 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderApi;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -31,7 +33,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,6 +44,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,7 +60,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    private final LatLng mDefaultLocation = new LatLng(0, 0);
     private static final float DEFAULT_ZOOM = 20;
     private static final double DEFAULT_RADIUS = 50;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -68,11 +71,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
 
     private ArrayList<Marker> markers = new ArrayList<>();
-    private ArrayList<Place> places = new ArrayList<>();
 
     private View popupView;
     private PopupWindow popupWindow;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,13 +136,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapLongClick(LatLng latLng) {
 
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                markers.add(marker);
                 CameraUpdate centerCam = CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM);
                 mMap.animateCamera(centerCam, 400, null);
 
                 LinearLayout mapsLayout = (LinearLayout) findViewById(R.id.map_layout);
                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-                popupView = inflater.inflate(R.layout.marker_popup, null);
+                popupView = inflater.inflate(R.layout.new_tree_popup, null);
 
                 Spinner landSpinner = (Spinner) popupView.findViewById(R.id.land_spinner);
                 Spinner statusSpinner = (Spinner) popupView.findViewById(R.id.status_spinner);
@@ -152,7 +154,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 boolean focusable = true;
 
                 TextView coords = (TextView) popupView.findViewById(R.id.tree_coords);
-                coords.setText(marker.getPosition().toString());
+                LatLng markerPos = marker.getPosition();
+                Double latitude = markerPos.latitude;
+                Double longitude = markerPos.longitude;
+
+                coords.setText(latitude + " " + longitude);
 
                 popupWindow = new PopupWindow(popupView, width, height, focusable);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
@@ -176,7 +182,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public boolean onMarkerClick(Marker marker) {
                 // TODO: Open popupwindow containing cutDown method, and tree info
-                Toast.makeText(getApplicationContext(), marker.getPosition().toString(), Toast.LENGTH_SHORT).show();
+                LinearLayout mapsLayout = (LinearLayout) findViewById(R.id.map_layout);
+                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+                popupView = inflater.inflate(R.layout.marker_popup, null);
+
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                boolean focusable = true;
+
+                TextView coords = (TextView) popupView.findViewById(R.id.tree_coords);
+                coords.setText(marker.getPosition().toString());
+
+                popupWindow = new PopupWindow(popupView, width, height, focusable);
+                popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
+
                 return true;
             }
         });
@@ -271,7 +291,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void clearMarkers() {
         mMap.clear();
         markers.clear();
-        places.clear();
     }
 
     @SuppressLint("MissingPermission")
@@ -301,30 +320,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void onLocationChanged(Location location) {
         mLastKnownLocation = location;
-    }
-
-    public String getUsername() {
-        if (RegisterActivity.username != null) {
-            return RegisterActivity.username;
-        } else if (LoginActivity.username != null) {
-            return LoginActivity.username;
-        } else {
-            System.out.println("USER NULL");
-            return "testUser";
-        }
-
-    }
-
-    public String replace(String str) {
-        String[] words = str.split(" ");
-        StringBuilder sentence = new StringBuilder(words[0]);
-
-        for (int i = 1; i < words.length; ++i) {
-            sentence.append("%20");
-            sentence.append(words[i]);
-        }
-
-        return sentence.toString();
     }
 
     private Bundle getDateFromLabel(String text) {
@@ -365,9 +360,86 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         tv.setText(String.format("%02d-%02d-%04d", d, m + 1, y));
     }
 
-    public void plantTree(View view) {
+    public void plantTree(View view) throws JSONException {
         // TODO: Need to add Volley get request here
-        popupWindow.dismiss();
+        TextView currentView = popupView.findViewById(R.id.tree_height);
+        int height = Integer.parseInt(currentView.getText().toString());
+
+        currentView = popupView.findViewById(R.id.tree_diameter);
+        int diameter = Integer.parseInt(currentView.getText().toString());
+
+        currentView = popupView.findViewById(R.id.tree_date_planted);
+        String datePlanted = currentView.getText().toString();
+
+        Spinner currentSpinner = popupView.findViewById(R.id.land_spinner);
+        String land = currentSpinner.getSelectedItem().toString();
+
+        currentSpinner = popupView.findViewById(R.id.status_spinner);
+        String status = currentSpinner.getSelectedItem().toString();
+
+        currentSpinner = popupView.findViewById(R.id.ownership_spinner);
+        String ownership = currentSpinner.getSelectedItem().toString();
+
+        currentView = popupView.findViewById(R.id.tree_species);
+        String species = currentView.getText().toString();
+
+        currentView = popupView.findViewById(R.id.tree_municipality);
+        String municipality = currentView.getText().toString();
+
+        currentView = popupView.findViewById(R.id.tree_coords);
+        String[] latlng = currentView.getText().toString().split(" ");
+        Double latitude = Double.parseDouble(latlng[0]);
+        Double longitude = Double.parseDouble(latlng[1]);
+
+        JSONObject treeObj = new JSONObject();
+        treeObj.put("height", height);
+        treeObj.put("diameter", diameter);
+        treeObj.put("datePlanted", datePlanted);
+        treeObj.put("land", land);
+        treeObj.put("status", status);
+        treeObj.put("ownership", ownership);
+        treeObj.put("species", species);
+        treeObj.put("latitude", latitude);
+        treeObj.put("longitude", longitude);
+        treeObj.put("municipality", municipality);
+
+        System.out.println("TEST: " + treeObj);
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "/newtree/", treeObj, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                System.out.println("TEST: " + "JSONRESPONSE " + response.toString());
+                popupWindow.dismiss();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("TEST: " + "ErrRESPONSE " + error);
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+    }
+
+    public void cutDownTree(View view) throws JSONException {
+        // TODO add cut method, get tree ids
+        JSONObject treeObj = new JSONObject();
+        int treeId = 0;
+        treeObj.put("treeId", treeId);
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.DELETE, VolleyController.DEFAULT_BASE_URL + "/deletetree/", null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                popupWindow.dismiss();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
 }

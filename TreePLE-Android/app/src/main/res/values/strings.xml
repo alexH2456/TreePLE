@@ -51,6 +51,17 @@
     <string name="height">Height</string>
     <string name="diameter">Diameter</string>
     <string name="add_tree_button">Plant Tree</string>
+    <string name="height_placeholder">height_placeholder</string>
+    <string name="diameter_placeholder">diameter_placeholder</string>
+    <string name="date_placeholder">date_placeholder</string>
+    <string name="land_type_placeholder">land_type</string>
+    <string name="status_placeholder">status</string>
+    <string name="ownership_placeholder">ownership</string>
+    <string name="species_placeholder">species</string>
+    <string name="cut_down_button">Cut Down</string>
+    <string name="municipality">Municipality</string>
+    <string name="prompt_municipality">Enter municipality</string>
+    <string name="municipality_placeholder">municipality</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>

@@ -7,11 +7,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 public class VolleyController {
+
     private static VolleyController mInstance;
     private RequestQueue mRequestQueue;
     private static Context mContext;
 
-    public static final String DEFAULT_BASE_URL = "http://4442ea2a.ngrok.io";
+    public static final String DEFAULT_BASE_URL = "http://c62092d7.ngrok.io/";
 
     private VolleyController(Context context) {
         mContext = context;

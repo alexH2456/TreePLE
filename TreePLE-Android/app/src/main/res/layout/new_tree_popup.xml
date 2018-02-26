@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/marker_popup"
+    android:id="@+id/new_tree_popup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
@@ -12,12 +12,15 @@
         android:layout_height="wrap_content"
         android:text="@string/height" />
 
-    <TextView
+    <EditText
         android:id="@+id/tree_height"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/height_placeholder"
+        android:hint="@string/prompt_height"
+        android:inputType="number"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textSize="12sp" />
 
     <TextView
@@ -25,12 +28,15 @@
         android:layout_height="wrap_content"
         android:text="@string/diameter" />
 
-    <TextView
+    <EditText
         android:id="@+id/tree_diameter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/diameter_placeholder"
+        android:hint="@string/prompt_diameter"
+        android:inputType="number"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textSize="12sp" />
 
     <TextView
@@ -43,56 +49,59 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/date_placeholder"
-        android:textSize="12sp" />
+        android:onClick="showDatePickerDialog"
+        android:text="@string/date_first" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/prompt_land" />
 
-    <TextView
-        android:id="@+id/land_type"
+    <Spinner
+        android:id="@+id/land_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/land_type_placeholder" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/prompt_status" />
 
-    <TextView
-        android:id="@+id/tree_status"
+    <Spinner
+        android:id="@+id/status_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/status_placeholder" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/prompt_ownership" />
 
-    <TextView
-        android:id="@+id/tree_ownership"
+    <Spinner
+        android:id="@+id/ownership_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/ownership_placeholder" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/species" />
 
-    <TextView
+    <EditText
         android:id="@+id/tree_species"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/species_placeholder"
+        android:hint="@string/prompt_species"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textSize="12sp" />
 
     <TextView
@@ -100,15 +109,18 @@
         android:layout_height="wrap_content"
         android:text="@string/municipality" />
 
-    <TextView
+    <EditText
         android:id="@+id/tree_municipality"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/municipality_placeholder"
+        android:hint="@string/prompt_municipality"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textSize="12sp" />
 
-   <TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tree_coords_prompt" />
@@ -121,12 +133,12 @@
         android:text="@string/tree_coords" />
 
     <Button
-        android:id="@+id/cutdown_tree"
+        android:id="@+id/add_tree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/button_bg_rounded_corners"
-        android:onClick="cutDownTree"
-        android:text="@string/cut_down_button" />
+        android:onClick="plantTree"
+        android:text="@string/add_tree_button" />
 
 </LinearLayout>
