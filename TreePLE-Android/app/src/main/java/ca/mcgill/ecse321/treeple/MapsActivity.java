@@ -21,13 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -35,7 +33,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,7 +47,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,7 +60,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    private final LatLng mDefaultLocation = new LatLng(0, 0);
     private static final float DEFAULT_ZOOM = 20;
     private static final double DEFAULT_RADIUS = 50;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -76,11 +71,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
 
     private ArrayList<Marker> markers = new ArrayList<>();
-    private ArrayList<Place> places = new ArrayList<>();
 
     private View popupView;
     private PopupWindow popupWindow;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +136,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapLongClick(LatLng latLng) {
 
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                markers.add(marker);
                 CameraUpdate centerCam = CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM);
                 mMap.animateCamera(centerCam, 400, null);
 
@@ -297,7 +291,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void clearMarkers() {
         mMap.clear();
         markers.clear();
-        places.clear();
     }
 
     @SuppressLint("MissingPermission")
@@ -327,30 +320,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void onLocationChanged(Location location) {
         mLastKnownLocation = location;
-    }
-
-    public String getUsername() {
-        if (RegisterActivity.username != null) {
-            return RegisterActivity.username;
-        } else if (LoginActivity.username != null) {
-            return LoginActivity.username;
-        } else {
-            System.out.println("USER NULL");
-            return "testUser";
-        }
-
-    }
-
-    public String replace(String str) {
-        String[] words = str.split(" ");
-        StringBuilder sentence = new StringBuilder(words[0]);
-
-        for (int i = 1; i < words.length; ++i) {
-            sentence.append("%20");
-            sentence.append(words[i]);
-        }
-
-        return sentence.toString();
     }
 
     private Bundle getDateFromLabel(String text) {
@@ -440,22 +409,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("TEST: " + "JSONRESPONSE " + response.toString());
+                popupWindow.dismiss();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("TEST: " + "ERRESPONSE " + error);
+                System.out.println("TEST: " + "ErrRESPONSE " + error);
             }
         });
 
-        VolleyController.getInstance(this).addToRequestQueue(jsonReq);
-
-        popupWindow.dismiss();
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    public void cutDownTree(View view) {
-        // TODO add cut method
-        popupWindow.dismiss();
+    public void cutDownTree(View view) throws JSONException {
+        // TODO add cut method, get tree ids
+        JSONObject treeObj = new JSONObject();
+        int treeId = 0;
+        treeObj.put("treeId", treeId);
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.DELETE, VolleyController.DEFAULT_BASE_URL + "/deletetree/", null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                popupWindow.dismiss();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
 }

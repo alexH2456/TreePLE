@@ -7,6 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 public class VolleyController {
+
     private static VolleyController mInstance;
     private RequestQueue mRequestQueue;
     private static Context mContext;
