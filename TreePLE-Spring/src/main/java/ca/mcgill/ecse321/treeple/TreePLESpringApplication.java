@@ -67,7 +67,6 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
         Tree.setNextTreeId(sql.getMaxTreeId() + 1);
         Location.setNextLocationId(sql.getMaxLocationId() + 1);
         SurveyReport.setNextReportId(sql.getMaxReportId() + 1);
-        System.out.println("OYOOYOYOYOYYYOYOOOYOYYOOYOYOYOYOYOYOYOYYOYOYOYOYOYOYOY");
         return sql;
     }
 }

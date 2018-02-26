@@ -69,7 +69,7 @@ public class TreePLEService {
             throw new InvalidInputException("That ownership doesn't exist!");
 
 
-        String address = "";
+        String address = "sdf";
         CloseableHttpClient httpClient = HttpClients.createDefault();
         String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
                                         latitude, longitude, gmapsKey);

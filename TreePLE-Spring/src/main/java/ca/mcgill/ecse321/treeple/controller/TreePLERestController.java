@@ -83,16 +83,6 @@ public class TreePLERestController {
         return locationDtos;
     }
 
-
-    public JSONObject emptyJSON() {
-        try {
-            return new JSONObject("{}");
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return null;
-    }
-
     @GetMapping(value = {"/trees/"})
     public List<TreeDto> getAllTrees() {
         List<TreeDto> trees = new ArrayList<TreeDto>();
