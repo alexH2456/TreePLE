@@ -30,7 +30,7 @@ public class TreePLERestController {
 
 
     // ==============================
-    // CONVERSION METHODS
+    // DTO CONVERSION API
     // ==============================
 
     private TreeDto convertToDto(Tree tree) {
@@ -39,6 +39,11 @@ public class TreePLERestController {
                            tree.getDatePlanted(), tree.getLand(), tree.getStatus(), tree.getOwnership(),
                            convertToDto(tree.getSpecies()), convertToDto(tree.getLocation()),
                            convertToDto(tree.getMunicipality()), createSurveyReportDtos(tree.getReports()));
+    }
+
+    private UserDto convertToDto(User user) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(user, UserDto.class);
     }
 
     private SpeciesDto convertToDto(Species species) {
@@ -62,11 +67,6 @@ public class TreePLERestController {
         return modelMapper.map(report, SurveyReportDto.class);
     }
 
-    private UserDto convertToDto(User user) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(user, UserDto.class);
-    }
-
     private ArrayList<SurveyReportDto> createSurveyReportDtos(List<SurveyReport> reports) {
         ArrayList<SurveyReportDto> reportDtos = new ArrayList<SurveyReportDto>();
         for (SurveyReport report : reports) {
@@ -83,6 +83,10 @@ public class TreePLERestController {
         return locationDtos;
     }
 
+    // ==============================
+    // GET MAPPING API
+    // ==============================
+
     @GetMapping(value = {"/trees/"})
     public List<TreeDto> getAllTrees() {
         List<TreeDto> trees = new ArrayList<TreeDto>();
@@ -97,6 +101,22 @@ public class TreePLERestController {
         for (User user : service.getAllUsers())
             users.add(convertToDto(user));
         return users;
+    }
+
+    @GetMapping(value = {"/species/"})
+    public List<SpeciesDto> getAllSpecies() {
+        List<SpeciesDto> species = new ArrayList<SpeciesDto>();
+        for (Species name : service.getAllSpecies())
+            species.add(convertToDto(name));
+        return species;
+    }
+
+    @GetMapping(value = {"/municipalities/"})
+    public List<MunicipalityDto> getAllMunicipalities() {
+        List<MunicipalityDto> municipalities = new ArrayList<MunicipalityDto>();
+        for (Municipality municipality : service.getAllMunicipalities())
+            municipalities.add(convertToDto(municipality));
+        return municipalities;
     }
 
     // @GetMapping(value = {"/trees/{treeId}/"})
@@ -125,6 +145,11 @@ public class TreePLERestController {
     //     return convertToDto(location);
     // }
 
+
+    // ==============================
+    // POST MAPPING API
+    // ==============================
+
     @PostMapping(value = {"/newtree/"})
     public TreeDto createTree(@RequestBody String json) throws InvalidInputException {
         Tree tree = service.createTree(new JSONObject(json));
@@ -135,6 +160,18 @@ public class TreePLERestController {
     public UserDto createUser(@RequestBody String json) throws InvalidInputException {
         User user = service.createUser(new JSONObject(json));
         return convertToDto(user);
+    }
+
+    @PostMapping(value = {"/newspecies/"})
+    public SpeciesDto createSpecies(@RequestBody String json) throws InvalidInputException {
+        Species species = service.createSpecies(new JSONObject(json));
+        return convertToDto(species);
+    }
+
+    @PostMapping(value = {"/newmunicipality/"})
+    public MunicipalityDto createMunicipality(@RequestBody String json) throws InvalidInputException {
+        Municipality municipality = service.createMunicipality(new JSONObject(json));
+        return convertToDto(municipality);
     }
 
     // @PostMapping(value = {"/locations/{id}", "/locations/{id}/"})
@@ -183,6 +220,10 @@ public class TreePLERestController {
     //     Location location = service.updateLocationCheckOut(id, username, checkOut);
     //     return convertToDto(location);
     // }
+
+    // ==============================
+    // DELETE MAPPING API
+    // ==============================
 
     @DeleteMapping(value = {"/deletetree/"})
     public TreeDto deleteTree(@RequestBody String json) throws InvalidInputException {

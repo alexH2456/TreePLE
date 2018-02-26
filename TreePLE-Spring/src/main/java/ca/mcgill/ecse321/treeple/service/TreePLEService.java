@@ -1,14 +1,14 @@
 package ca.mcgill.ecse321.treeple.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
@@ -37,6 +37,28 @@ public class TreePLEService {
         return Collections.unmodifiableList(sql.getAllUsers());
     }
 
+    // Get a list of all Species
+    public List<Species> getAllSpecies() {
+        return Collections.unmodifiableList(sql.getAllSpecies());
+    }
+
+    // Get a list of all Locations
+    public List<Location> getAllLocations() {
+        return Collections.unmodifiableList(sql.getAllLocations());
+    }
+
+    // Get a list of all Municipalities
+    public List<Municipality> getAllMunicipalities() {
+        return Collections.unmodifiableList(sql.getAllMunicipalities());
+    }
+
+    // Get a list of all Survey Reports
+    public List<SurveyReport> getAllSurveyReports() {
+        return Collections.unmodifiableList(sql.getAllSurveyReports());
+    }
+
+
+
     // Create a new Tree
     public Tree createTree(JSONObject treeParams) throws InvalidInputException {
         int height = treeParams.getInt("height");
@@ -55,10 +77,6 @@ public class TreePLEService {
             throw new InvalidInputException("Height cannot be negative!");
         if (diameter < 0)
             throw new InvalidInputException("Diameter cannot be negative!");
-        // if (latitude == null)
-        //     throw new InvalidInputException("Latitude cannot be null!");
-        // if (longitude == null)
-        //     throw new InvalidInputException("Longitude cannot be null!");
         if (datePlanted == null || !datePlanted.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
             throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
         if (!EnumUtils.isValidEnum(Land.class, land))
@@ -69,7 +87,7 @@ public class TreePLEService {
             throw new InvalidInputException("That ownership doesn't exist!");
 
 
-        String address = "sdf";
+        String address = "";
         CloseableHttpClient httpClient = HttpClients.createDefault();
         String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
                                         latitude, longitude, gmapsKey);
@@ -93,11 +111,10 @@ public class TreePLEService {
         Tree tree = new Tree(height, diameter, address, Date.valueOf(datePlanted), Land.valueOf(land),
                              Status.valueOf(status), Ownership.valueOf(ownership), speciesObj, locationObj, municipalityObj);
 
-        sql.insertLocation(locationObj.getLocationId(), latitude, longitude);
-
         sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land,
                        ownership, status, species, locationObj.getLocationId(), municipality, reports);
-                    //    species, locationObj.getLocationId(), municipality, tree.getReports().toString().replaceAll("(\\[)|(\\])", ""));
+
+        sql.insertLocation(locationObj.getLocationId(), latitude, longitude);
 
         return tree;
     }
@@ -129,15 +146,60 @@ public class TreePLEService {
             }
         }
 
-        // for (String treeId : myTrees.split(",")) {
-        //     if (treeId.matches("^\\d+$") && sql.getTree(Integer.parseInt(treeId)) != null) {
-        //         user.addMyTree(Integer.parseInt(treeId));
-        //     }
-        // }
-
         sql.insertUser(username, password, role, myAddresses, myTrees);
 
         return user;
+    }
+
+    // Create a new Species
+    public Species createSpecies(JSONObject speciesParams) throws InvalidInputException {
+        String name = speciesParams.getString("name");
+        String species = speciesParams.getString("species");
+        String genus = speciesParams.getString("genus");
+
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Species cannot be empty!");
+        if (Species.hasWithName(name))
+            throw new InvalidInputException("Species already exists!");
+
+        Species speciesObj = new Species(name, species, genus);
+
+        sql.insertSpecies(name, species, genus);
+
+        return speciesObj;
+    }
+
+
+    // Create a new Municipality
+    public Municipality createMunicipality(JSONObject municipalityParams) throws InvalidInputException {
+        String name = municipalityParams.getString("name");
+        int totalTrees = municipalityParams.getInt("totalTrees");
+        JSONArray borders = municipalityParams.getJSONArray("borders");
+
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Municipality cannot be empty!");
+        if (Municipality.hasWithName(name))
+            throw new InvalidInputException("Municipality already exists!");
+        if (borders.length() < 3)
+            throw new InvalidInputException("Municipality requires minimum 3 borders!");
+
+        Municipality municipality = new Municipality(name, totalTrees);
+
+        ArrayList<Integer> locationIdList = new ArrayList<>();
+        borders.forEach(border -> {
+            JSONArray locationJSON = (JSONArray) border;
+            Location location = new Location(locationJSON.getDouble(0), locationJSON.getDouble(1));
+            municipality.addBorder(location);
+            locationIdList.add(location.getLocationId());
+        });
+
+        sql.insertMunicipality(name, totalTrees, locationIdList.toString().replaceAll("(\\[)|(\\])", ""));
+
+        for (Location location : municipality.getBorders()) {
+            sql.insertLocation(location.getLocationId(), location.getLatitude(), location.getLongitude());
+        }
+
+        return municipality;
     }
 
     // Delete a Tree

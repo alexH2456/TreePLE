@@ -54,6 +54,14 @@ public class SQLiteJDBC {
                             + " municipality VARCHAR(50),"
                             + " reports      TEXT         NOT NULL)";
 
+            // Users DB Table
+            String sqlUsers = "CREATE TABLE IF NOT EXISTS USERS "
+            + "(username VARCHAR(50) PRIMARY KEY NOT NULL,"
+            + " password    VARCHAR(50) NOT NULL,"
+            + " role        VARCHAR(50) NOT NULL,"
+            + " myAddresses TEXT,"
+            + " myTrees     TEXT)";
+
             // Species DB Table
             String sqlSpecies = "CREATE TABLE IF NOT EXISTS SPECIES "
                               + "(name VARCHAR(50) PRIMARY KEY NOT NULL,"
@@ -78,22 +86,13 @@ public class SQLiteJDBC {
                                     + " reportDate    VARCHAR(50) NOT NULL,"
                                     + " reportingUser VARCHAR(50) NOT NULL)";
 
-
-            // Users DB Table
-            String sqlUsers = "CREATE TABLE IF NOT EXISTS USERS "
-                            + "(username VARCHAR(50) PRIMARY KEY NOT NULL,"
-                            + " password    VARCHAR(50) NOT NULL,"
-                            + " role        VARCHAR(50) NOT NULL,"
-                            + " myAddresses TEXT,"
-                            + " myTrees     TEXT)";
-
             stmt = c.createStatement();
             stmt.executeUpdate(sqlTrees);
+            stmt.executeUpdate(sqlUsers);
             stmt.executeUpdate(sqlSpecies);
             stmt.executeUpdate(sqlLocations);
             stmt.executeUpdate(sqlMunicipalities);
             stmt.executeUpdate(sqlSurveyReports);
-            stmt.executeUpdate(sqlUsers);
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
@@ -275,6 +274,172 @@ public class SQLiteJDBC {
 
 
     // ==============================
+    // USERS TABLE API
+    // ==============================
+
+    // Add a new User
+    public void insertUser(String username, String password, String role, String myAddresses, String myTrees) {
+        String insertUser = String.format(
+            "INSERT INTO USERS (username, password, role, myAddresses, myTrees) " +
+            "VALUES ('%s', '%s', '%s', '%s', '%s');",
+            username, password, role, myAddresses, myTrees);
+
+        try {
+            stmt.executeUpdate(insertUser);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    // Update a User's password
+    public void updateUserPassword(String username, String password) {
+        String updateUserPassword = String.format(
+            "UPDATE USERS " +
+            "SET password = '%s' " +
+            "WHERE username = '%s';",
+            password, username);
+
+        try {
+            stmt.executeUpdate(updateUserPassword);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    // Update a User's role
+    public void updateUserRole(String username, String role) {
+        String updateUserRole = String.format(
+            "UPDATE USERS " +
+            "SET role = '%s' " +
+            "WHERE username = '%s';",
+            role, username);
+
+        try {
+            stmt.executeUpdate(updateUserRole);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+
+    // Update a User's addresses
+    public void updateUserAddresses(String username, String myAddresses) {
+        String updateUserAddresses = String.format(
+            "UPDATE USERS " +
+            "SET myAddresses = '%s' " +
+            "WHERE username = '%s';",
+            myAddresses, username);
+
+        try {
+            stmt.executeUpdate(updateUserAddresses);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+
+    // Update a User's trees
+    public void updateUserTrees(String username, String myTrees) {
+        String updateUserTrees = String.format(
+            "UPDATE USERS " +
+            "SET myTrees = '%s' " +
+            "WHERE username = '%s';",
+            myTrees, username);
+
+        try {
+            stmt.executeUpdate(updateUserTrees);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    // Get all Users
+    public ArrayList<User> getAllUsers() {
+        ArrayList<User> userList = new ArrayList<User>();
+
+        try {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM USERS;");
+
+            while (rs.next()) {
+                String username = rs.getString("username");
+
+                if (User.hasWithUsername(username)) {
+                    userList.add(User.getWithUsername(username));
+                } else {
+                    User user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
+
+                    for (String addressId : rs.getString("myAddresses").split(",")) {
+                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
+                            user.addMyAddress(addressId);
+                        }
+                    }
+
+                    for (String treeId : rs.getString("myTrees").split(",")) {
+                        if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
+                            user.addMyTree(Integer.parseInt(treeId));
+                        }
+                    }
+
+                    userList.add(user);
+                }
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return userList;
+    }
+
+    // Get a User
+    public User getUser(String username) {
+        User user = null;
+        String getUser = String.format("SELECT * FROM USERS WHERE username = '%s';", username);
+
+        try {
+            ResultSet rs = stmt.executeQuery(getUser);
+
+            if (rs.next()) {
+                if (User.hasWithUsername(username)) {
+                    user = User.getWithUsername(username);
+                } else {
+                    user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
+
+                    for (String addressId : rs.getString("myAddresses").split(",")) {
+                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
+                            user.addMyAddress(addressId);
+                        }
+                    }
+
+                    for (String treeId : rs.getString("myTrees").split(",")) {
+                        if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
+                            user.addMyTree(Integer.parseInt(treeId));
+                        }
+                    }
+                }
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return user;
+    }
+
+    // Delete a User
+    public void deleteUser(String username) {
+        String deleteUser = String.format("DELETE FROM USERS WHERE username = '%s';", username);
+
+        try {
+            stmt.executeUpdate(deleteUser);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+
+
+    // ==============================
     // SPECIES TABLE API
     // ==============================
 
@@ -398,6 +563,24 @@ public class SQLiteJDBC {
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+
+    // Get all Locations
+    public ArrayList<Location> getAllLocations() {
+        ArrayList<Location> locations = new ArrayList<>();
+
+        try {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM LOCATIONS;");
+
+            while (rs.next()) {
+                locations.add(new Location(rs.getDouble("latitude"), rs.getDouble("longitude"), rs.getInt("locationId")));
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return locations;
     }
 
     // Get a Location
@@ -634,172 +817,6 @@ public class SQLiteJDBC {
 
         try {
             stmt.executeUpdate(deleteSurveyReport);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-
-
-    // ==============================
-    // USERS TABLE API
-    // ==============================
-
-    // Add a new User
-    public void insertUser(String username, String password, String role, String myAddresses, String myTrees) {
-        String insertUser = String.format(
-            "INSERT INTO USERS (username, password, role, myAddresses, myTrees) " +
-            "VALUES ('%s', '%s', '%s', '%s', '%s');",
-            username, password, role, myAddresses, myTrees);
-
-        try {
-            stmt.executeUpdate(insertUser);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-    // Update a User's password
-    public void updateUserPassword(String username, String password) {
-        String updateUserPassword = String.format(
-            "UPDATE USERS " +
-            "SET password = '%s' " +
-            "WHERE username = '%s';",
-            password, username);
-
-        try {
-            stmt.executeUpdate(updateUserPassword);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-    // Update a User's role
-    public void updateUserRole(String username, String role) {
-        String updateUserRole = String.format(
-            "UPDATE USERS " +
-            "SET role = '%s' " +
-            "WHERE username = '%s';",
-            role, username);
-
-        try {
-            stmt.executeUpdate(updateUserRole);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-
-    // Update a User's addresses
-    public void updateUserAddresses(String username, String myAddresses) {
-        String updateUserAddresses = String.format(
-            "UPDATE USERS " +
-            "SET myAddresses = '%s' " +
-            "WHERE username = '%s';",
-            myAddresses, username);
-
-        try {
-            stmt.executeUpdate(updateUserAddresses);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-
-    // Update a User's trees
-    public void updateUserTrees(String username, String myTrees) {
-        String updateUserTrees = String.format(
-            "UPDATE USERS " +
-            "SET myTrees = '%s' " +
-            "WHERE username = '%s';",
-            myTrees, username);
-
-        try {
-            stmt.executeUpdate(updateUserTrees);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-    // Get all Users
-    public ArrayList<User> getAllUsers() {
-        ArrayList<User> userList = new ArrayList<User>();
-
-        try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM USERS;");
-
-            while (rs.next()) {
-                String username = rs.getString("username");
-
-                if (User.hasWithUsername(username)) {
-                    userList.add(User.getWithUsername(username));
-                } else {
-                    User user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
-
-                    for (String addressId : rs.getString("myAddresses").split(",")) {
-                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
-                            user.addMyAddress(addressId);
-                        }
-                    }
-
-                    for (String treeId : rs.getString("myTrees").split(",")) {
-                        if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
-                            user.addMyTree(Integer.parseInt(treeId));
-                        }
-                    }
-
-                    userList.add(user);
-                }
-            }
-
-            rs.close();
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return userList;
-    }
-
-    // Get a User
-    public User getUser(String username) {
-        User user = null;
-        String getUser = String.format("SELECT * FROM USERS WHERE username = '%s';", username);
-
-        try {
-            ResultSet rs = stmt.executeQuery(getUser);
-
-            if (rs.next()) {
-                if (User.hasWithUsername(username)) {
-                    user = User.getWithUsername(username);
-                } else {
-                    user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
-
-                    for (String addressId : rs.getString("myAddresses").split(",")) {
-                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
-                            user.addMyAddress(addressId);
-                        }
-                    }
-
-                    for (String treeId : rs.getString("myTrees").split(",")) {
-                        if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
-                            user.addMyTree(Integer.parseInt(treeId));
-                        }
-                    }
-                }
-            }
-
-            rs.close();
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return user;
-    }
-
-    // Delete a User
-    public void deleteUser(String username) {
-        String deleteUser = String.format("DELETE FROM USERS WHERE username = '%s';", username);
-
-        try {
-            stmt.executeUpdate(deleteUser);
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }

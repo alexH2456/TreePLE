@@ -1,0 +1,48 @@
+// Tree
+{
+    "height": 132,
+    "diameter": 122,
+    "datePlanted": "2018-02-26",
+    "land": "Residential",
+    "status": "Planted",
+    "ownership": "Public",
+    "species": "Human",
+    "latitude": 45.399067,
+    "longitude": -74.152067,
+    "municipality": "Saint-Lazare"
+}
+
+// Species
+{
+    "name": "Human",
+    "species": "HomoFgt",
+    "genus": "TheBigGay"
+}
+
+
+// Municipality
+{
+    "name": "Saint-Lazare",
+    "totalTrees": 0,
+    "borders": [
+        [45.397067, -74.152067],
+        [45.411974, -74.152188],
+        [45.408184, -74.122178],
+        [45.391692, -74.129016]
+    ]
+}
+
+// User
+{
+    "username": "Abbas",
+    "password": "alacuck",
+    "role": "Resident",
+    "myAddresses": "decarie"
+}
+
+{
+    "username": "Fetish",
+    "password": "gayboi",
+    "role": "Resident",
+    "myAddresses": "St-Lazare"
+}
