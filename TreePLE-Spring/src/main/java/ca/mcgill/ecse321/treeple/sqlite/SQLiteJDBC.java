@@ -10,7 +10,6 @@ import ca.mcgill.ecse321.treeple.model.User.*;
 
 public class SQLiteJDBC {
     private static Connection c;
-    private static Statement stmt;
     private static String dbPath;
 
     public SQLiteJDBC() {
@@ -25,12 +24,13 @@ public class SQLiteJDBC {
         return dbPath;
     }
 
+
     // ==============================
     // CONNECTION API
     // ==============================
 
     // Connect to a database
-    public void connect() {
+    public boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
 
@@ -86,36 +86,44 @@ public class SQLiteJDBC {
                                     + " reportDate    VARCHAR(50) NOT NULL,"
                                     + " reportingUser VARCHAR(50) NOT NULL)";
 
-            stmt = c.createStatement();
+            Statement stmt = c.createStatement();
             stmt.executeUpdate(sqlTrees);
             stmt.executeUpdate(sqlUsers);
             stmt.executeUpdate(sqlSpecies);
             stmt.executeUpdate(sqlLocations);
             stmt.executeUpdate(sqlMunicipalities);
             stmt.executeUpdate(sqlSurveyReports);
+            stmt.close();
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Close connection to database
-    public void closeConnection() {
+    public boolean closeConnection() {
         try {
-            if (stmt != null)
-                stmt.close();
-            if (c != null)
+            if (c != null) {
                 c.close();
+                return true;
+            }
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
-    public void deleteDB() {
+    public boolean deleteDB() {
         try {
-            Files.deleteIfExists(new File(dbPath).toPath());
+            if (closeConnection()) {
+                Files.deleteIfExists(new File(dbPath).toPath());
+                return connect();
+            }
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -125,23 +133,25 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Tree
-    public void insertTree(int treeId, int height, int diameter, String address,
+    public boolean insertTree(int treeId, int height, int diameter, String address,
                            String datePlanted, String land, String status, String ownership,
                            String species, int location, String municipality, String reports) {
         String insertTree = String.format(
             "INSERT INTO TREES (treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports) " +
-            "VALUES (%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s' '%s');",
+            "VALUES (%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s');",
             treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
 
         try {
-            stmt.executeUpdate(insertTree);
+            c.createStatement().executeUpdate(insertTree);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a Tree
-    public void updateTree(int treeId, int height, int diameter, String land, String status,
+    public boolean updateTree(int treeId, int height, int diameter, String land, String status,
                            String ownership, String species, String municipality, String reports) {
         String updateTree = String.format(
             "UPDATE TREES " +
@@ -150,21 +160,25 @@ public class SQLiteJDBC {
             height, diameter, land, status, ownership, species, municipality, reports, treeId);
 
         try {
-            stmt.executeUpdate(updateTree);
+            c.createStatement().executeUpdate(updateTree);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a Tree's Survey Reports
-    public void updateTreeSurveyReport(int treeId, String reports) {
+    public boolean updateTreeSurveyReport(int treeId, String reports) {
         String updateTreeReport = String.format("UPDATE TREES SET reports = '%s' WHERE treeId = %d;", reports, treeId);
 
         try {
-            stmt.executeUpdate(updateTreeReport);
+            c.createStatement().executeUpdate(updateTreeReport);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Trees
@@ -172,7 +186,7 @@ public class SQLiteJDBC {
         ArrayList<Tree> treeList = new ArrayList<Tree>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM TREES;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM TREES;");
 
             while (rs.next()) {
                 int treeId = rs.getInt("treeId");
@@ -211,7 +225,7 @@ public class SQLiteJDBC {
         String getTree = String.format("SELECT * FROM TREES WHERE treeId = %d;", treeId);
 
         try {
-            ResultSet rs = stmt.executeQuery(getTree);
+            ResultSet rs = c.createStatement().executeQuery(getTree);
 
             if (rs.next()) {
                 int height = rs.getInt("height");
@@ -247,7 +261,7 @@ public class SQLiteJDBC {
     public int getMaxTreeId() {
         int getMaxTreeId = -1;
         try {
-            ResultSet rs = stmt.executeQuery("SELECT MAX(treeId) AS maxTreeId FROM TREES;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(treeId) AS maxTreeId FROM TREES;");
 
             if (rs.next()) {
                 getMaxTreeId = rs.getInt("maxTreeId");
@@ -261,14 +275,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a Tree
-    public void deleteTree(int treeId) {
+    public boolean deleteTree(int treeId) {
         String deleteTree = String.format("DELETE FROM TREES WHERE treeId = %d;", treeId);
 
         try {
-            stmt.executeUpdate(deleteTree);
+            c.createStatement().executeUpdate(deleteTree);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -278,21 +294,23 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new User
-    public void insertUser(String username, String password, String role, String myAddresses, String myTrees) {
+    public boolean insertUser(String username, String password, String role, String myAddresses, String myTrees) {
         String insertUser = String.format(
             "INSERT INTO USERS (username, password, role, myAddresses, myTrees) " +
             "VALUES ('%s', '%s', '%s', '%s', '%s');",
             username, password, role, myAddresses, myTrees);
 
         try {
-            stmt.executeUpdate(insertUser);
+            c.createStatement().executeUpdate(insertUser);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a User's password
-    public void updateUserPassword(String username, String password) {
+    public boolean updateUserPassword(String username, String password) {
         String updateUserPassword = String.format(
             "UPDATE USERS " +
             "SET password = '%s' " +
@@ -300,14 +318,16 @@ public class SQLiteJDBC {
             password, username);
 
         try {
-            stmt.executeUpdate(updateUserPassword);
+            c.createStatement().executeUpdate(updateUserPassword);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a User's role
-    public void updateUserRole(String username, String role) {
+    public boolean updateUserRole(String username, String role) {
         String updateUserRole = String.format(
             "UPDATE USERS " +
             "SET role = '%s' " +
@@ -315,15 +335,16 @@ public class SQLiteJDBC {
             role, username);
 
         try {
-            stmt.executeUpdate(updateUserRole);
+            c.createStatement().executeUpdate(updateUserRole);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
-
     // Update a User's addresses
-    public void updateUserAddresses(String username, String myAddresses) {
+    public boolean updateUserAddresses(String username, String myAddresses) {
         String updateUserAddresses = String.format(
             "UPDATE USERS " +
             "SET myAddresses = '%s' " +
@@ -331,15 +352,16 @@ public class SQLiteJDBC {
             myAddresses, username);
 
         try {
-            stmt.executeUpdate(updateUserAddresses);
+            c.createStatement().executeUpdate(updateUserAddresses);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
-
     // Update a User's trees
-    public void updateUserTrees(String username, String myTrees) {
+    public boolean updateUserTrees(String username, String myTrees) {
         String updateUserTrees = String.format(
             "UPDATE USERS " +
             "SET myTrees = '%s' " +
@@ -347,10 +369,12 @@ public class SQLiteJDBC {
             myTrees, username);
 
         try {
-            stmt.executeUpdate(updateUserTrees);
+            c.createStatement().executeUpdate(updateUserTrees);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Users
@@ -358,7 +382,7 @@ public class SQLiteJDBC {
         ArrayList<User> userList = new ArrayList<User>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM USERS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM USERS;");
 
             while (rs.next()) {
                 String username = rs.getString("username");
@@ -397,7 +421,7 @@ public class SQLiteJDBC {
         String getUser = String.format("SELECT * FROM USERS WHERE username = '%s';", username);
 
         try {
-            ResultSet rs = stmt.executeQuery(getUser);
+            ResultSet rs = c.createStatement().executeQuery(getUser);
 
             if (rs.next()) {
                 if (User.hasWithUsername(username)) {
@@ -427,14 +451,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a User
-    public void deleteUser(String username) {
+    public boolean deleteUser(String username) {
         String deleteUser = String.format("DELETE FROM USERS WHERE username = '%s';", username);
 
         try {
-            stmt.executeUpdate(deleteUser);
+            c.createStatement().executeUpdate(deleteUser);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -444,21 +470,23 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Species
-    public void insertSpecies(String name, String species, String genus) {
+    public boolean insertSpecies(String name, String species, String genus) {
         String insertSpecies = String.format(
             "INSERT INTO SPECIES (name, species, genus) " +
             "VALUES ('%s', '%s', '%s');",
             name, species, genus);
 
         try {
-            stmt.executeUpdate(insertSpecies);
+            c.createStatement().executeUpdate(insertSpecies);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a Species
-    public void updateSpecies(String name, String species, String genus) {
+    public boolean updateSpecies(String name, String species, String genus) {
         String updateSpecies = String.format(
             "UPDATE SPECIES " +
             "SET species = '%s', genus = '%s' " +
@@ -466,10 +494,12 @@ public class SQLiteJDBC {
             species, genus, name);
 
         try {
-            stmt.executeUpdate(updateSpecies);
+            c.createStatement().executeUpdate(updateSpecies);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Species
@@ -477,7 +507,7 @@ public class SQLiteJDBC {
         ArrayList<Species> speciesList = new ArrayList<Species>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM SPECIES;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM SPECIES;");
 
             while (rs.next()) {
                 String name = rs.getString("name");
@@ -502,7 +532,7 @@ public class SQLiteJDBC {
         String getSpecies = String.format("SELECT * FROM SPECIES WHERE name = '%s';", name);
 
         try {
-            ResultSet rs = stmt.executeQuery(getSpecies);
+            ResultSet rs = c.createStatement().executeQuery(getSpecies);
 
             if (rs.next()) {
                 if (Species.hasWithName(name)) {
@@ -520,14 +550,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a Species
-    public void deleteSpecies(String name) {
+    public boolean deleteSpecies(String name) {
         String speciesDelete = String.format("DELETE FROM SPECIES WHERE name = '%s';", name);
 
         try {
-            stmt.executeUpdate(speciesDelete);
+            c.createStatement().executeUpdate(speciesDelete);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -537,21 +569,23 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Location
-    public void insertLocation(int locationId, Double latitude, Double longitude) {
+    public boolean insertLocation(int locationId, Double latitude, Double longitude) {
         String insertLocation = String.format(
             "INSERT INTO LOCATIONS (locationId, latitude, longitude) " +
             "VALUES (%d, %.8f, %.8f);",
             locationId, latitude, longitude);
 
         try {
-            stmt.executeUpdate(insertLocation);
+            c.createStatement().executeUpdate(insertLocation);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a Location
-    public void updateLocation(int locationId, Double latitude, Double longitude) {
+    public boolean updateLocation(int locationId, Double latitude, Double longitude) {
         String updateLocation = String.format(
             "UPDATE LOCATIONS " +
             "SET latitude = %.8f, longitude = %.8f " +
@@ -559,10 +593,12 @@ public class SQLiteJDBC {
             latitude, longitude, locationId);
 
         try {
-            stmt.executeUpdate(updateLocation);
+            c.createStatement().executeUpdate(updateLocation);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Locations
@@ -570,7 +606,7 @@ public class SQLiteJDBC {
         ArrayList<Location> locations = new ArrayList<>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM LOCATIONS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM LOCATIONS;");
 
             while (rs.next()) {
                 locations.add(new Location(rs.getDouble("latitude"), rs.getDouble("longitude"), rs.getInt("locationId")));
@@ -589,7 +625,7 @@ public class SQLiteJDBC {
         String getLocation = String.format("SELECT * FROM LOCATIONS WHERE locationId = %d;", locationId);
 
         try {
-            ResultSet rs = stmt.executeQuery(getLocation);
+            ResultSet rs = c.createStatement().executeQuery(getLocation);
 
             if (rs.next()) {
                 location = new Location(rs.getDouble("latitude"), rs.getDouble("longitude"), locationId);
@@ -606,7 +642,7 @@ public class SQLiteJDBC {
     public int getMaxLocationId() {
         int getMaxLocationId = -1;
         try {
-            ResultSet rs = stmt.executeQuery("SELECT MAX(locationId) AS maxLocationId FROM LOCATIONS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(locationId) AS maxLocationId FROM LOCATIONS;");
 
             if (rs.next()) {
                 getMaxLocationId = rs.getInt("maxLocationId");
@@ -620,14 +656,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a Location
-    public void deleteLocation(int locationId) {
+    public boolean deleteLocation(int locationId) {
         String deleteLocation = String.format("DELETE FROM LOCATIONS WHERE locationId = %d;", locationId);
 
         try {
-            stmt.executeUpdate(deleteLocation);
+            c.createStatement().executeUpdate(deleteLocation);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -637,21 +675,23 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Municipality
-    public void insertMunicipality(String name, int totalTrees, String borders) {
+    public boolean insertMunicipality(String name, int totalTrees, String borders) {
         String insertMunicipality = String.format(
             "INSERT INTO MUNICIPALITIES (name, totalTrees, borders) " +
             "VALUES ('%s', %d, '%s');",
             name, totalTrees, borders);
 
         try {
-            stmt.executeUpdate(insertMunicipality);
+            c.createStatement().executeUpdate(insertMunicipality);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Update a Municipality
-    public void updateMunicipality(String name, int totalTrees, String borders) {
+    public boolean updateMunicipality(String name, int totalTrees, String borders) {
         String updateMunicipality = String.format(
             "UPDATE MUNICIPALITIES " +
             "SET totalTrees = %d, borders = '%s' " +
@@ -659,10 +699,12 @@ public class SQLiteJDBC {
             totalTrees, borders, name);
 
         try {
-            stmt.executeUpdate(updateMunicipality);
+            c.createStatement().executeUpdate(updateMunicipality);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Municipalities
@@ -670,7 +712,7 @@ public class SQLiteJDBC {
         ArrayList<Municipality> municipalityList = new ArrayList<Municipality>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM MUNICIPALITIES;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM MUNICIPALITIES;");
 
             while (rs.next()) {
                 String name = rs.getString("name");
@@ -703,7 +745,7 @@ public class SQLiteJDBC {
         String getMunicipality = String.format("SELECT * FROM MUNICIPALITIES WHERE name = '%s';", name);
 
         try {
-            ResultSet rs = stmt.executeQuery(getMunicipality);
+            ResultSet rs = c.createStatement().executeQuery(getMunicipality);
 
             if (rs.next()) {
                 if (Municipality.hasWithName(name)) {
@@ -727,14 +769,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a Municipality
-    public void deleteMunicipality(String name) {
+    public boolean deleteMunicipality(String name) {
         String deleteMunicipality = String.format("DELETE FROM MUNICIPALITIES WHERE name = '%s';", name);
 
         try {
-            stmt.executeUpdate(deleteMunicipality);
+            c.createStatement().executeUpdate(deleteMunicipality);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 
@@ -744,17 +788,19 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Survey Report
-    public void insertSurveyReport(int reportId, String reportDate, String reportingUser) {
+    public boolean insertSurveyReport(int reportId, String reportDate, String reportingUser) {
         String insertSurveyReport = String.format(
             "INSERT INTO SURVEYREPORTS (reportId, reportDate, reportingUser) " +
             "VALUES (%d, '%s', '%s');",
             reportId, reportDate, reportingUser);
 
         try {
-            stmt.executeUpdate(insertSurveyReport);
+            c.createStatement().executeUpdate(insertSurveyReport);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
     // Get all Survey Reports
@@ -762,7 +808,7 @@ public class SQLiteJDBC {
         ArrayList<SurveyReport> reportList = new ArrayList<SurveyReport>();
 
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM SURVEYREPORTS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM SURVEYREPORTS;");
 
             while (rs.next()) {
                 reportList.add(new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportingUser"), rs.getInt("reportId")));
@@ -781,7 +827,7 @@ public class SQLiteJDBC {
         String getSurveyReport = String.format("SELECT * FROM SURVEYREPORTS WHERE reportId = %d;", reportId);
 
         try {
-            ResultSet rs = stmt.executeQuery(getSurveyReport);
+            ResultSet rs = c.createStatement().executeQuery(getSurveyReport);
 
             if (rs.next()) {
                 report = new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportingUser"), reportId);
@@ -798,7 +844,7 @@ public class SQLiteJDBC {
     public int getMaxReportId() {
         int getMaxReportId = -1;
         try {
-            ResultSet rs = stmt.executeQuery("SELECT MAX(reportId) AS getMaxReportId FROM SURVEYREPORTS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(reportId) AS getMaxReportId FROM SURVEYREPORTS;");
 
             if (rs.next()) {
                 getMaxReportId = rs.getInt("getMaxReportId");
@@ -812,14 +858,16 @@ public class SQLiteJDBC {
     }
 
     // Delete a Survey Report
-    public void deleteSurveyReport(int reportId) {
+    public boolean deleteSurveyReport(int reportId) {
         String deleteSurveyReport = String.format("DELETE FROM SURVEYREPORTS WHERE reportId = %d;", reportId);
 
         try {
-            stmt.executeUpdate(deleteSurveyReport);
+            c.createStatement().executeUpdate(deleteSurveyReport);
+            return true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+        return false;
     }
 
 

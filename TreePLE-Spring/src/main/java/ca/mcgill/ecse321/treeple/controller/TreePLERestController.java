@@ -1,7 +1,6 @@
 package ca.mcgill.ecse321.treeple.controller;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
@@ -151,26 +150,26 @@ public class TreePLERestController {
     // ==============================
 
     @PostMapping(value = {"/newtree/"})
-    public TreeDto createTree(@RequestBody String json) throws InvalidInputException {
-        Tree tree = service.createTree(new JSONObject(json));
+    public TreeDto createTree(@RequestBody String jsonBody) throws InvalidInputException {
+        Tree tree = service.createTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
     @PostMapping(value = {"/newuser/"})
-    public UserDto createUser(@RequestBody String json) throws InvalidInputException {
-        User user = service.createUser(new JSONObject(json));
+    public UserDto createUser(@RequestBody String jsonBody) throws InvalidInputException {
+        User user = service.createUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
     @PostMapping(value = {"/newspecies/"})
-    public SpeciesDto createSpecies(@RequestBody String json) throws InvalidInputException {
-        Species species = service.createSpecies(new JSONObject(json));
+    public SpeciesDto createSpecies(@RequestBody String jsonBody) throws InvalidInputException {
+        Species species = service.createSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
     @PostMapping(value = {"/newmunicipality/"})
-    public MunicipalityDto createMunicipality(@RequestBody String json) throws InvalidInputException {
-        Municipality municipality = service.createMunicipality(new JSONObject(json));
+    public MunicipalityDto createMunicipality(@RequestBody String jsonBody) throws InvalidInputException {
+        Municipality municipality = service.createMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
 
@@ -226,8 +225,8 @@ public class TreePLERestController {
     // ==============================
 
     @DeleteMapping(value = {"/deletetree/"})
-    public TreeDto deleteTree(@RequestBody String json) throws InvalidInputException {
-        Tree tree = service.deleteTree(new JSONObject(json));
+    public TreeDto deleteTree(@RequestBody String jsonBody) throws InvalidInputException {
+        Tree tree = service.deleteTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 

@@ -1,16 +1,20 @@
 // Tree
 {
-    "height": 132,
-    "diameter": 122,
-    "datePlanted": "2018-02-26",
-    "land": "Residential",
-    "status": "Planted",
-    "ownership": "Public",
-    "species": "Human",
-    "latitude": 45.399067,
-    "longitude": -74.152067,
-    "municipality": "Saint-Lazare"
+    "user": "Abbas",
+    "tree": {
+        "height": 132,
+        "diameter": 122,
+        "datePlanted": "2018-02-26",
+        "land": "Residential",
+        "status": "Planted",
+        "ownership": "Public",
+        "species": "Human",
+        "latitude": 45.399067,
+        "longitude": -74.152067,
+        "municipality": "Saint-Lazare"
+    }
 }
+
 
 // Species
 {

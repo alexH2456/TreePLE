@@ -1,12 +1,9 @@
 package ca.mcgill.ecse321.treeple.service;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.*;
 
+import org.json.*;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
@@ -26,6 +23,11 @@ public class TreePLEService {
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
     }
+
+
+    // ==============================
+    // GET ALL API
+    // ==============================
 
     // Get a list of all Trees
     public List<Tree> getAllTrees() {
@@ -58,9 +60,17 @@ public class TreePLEService {
     }
 
 
+    // ==============================
+    // CREATE NEW API
+    // ==============================
 
     // Create a new Tree
-    public Tree createTree(JSONObject treeParams) throws InvalidInputException {
+    public Tree createTree(JSONObject jsonParams) throws InvalidInputException {
+        // User data
+        String username = jsonParams.getString("user");
+
+        // Tree data
+        JSONObject treeParams = jsonParams.getJSONObject("tree");
         int height = treeParams.getInt("height");
         int diameter = treeParams.getInt("diameter");
         String datePlanted = treeParams.getString("datePlanted");
@@ -71,7 +81,7 @@ public class TreePLEService {
         Double latitude = treeParams.getDouble("latitude");
         Double longitude = treeParams.getDouble("longitude");
         String municipality = treeParams.getString("municipality");
-        String reports = "";
+
 
         if (height < 0)
             throw new InvalidInputException("Height cannot be negative!");
@@ -79,6 +89,8 @@ public class TreePLEService {
             throw new InvalidInputException("Diameter cannot be negative!");
         if (datePlanted == null || !datePlanted.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
             throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("User is not logged in/Missing username!");
         if (!EnumUtils.isValidEnum(Land.class, land))
             throw new InvalidInputException("That land type doesn't exist!");
         if (!EnumUtils.isValidEnum(Status.class, status))
@@ -86,14 +98,11 @@ public class TreePLEService {
         if (!EnumUtils.isValidEnum(Ownership.class, ownership))
             throw new InvalidInputException("That ownership doesn't exist!");
 
-
         String address = "";
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
-                                        latitude, longitude, gmapsKey);
-        HttpGet httpGet = new HttpGet(gmapsUrl);
         try {
-            CloseableHttpResponse response = httpClient.execute(httpGet);
+            String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
+                                            latitude, longitude, gmapsKey);
+            CloseableHttpResponse response = HttpClients.createDefault().execute(new HttpGet(gmapsUrl));
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode >= 200 && statusCode < 300) {
                 JSONObject gmapsJSON = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
@@ -104,27 +113,41 @@ public class TreePLEService {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
 
+        User userObj;
+        Species speciesObj;
+        Municipality municipalityObj;
+        if ((userObj = sql.getUser(username)) == null)
+            throw new InvalidInputException("User does not exist!");
+        if ((speciesObj = sql.getSpecies(species)) == null)
+            throw new InvalidInputException("Species does not exist!");
+        if ((municipalityObj = sql.getMunicipality(municipality)) == null)
+            throw new InvalidInputException("Municipality does not exist!");
+
         Location locationObj = new Location(latitude, longitude);
-        Species speciesObj = sql.getSpecies(species);
-        Municipality municipalityObj = sql.getMunicipality(municipality);
+        SurveyReport surveyReportObj = new SurveyReport(Date.valueOf(datePlanted), username);
 
         Tree tree = new Tree(height, diameter, address, Date.valueOf(datePlanted), Land.valueOf(land),
                              Status.valueOf(status), Ownership.valueOf(ownership), speciesObj, locationObj, municipalityObj);
 
-        sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land,
-                       ownership, status, species, locationObj.getLocationId(), municipality, reports);
+        tree.addReport(surveyReportObj);
+        sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
+                       locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()));
 
         sql.insertLocation(locationObj.getLocationId(), latitude, longitude);
+        sql.insertSurveyReport(surveyReportObj.getReportId(), surveyReportObj.getReportDate().toString(), username);
+
+        userObj.addMyTree(locationObj.getLocationId());
+        sql.updateUserTrees(username, userObj.getMyTrees().toString().replaceAll("(\\[)|(\\])", ""));
 
         return tree;
     }
 
     // Create a new User
-    public User createUser(JSONObject userParams) throws InvalidInputException {
-        String username = userParams.getString("username");
-        String password = userParams.getString("password");
-        String role = userParams.getString("role");
-        String myAddresses = userParams.getString("myAddresses");
+    public User createUser(JSONObject jsonParams) throws InvalidInputException {
+        String username = jsonParams.getString("username");
+        String password = jsonParams.getString("password");
+        String role = jsonParams.getString("role");
+        String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
 
         if (username == null || username.replaceAll("\\s", "").isEmpty())
@@ -152,10 +175,10 @@ public class TreePLEService {
     }
 
     // Create a new Species
-    public Species createSpecies(JSONObject speciesParams) throws InvalidInputException {
-        String name = speciesParams.getString("name");
-        String species = speciesParams.getString("species");
-        String genus = speciesParams.getString("genus");
+    public Species createSpecies(JSONObject jsonParams) throws InvalidInputException {
+        String name = jsonParams.getString("name");
+        String species = jsonParams.getString("species");
+        String genus = jsonParams.getString("genus");
 
         if (name == null || name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species cannot be empty!");
@@ -171,10 +194,10 @@ public class TreePLEService {
 
 
     // Create a new Municipality
-    public Municipality createMunicipality(JSONObject municipalityParams) throws InvalidInputException {
-        String name = municipalityParams.getString("name");
-        int totalTrees = municipalityParams.getInt("totalTrees");
-        JSONArray borders = municipalityParams.getJSONArray("borders");
+    public Municipality createMunicipality(JSONObject jsonParams) throws InvalidInputException {
+        String name = jsonParams.getString("name");
+        int totalTrees = jsonParams.getInt("totalTrees");
+        JSONArray borders = jsonParams.getJSONArray("borders");
 
         if (name == null || name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Municipality cannot be empty!");
@@ -203,8 +226,8 @@ public class TreePLEService {
     }
 
     // Delete a Tree
-    public Tree deleteTree(JSONObject treeParams) throws InvalidInputException {
-        int treeId = treeParams.getInt("treeId");
+    public Tree deleteTree(JSONObject jsonParams) throws InvalidInputException {
+        int treeId = jsonParams.getInt("treeId");
 
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative or zero!");
@@ -305,8 +328,8 @@ public class TreePLEService {
     // }
 
     // Delete the database
-    public void resetDatabase() {
-        sql.deleteDB();
+    public boolean resetDatabase() {
+        return sql.deleteDB();
     }
 
 }
