@@ -6,34 +6,34 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class VolleyController {
+class VolleyController {
 
     private static VolleyController mInstance;
     private RequestQueue mRequestQueue;
     private static Context mContext;
 
-    public static final String DEFAULT_BASE_URL = "http://c62092d7.ngrok.io/";
+    static final String DEFAULT_BASE_URL = "http://00ff2874.ngrok.io/";
 
     private VolleyController(Context context) {
         mContext = context;
         mRequestQueue = getRequestQueue();
     }
 
-    public static synchronized VolleyController getInstance(Context context) {
+    static synchronized VolleyController getInstance(Context context) {
         if (mInstance == null) {
             mInstance = new VolleyController(context);
         }
         return mInstance;
     }
 
-    public RequestQueue getRequestQueue() {
+    private RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(mContext.getApplicationContext());
         }
         return mRequestQueue;
     }
 
-    public <T> void addToRequestQueue(Request<T> req) {
+    <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
 }

@@ -344,7 +344,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO Update to Volley
+            // TODO: Update to Volley
 //            HttpUtils.get("/users/", new RequestParams(), new JsonHttpResponseHandler() {
 //                @Override
 //                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -381,7 +381,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 }
             }
 
-            //TODO Update to Volley
+            //TODO: Update to Volley
 //            HttpUtils.post(String.format("/users/%s?password=%s&age=%s", mUsername, mPassword, mAge), new RequestParams(), new JsonHttpResponseHandler() {
 //                @Override
 //                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
