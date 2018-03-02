@@ -83,7 +83,7 @@ public class TreePLERestController {
     }
 
     // ==============================
-    // GET MAPPING API
+    // GET ALL MAPPING API
     // ==============================
 
     @GetMapping(value = {"/trees/"})
@@ -118,17 +118,31 @@ public class TreePLERestController {
         return municipalities;
     }
 
+    // ==============================
+    // GET ONE MAPPING API
+    // ==============================
+
+    @GetMapping(value = {"/trees/{treeid}/"})
+    public TreeDto getTreeById(@PathVariable("treeid") int treeId) throws InvalidInputException {
+        Tree tree = service.getTreeById(treeId);
+        return convertToDto(tree);
+    }
+
+    @GetMapping(value = {"/users/{username}/"})
+    public UserDto getUserByUsername(@PathVariable("username") String username) throws InvalidInputException {
+        User user = service.getUserByUsername(username);
+        System.out.println(user + "name: " + user.getUsername());
+        return convertToDto(user);
+    }
+
+
+
     // @GetMapping(value = {"/trees/{treeId}/"})
     // public TreeDto getTreeById(@PathVariable("treeId") int treeId) throws InvalidInputException {
     //     Tree tree = service.getTreeById(treeId);
     //     return convertToDto(tree);
     // }
 
-    // @GetMapping(value = {"/users/{username}/"})
-    // public UserDto getUserByName(@PathVariable("username") String username) throws InvalidInputException {
-    //     User user = service.getUserByName(username);
-    //     return convertToDto(user);
-    // }
 
     // @GetMapping(value = {"/locations/"})
     // public List<LocationDto> findAllLocations() {

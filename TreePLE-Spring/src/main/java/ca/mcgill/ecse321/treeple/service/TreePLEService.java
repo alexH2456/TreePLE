@@ -24,44 +24,8 @@ public class TreePLEService {
         this.sql = sql;
     }
 
-
     // ==============================
-    // GET ALL API
-    // ==============================
-
-    // Get a list of all Trees
-    public List<Tree> getAllTrees() {
-        return Collections.unmodifiableList(sql.getAllTrees());
-    }
-
-    // Get a list of all Users
-    public List<User> getAllUsers() {
-        return Collections.unmodifiableList(sql.getAllUsers());
-    }
-
-    // Get a list of all Species
-    public List<Species> getAllSpecies() {
-        return Collections.unmodifiableList(sql.getAllSpecies());
-    }
-
-    // Get a list of all Locations
-    public List<Location> getAllLocations() {
-        return Collections.unmodifiableList(sql.getAllLocations());
-    }
-
-    // Get a list of all Municipalities
-    public List<Municipality> getAllMunicipalities() {
-        return Collections.unmodifiableList(sql.getAllMunicipalities());
-    }
-
-    // Get a list of all Survey Reports
-    public List<SurveyReport> getAllSurveyReports() {
-        return Collections.unmodifiableList(sql.getAllSurveyReports());
-    }
-
-
-    // ==============================
-    // CREATE NEW API
+    // CREATE API
     // ==============================
 
     // Create a new Tree
@@ -156,10 +120,10 @@ public class TreePLEService {
             throw new InvalidInputException("Username is already taken!");
         if (password == null || password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
-        if (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Address cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
+        if (role.equals("Residential") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
+            throw new InvalidInputException("Address cannot be empty!");
 
         User user = new User(username, password, UserRole.valueOf(role));
 
@@ -225,6 +189,71 @@ public class TreePLEService {
         return municipality;
     }
 
+
+    // ==============================
+    // GET ALL API
+    // ==============================
+
+    // Get a list of all Trees
+    public List<Tree> getAllTrees() {
+        return Collections.unmodifiableList(sql.getAllTrees());
+    }
+
+    // Get a list of all Users
+    public List<User> getAllUsers() {
+        return Collections.unmodifiableList(sql.getAllUsers());
+    }
+
+    // Get a list of all Species
+    public List<Species> getAllSpecies() {
+        return Collections.unmodifiableList(sql.getAllSpecies());
+    }
+
+    // Get a list of all Locations
+    public List<Location> getAllLocations() {
+        return Collections.unmodifiableList(sql.getAllLocations());
+    }
+
+    // Get a list of all Municipalities
+    public List<Municipality> getAllMunicipalities() {
+        return Collections.unmodifiableList(sql.getAllMunicipalities());
+    }
+
+    // Get a list of all Survey Reports
+    public List<SurveyReport> getAllSurveyReports() {
+        return Collections.unmodifiableList(sql.getAllSurveyReports());
+    }
+
+
+    // ==============================
+    // GET API
+    // ==============================
+
+    // Get a specific Tree
+    public Tree getTreeById(int treeId) throws InvalidInputException {
+        if (treeId <= 0)
+            throw new InvalidInputException("Tree ID cannot be negative!");
+
+        return sql.getTree(treeId);
+    }
+
+    // Get a specific User
+    public User getUserByUsername(String username) throws InvalidInputException {
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+
+        if (User.hasWithUsername(username)) {
+            return User.getWithUsername(username);
+        } else {
+            return sql.getUser(username);
+        }
+    }
+
+
+    // ==============================
+    // DELETE API
+    // ==============================
+
     // Delete a Tree
     public Tree deleteTree(JSONObject jsonParams) throws InvalidInputException {
         int treeId = jsonParams.getInt("treeId");
@@ -243,42 +272,10 @@ public class TreePLEService {
         return tree;
     }
 
-
-    // public Location createLocation(String id, String name, String strtNum, String address, int qTime, JSONObject checkTimes) throws InvalidInputException {
-    //     if (id == null || name.trim().length() == 0)
-    //         throw new InvalidInputException("Location name cannot be empty!");
-    //     if (name == null || name.trim().length() == 0)
-    //         throw new InvalidInputException("Location name cannot be empty!");
-    //     if (strtNum == null || strtNum.trim().length() == 0)
-    //         throw new InvalidInputException("Location street number cannot be empty!");
-    //     if (address == null || address.trim().length() == 0)
-    //         throw new InvalidInputException("Location address cannot be empty!");
-    //     if (qTime < -1)
-    //         throw new InvalidInputException("Location queue times cannot be negative!");
-    //     if (checkTimes == null)
-    //         throw new InvalidInputException("Location check times cannot be null!");
-
-    //     Location l = new Location(id, name, strtNum, address, qTime, checkTimes);
-    //     for (Location location : rm.getLocations()) {
-    //         if (location.getId().equals(l.getId()) && location.getName().equals(l.getName())
-    //             && location.getStrtNum().equals(l.getStrtNum()) && location.getAddress().equals(l.getAddress())
-    //             && location.getQTime() == l.getQTime() && location.getCheckTimes().toString().equals(l.getCheckTimes().toString())) {
-    //             throw new InvalidInputException("Cannot create identical locations!");
-    //         }
-    //     }
-
-    //     rm.addLocation(l);
-    //     sql.insertLocation(l.getId(), l.getName(), l.getStrtNum(), l.getAddress(), l.getQTime(), l.getCheckTimes().toString());
-    //     return l;
-    // }
-
-    // public User getUserByName(String username) throws InvalidInputException {
-    //     for (User user : rm.getUsers()) {
-    //         if (user.getUsername().equals(username))
-    //             return user;
-    //     }
-    //     throw new InvalidInputException("User does not exist!");
-    // }
+    // Delete the database
+    public boolean resetDatabase() {
+        return sql.deleteDB();
+    }
 
     // public Location getLocationById(String id) throws InvalidInputException {
     //     for (Location location : rm.getLocations()) {
@@ -326,10 +323,4 @@ public class TreePLEService {
     //     l.setCheckTimes(checkTimes);
     //     return l;
     // }
-
-    // Delete the database
-    public boolean resetDatabase() {
-        return sql.deleteDB();
-    }
-
 }
