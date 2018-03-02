@@ -23,7 +23,7 @@
     <string name="error_no_age">This field is required</string>
     <string name="error_invalid_age">Must be digits only</string>
     <string name="error_account_exists">This account already exists</string>
-    <string name="error_no_account">Please sign up</string>
+    <string name="error_no_account">Login Error</string>
     <string name="title_activity_favorites">Favorites</string>
     <string name="large_text">Favorites</string>
     <string name="action_settings">Settings</string>
@@ -64,6 +64,7 @@
     <string name="municipality_placeholder">municipality</string>
     <string name="prompt_role">Role</string>
     <string name="prompt_address">Address</string>
+    <string name="refresh_markers">Refresh</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>

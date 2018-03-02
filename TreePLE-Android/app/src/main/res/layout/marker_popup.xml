@@ -126,7 +126,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/button_bg_rounded_corners"
-        android:onClick="cutDownTree"
         android:text="@string/cut_down_button" />
 
 </LinearLayout>

@@ -2,23 +2,22 @@ package ca.mcgill.ecse321.treeple;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,17 +34,12 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import cz.msebera.android.httpclient.Header;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -123,9 +117,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     }
 
     private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
         if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
@@ -164,7 +155,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private void setupActionBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Show the Up button in the action bar.
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 
@@ -174,6 +167,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+
         if (mAuthTask != null) {
             return;
         }
@@ -341,6 +335,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
+    @SuppressLint("StaticFieldLeak")
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mUsername;
@@ -362,7 +357,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            // TODO: Update to Volley
             RequestFuture<JSONObject> registerReq = RequestFuture.newFuture();
 
             JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + mUsername + "/", new JSONObject(), registerReq, registerReq);
@@ -372,36 +366,36 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             try {
                 user = registerReq.get();
                 if (user != null) {
-                    accountExists = false;
+                    accountExists = true;
                     return false;
                 } else {
                     noAccount = true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                noAccount = true;
             }
 
-            if (noAccount) {
-                user = new JSONObject();
-                try {
-                    user.put("username", mUsername);
-                    user.put("password", mPassword);
-                    user.put("role", mRole);
-                    user.put("myaddresses", mAddress);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            user = new JSONObject();
 
-                RequestFuture<JSONObject> newAccountReq = RequestFuture.newFuture();
-                JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newuser/", user, newAccountReq, newAccountReq);
-                VolleyController.getInstance(getApplicationContext()).addToRequestQueue(accountReq);
+            try {
+                user.put("username", mUsername);
+                user.put("password", mPassword);
+                user.put("role", mRole);
+                user.put("myAddresses", mAddress);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-                try {
-                    newAccountReq.get();
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            RequestFuture<JSONObject> newAccountReq = RequestFuture.newFuture();
+            JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newuser/", user, newAccountReq, newAccountReq);
+            VolleyController.getInstance(getApplicationContext()).addToRequestQueue(accountReq);
+
+            try {
+                newAccountReq.get();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return false;
@@ -409,6 +403,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
             mAuthTask = null;
             showProgress(false);
 
