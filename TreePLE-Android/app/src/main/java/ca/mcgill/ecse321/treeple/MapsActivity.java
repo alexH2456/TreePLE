@@ -1,6 +1,7 @@
 package ca.mcgill.ecse321.treeple;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -22,10 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -46,11 +49,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -62,7 +67,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private static final float DEFAULT_ZOOM = 20;
-    private static final double DEFAULT_RADIUS = 50;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -71,16 +75,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    private ArrayList<Marker> markers = new ArrayList<>();
+    private Map<Marker,JSONObject> trees = new HashMap<>();
 
     private View popupView;
     private PopupWindow popupWindow;
 
-    // TODO: Replace with user from login activity
-    private String username = "Gareth";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -96,8 +98,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false);
+        }
     }
 
     @Override
@@ -117,8 +121,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.option_clear_markers) {
-            clearMarkers();
+        if (item.getItemId() == R.id.option_refresh_markers) {
+            populateMap();
         } else if (item.getItemId() == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
@@ -128,6 +132,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(final GoogleMap map) {
+
         mMap = map;
 
         getLocationPermission();
@@ -137,17 +142,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         populateMap();
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+
+            @SuppressLint("InflateParams")
             @Override
             public void onMapLongClick(LatLng latLng) {
 
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                markers.add(marker);
+                final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                 CameraUpdate centerCam = CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM);
                 mMap.animateCamera(centerCam, 400, null);
 
                 LinearLayout mapsLayout = (LinearLayout) findViewById(R.id.map_layout);
                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
+                assert inflater != null;
                 popupView = inflater.inflate(R.layout.new_tree_popup, null);
 
                 Spinner landSpinner = (Spinner) popupView.findViewById(R.id.land_spinner);
@@ -156,24 +163,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 int width = LinearLayout.LayoutParams.WRAP_CONTENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                boolean focusable = true;
 
                 TextView coords = (TextView) popupView.findViewById(R.id.tree_coords);
                 LatLng markerPos = marker.getPosition();
                 Double latitude = markerPos.latitude;
                 Double longitude = markerPos.longitude;
+                String latlng = latitude + " " + longitude;
 
-                coords.setText(latitude + " " + longitude);
+                coords.setText(latlng);
 
-                popupWindow = new PopupWindow(popupView, width, height, focusable);
+                popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
-
-                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                    @Override
-                    public void onDismiss() {
-                        //TODO: Make sure new tree has been added, and remove marker if it hasn't
-                    }
-                });
 
                 ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.spinner_layout);
                 landAdapter.setDropDownViewResource(R.layout.spinner_layout);
@@ -186,57 +186,120 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.spinner_layout);
                 ownershipAdapter.setDropDownViewResource(R.layout.spinner_layout);
                 ownershipSpinner.setAdapter(ownershipAdapter);
+
+                Button plantTreeButton = (Button) popupView.findViewById(R.id.add_tree);
+                plantTreeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            plantTree(popupView);
+                            populateMap();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
+            @SuppressLint({"SetTextI18n", "InflateParams"})
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                // TODO: Open popupwindow containing cutDown method, and tree info
-                final int treeID = 0;
+            public boolean onMarkerClick(final Marker marker) {
+
+                JSONObject tree = trees.get(marker);
 
                 LinearLayout mapsLayout = (LinearLayout) findViewById(R.id.map_layout);
                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
+                assert inflater != null;
                 popupView = inflater.inflate(R.layout.marker_popup, null);
 
                 int width = LinearLayout.LayoutParams.WRAP_CONTENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                boolean focusable = true;
 
-                TextView coords = (TextView) popupView.findViewById(R.id.tree_coords);
-                coords.setText(marker.getPosition().toString());
+                TextView treeHeight = (TextView) popupView.findViewById(R.id.tree_height);
+                TextView treeDiameter = (TextView) popupView.findViewById(R.id.tree_diameter);
+                TextView datePlanted = (TextView) popupView.findViewById(R.id.tree_date_planted);
+                TextView landType = (TextView) popupView.findViewById(R.id.land_type);
+                TextView treeStatus = (TextView) popupView.findViewById(R.id.tree_status);
+                TextView treeOwnership = (TextView) popupView.findViewById(R.id.tree_ownership);
+                TextView treeSpecies = (TextView) popupView.findViewById(R.id.tree_species);
+                TextView treeMunicipality = (TextView) popupView.findViewById(R.id.tree_municipality);
 
-                popupWindow = new PopupWindow(popupView, width, height, focusable);
+                try {
+                    treeHeight.setText(Integer.toString(tree.getInt("height")));
+                    treeDiameter.setText(Integer.toString(tree.getInt("diameter")));
+                    datePlanted.setText(tree.getString("datePlanted"));
+                    landType.setText(tree.getString("land"));
+                    treeStatus.setText(tree.getString("status"));
+                    treeOwnership.setText(tree.getString("ownership"));
+                    treeSpecies.setText(tree.getJSONObject("species").getString("name"));
+                    treeMunicipality.setText(tree.getJSONObject("municipality").getString("name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                TextView treeCoords = (TextView) popupView.findViewById(R.id.tree_coords);
+                treeCoords.setText(marker.getPosition().toString());
+
+                popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
-
-                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                    @Override
-                    public void onDismiss() {
-                        //TODO: Make sure tree has been cutdown, and remove from map if true
-                    }
-                });
 
                 Button cuttdownButton = (Button) popupView.findViewById(R.id.cutdown_tree);
                 cuttdownButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
-                            cutDownTree(treeID);
+                            cutDownTree(marker);
+                            populateMap();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 });
-
                 return true;
             }
         });
     }
 
     private void populateMap() {
-        //TODO: Populate map with existing trees.
+
+        clearTrees();
+
+        JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "trees/", null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject tree = response.getJSONObject(i);
+
+                        JSONObject location = tree.getJSONObject("location");
+                        double latitude = (double) location.get("latitude");
+                        double longitude = (double) location.get("longitude");
+
+                        LatLng latLng = new LatLng(latitude, longitude);
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                        trees.put(marker, tree);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("PopulateError: " + error);
+                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
     }
 
     public void getDeviceLocation() {
@@ -325,9 +388,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void clearMarkers() {
+    public void clearTrees() {
         mMap.clear();
-        markers.clear();
+        trees.clear();
     }
 
     @SuppressLint("MissingPermission")
@@ -362,7 +425,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Bundle getDateFromLabel(String text) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         Bundle rtn = new Bundle();
-        String comps[] = text.toString().split("-");
+        String comps[] = text.split("-");
 
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH);
@@ -430,6 +493,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         JSONObject plantObj = new JSONObject();
 
+        String username;
+        if (LoginActivity.loggedInUser != null) {
+            username = LoginActivity.loggedInUser.getString("username");
+        } else {
+            username = "TestUser";
+        }
+
         plantObj.put("user", username);
 
         JSONObject treeObj = new JSONObject();
@@ -446,7 +516,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         plantObj.put("tree", treeObj);
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "/newtree/", plantObj, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newtree/", plantObj, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("PlantResponse: " + response.toString());
@@ -456,19 +526,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onErrorResponse(VolleyError error) {
                 System.out.println("PlantError: " + error);
+                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    public void cutDownTree(int treeID) throws JSONException {
-        // TODO: Get tree ids
-        JSONObject treeObj = new JSONObject();
-        int treeId = 0;
-        treeObj.put("treeId", treeId);
+    //Gets tree json from map and sends it to server for deletion
+    public void cutDownTree(Marker marker) throws JSONException {
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.DELETE, VolleyController.DEFAULT_BASE_URL + "/deletetree/", null, new Response.Listener<JSONObject>() {
+        int treeID = (int) trees.get(marker).get("treeId");
+
+        JSONObject treeDelete = new JSONObject();
+        treeDelete.put("treeId", treeID);
+        treeDelete.put("user", LoginActivity.loggedInUser);
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "deletetree/", treeDelete, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("CutResponse: " + response.toString());
@@ -478,6 +552,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onErrorResponse(VolleyError error) {
                 System.out.println("CutError: " + error);
+                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
 

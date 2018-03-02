@@ -8,6 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:id="@+id/login_form"
     tools:context="ca.mcgill.ecse321.treeple.LoginActivity">
 
     <!-- Login progress -->
@@ -28,7 +29,6 @@
         android:maxLines="1"
         android:singleLine="true" />
 
-
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
@@ -41,7 +41,6 @@
         android:maxLines="1"
         android:singleLine="true" />
 
-
     <Button
         android:id="@+id/email_sign_in_button"
         android:layout_width="match_parent"
@@ -51,7 +50,6 @@
         android:background="@drawable/button_bg_rounded_corners"
         android:text="@string/action_sign_in"
         android:textStyle="bold" />
-
 
     <Button
         android:id="@+id/action_sign_up"
@@ -63,18 +61,6 @@
         android:onClick="switchToRegister"
         android:text="@string/action_sign_up"
         android:textStyle="bold" />
-
-
-    <Button
-        android:id="@+id/maps_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_bg_rounded_corners"
-        android:textStyle="bold"
-        android:text="@string/maps_button" />
-
 
 </LinearLayout>
 

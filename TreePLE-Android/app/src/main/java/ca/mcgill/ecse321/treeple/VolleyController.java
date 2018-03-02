@@ -1,11 +1,13 @@
 package ca.mcgill.ecse321.treeple;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+@SuppressLint("StaticFieldLeak")
 class VolleyController {
 
     private static VolleyController mInstance;
@@ -13,6 +15,7 @@ class VolleyController {
     private static Context mContext;
 
     static final String DEFAULT_BASE_URL = "http://00ff2874.ngrok.io/";
+//    static final String DEFAULT_BASE_URL = "http://19cd40eb.ngrok.io/";
 
     private VolleyController(Context context) {
         mContext = context;

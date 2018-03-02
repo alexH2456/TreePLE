@@ -2,6 +2,7 @@ package ca.mcgill.ecse321.treeple;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -28,31 +29,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
-
 import static android.Manifest.permission.READ_CONTACTS;
 
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
     private static final int REQUEST_READ_CONTACTS = 0;
-    private String error = null;
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
@@ -60,10 +51,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    public static String username;
+
+    public static JSONObject loggedInUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -92,14 +85,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mGoToMapButton = (Button) findViewById(R.id.maps_button);
-        mGoToMapButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchToMap();
-            }
-        });
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -112,6 +97,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void switchToMap() {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
         startActivity(mapsIntent);
+        finish();
     }
 
     private void populateAutoComplete() {
@@ -312,12 +298,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
+    @SuppressLint("StaticFieldLeak")
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mUsername;
         private final String mPassword;
-        private ArrayList<JSONObject> users = new ArrayList<>();
+        private JSONObject user;
         private boolean noAccount = false;
+        private boolean loggedIn = false;
 
         UserLoginTask(String username, String password) {
             mUsername = username;
@@ -326,50 +314,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: Update to Volley
-//            HttpUtils.get("/users/", new RequestParams(), new JsonHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//
-//                    for (int i = 0; i < response.length(); i++) {
-//                        try {
-//                            users.add(response.getJSONObject(i));
-//                        } catch (Exception e) {
-//                            error += e.getMessage();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                    try {
-//                        error += errorResponse.get("message").toString();
-//                    } catch (JSONException e) {
-//                        error += e.getMessage();
-//                    }
-//                }
-//            });
 
-            if (users != null) {
-                for (JSONObject user : users) {
-                    try {
-                        if (user.getString("username").equals(mUsername)) {
-                            // Account exists, return true if the password matches.
-                            username = user.getString("username");
-                            return user.getString("password").equals(mPassword);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            RequestFuture<JSONObject> loginReq = RequestFuture.newFuture();
+
+            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + mUsername + "/", new JSONObject(), loginReq, loginReq);
+
+            VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
+            try {
+                user = loginReq.get();
+                if (user != null) {
+                    if (user.getString("password").equals(mPassword)) {
+                        loggedInUser = user;
+                        loggedIn = true;
                     }
+                } else {
+                    noAccount = true;
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                noAccount = true;
             }
 
-            noAccount = true;
-            return false;
+            return loggedIn;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
+
             mAuthTask = null;
             showProgress(false);
 
@@ -381,6 +353,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            }
+            if (loggedInUser != null) {
+                System.out.println("Logged in user: " + loggedInUser.toString());
+            } else {
+                System.out.println("No logged in user!");
             }
         }
 
