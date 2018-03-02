@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -98,6 +99,16 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             }
         });
 
+        Button backToSignIn = (Button) findViewById(R.id.backto_signin_button);
+        backToSignIn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent signInIntent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(signInIntent);
+                finish();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -106,7 +117,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         if (!mayRequestContacts()) {
             return;
         }
-
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -156,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Show the Up button in the action bar.
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             }
         }
     }
@@ -308,7 +318,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
     }
 
     private interface ProfileQuery {
@@ -344,7 +353,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         private final String mAddress;
 
         private JSONObject user;
-        private boolean noAccount = false;
         private boolean accountExists = false;
 
         UserLoginTask(String username, String password, String role, String address) {
@@ -358,9 +366,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         protected Boolean doInBackground(Void... params) {
 
             RequestFuture<JSONObject> registerReq = RequestFuture.newFuture();
-
             JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + mUsername + "/", new JSONObject(), registerReq, registerReq);
-
             VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
             try {
@@ -368,12 +374,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 if (user != null) {
                     accountExists = true;
                     return false;
-                } else {
-                    noAccount = true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                noAccount = true;
             }
 
             user = new JSONObject();
@@ -408,14 +411,15 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             showProgress(false);
 
             if (success) {
-                LoginActivity.loggedInUser = user;
-                switchToMap();
-                finish();
-            } else if(accountExists) {
+                if (user != null) {
+                    LoginActivity.loggedInUser = user;
+                    switchToMap();
+                }
+            } else if (accountExists) {
                 mEmailView.setError(getString(R.string.error_account_exists));
                 mEmailView.requestFocus();
             } else {
-                mEmailView.setError("Registration Error");
+                mEmailView.setError(getString(R.string.error_registration));
                 mEmailView.requestFocus();
             }
         }
@@ -425,6 +429,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    private void switchToLogin() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 }
 

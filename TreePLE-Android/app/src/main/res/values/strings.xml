@@ -65,6 +65,9 @@
     <string name="prompt_role">Role</string>
     <string name="prompt_address">Address</string>
     <string name="refresh_markers">Refresh</string>
+    <string name="user_placeholder">User</string>
+    <string name="backto_signin_button">Back to sign in</string>
+    <string name="error_registration">Registration Error</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>
