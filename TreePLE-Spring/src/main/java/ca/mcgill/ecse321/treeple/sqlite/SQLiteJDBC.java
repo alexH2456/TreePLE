@@ -13,11 +13,11 @@ public class SQLiteJDBC {
     private static String dbPath;
 
     public SQLiteJDBC() {
-        dbPath = new File(System.getProperty("user.dir")).getParent() + "/db/treeple.db";
+        dbPath = new File(System.getProperty("user.dir")) + "/db/treeple.db";
     }
 
     public SQLiteJDBC(String filename) {
-        dbPath = new File(System.getProperty("user.dir")).getParent() + filename;
+        dbPath = new File(System.getProperty("user.dir")) + filename;
     }
 
     public String getDbPath() {
@@ -114,11 +114,17 @@ public class SQLiteJDBC {
         return false;
     }
 
+    public boolean resetDB() {
+        if (deleteDB()) {
+            return connect();
+        }
+        return false;
+    }
+
     public boolean deleteDB() {
         try {
             if (closeConnection()) {
-                Files.deleteIfExists(new File(dbPath).toPath());
-                return connect();
+                return Files.deleteIfExists(new File(dbPath).toPath());
             }
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
