@@ -28,8 +28,13 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -46,24 +51,17 @@ import static android.Manifest.permission.READ_CONTACTS;
 
 public class RegisterActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
     private static final int REQUEST_READ_CONTACTS = 0;
-    private String error = null;
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private EditText mAgeView;
+    private Spinner mRoleView;
+    private EditText mAddressView;
     private View mProgressView;
     private View mLoginFormView;
-    public static String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +71,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        mRoleView = (Spinner) findViewById(R.id.role_spinner);
+        mAddressView = (EditText) findViewById(R.id.address);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -85,8 +86,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 return false;
             }
         });
-
-        mAgeView = (EditText) findViewById(R.id.age);
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -111,6 +110,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private void switchToMap() {
         Intent mapsIntent = new Intent(this, MapsActivity.class);
         startActivity(mapsIntent);
+        finish();
     }
 
     private boolean mayRequestContacts() {
@@ -172,12 +172,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
-        mAgeView.setError(null);
+        mAddressView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        String age = mAgeView.getText().toString();
+        String role = mRoleView.getSelectedItem().toString();
+        String address = mAddressView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -204,13 +205,15 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(age)) {
-            mAgeView.setError(getString(R.string.error_no_age));
-            focusView = mAgeView;
+        if (TextUtils.isEmpty(address)) {
+            mAddressView.setError(getString(R.string.error_no_age));
+            focusView = mAddressView;
             cancel = true;
-        } else if (!TextUtils.isDigitsOnly(age)) {
-            mAgeView.setError(getString(R.string.error_invalid_age));
-            focusView = mAgeView;
+        }
+
+        if (TextUtils.isEmpty(role)) {
+            focusView = mRoleView;
+            Toast.makeText(getApplicationContext(), "This field is required", Toast.LENGTH_SHORT).show();
             cancel = true;
         }
 
@@ -222,7 +225,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password, age);
+            mAuthTask = new UserLoginTask(email, password, role, address);
             mAuthTask.execute((Void) null);
         }
     }
@@ -333,72 +336,66 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         private final String mUsername;
         private final String mPassword;
-        private final String mAge;
-        private ArrayList<JSONObject> users = new ArrayList<>();
+        private final String mRole;
+        private final String mAddress;
 
-        UserLoginTask(String username, String password, String age) {
+        private JSONObject user;
+        private boolean noAccount = false;
+        private boolean accountExists = false;
+
+        UserLoginTask(String username, String password, String role, String address) {
             mUsername = username;
             mPassword = password;
-            mAge = age;
+            mRole = role;
+            mAddress = address;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: Update to Volley
-//            HttpUtils.get("/users/", new RequestParams(), new JsonHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//
-//                    for (int i = 0; i < response.length(); i++) {
-//                        try {
-//                            users.add(response.getJSONObject(i));
-//                        } catch (Exception e) {
-//                            error += e.getMessage();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                    try {
-//                        error += errorResponse.get("message").toString();
-//                    } catch (JSONException e) {
-//                        error += e.getMessage();
-//                    }
-//                }
-//            });
 
-            if (users != null) {
-                for (JSONObject user : users) {
-                    try {
-                        if (user.getString("username").equals(mUsername)) {
-                            // Account exists
-                            return false;
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            // TODO: Update to Volley
+            RequestFuture<JSONObject> registerReq = RequestFuture.newFuture();
+
+            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + mUsername + "/", new JSONObject(), registerReq, registerReq);
+
+            VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
+            try {
+                user = registerReq.get();
+                if (user != null) {
+                    accountExists = false;
+                    return false;
+                } else {
+                    noAccount = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (noAccount) {
+                user = new JSONObject();
+                try {
+                    user.put("username", mUsername);
+                    user.put("password", mPassword);
+                    user.put("role", mRole);
+                    user.put("myaddresses", mAddress);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                RequestFuture<JSONObject> newAccountReq = RequestFuture.newFuture();
+                JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newuser/", user, newAccountReq, newAccountReq);
+                VolleyController.getInstance(getApplicationContext()).addToRequestQueue(accountReq);
+
+                try {
+                    newAccountReq.get();
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
-            //TODO: Update to Volley
-//            HttpUtils.post(String.format("/users/%s?password=%s&age=%s", mUsername, mPassword, mAge), new RequestParams(), new JsonHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                    try {
-//                        error += errorResponse.get("message").toString();
-//                    } catch (JSONException e) {
-//                        error += e.getMessage();
-//                    }
-//                }
-//            });
-
-            username = mUsername;
-            return true;
+            return false;
         }
 
         @Override
@@ -407,9 +404,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             showProgress(false);
 
             if (success) {
+                LoginActivity.loggedInUser = user;
                 switchToMap();
-            } else {
+            } else if(accountExists) {
                 mEmailView.setError(getString(R.string.error_account_exists));
+                mEmailView.requestFocus();
+            } else {
+                mEmailView.setError("Registration Error");
                 mEmailView.requestFocus();
             }
         }

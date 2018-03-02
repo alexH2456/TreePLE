@@ -1,6 +1,7 @@
 package ca.mcgill.ecse321.treeple;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -76,8 +77,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private View popupView;
     private PopupWindow popupWindow;
 
-    // TODO: Replace with user from login activity
-    private String username = "Gareth";
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +96,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false);
+        }
     }
 
     @Override
@@ -430,6 +432,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         JSONObject plantObj = new JSONObject();
 
+        if (LoginActivity.loggedInUser != null) {
+            username = LoginActivity.loggedInUser.getString("username");
+        } else {
+            username = "TestUser";
+        }
+
         plantObj.put("user", username);
 
         JSONObject treeObj = new JSONObject();
@@ -446,7 +454,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         plantObj.put("tree", treeObj);
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "/newtree/", plantObj, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newtree/", plantObj, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("PlantResponse: " + response.toString());
@@ -468,7 +476,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         int treeId = 0;
         treeObj.put("treeId", treeId);
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.DELETE, VolleyController.DEFAULT_BASE_URL + "/deletetree/", null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.DELETE, VolleyController.DEFAULT_BASE_URL + "deletetree/", null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("CutResponse: " + response.toString());
