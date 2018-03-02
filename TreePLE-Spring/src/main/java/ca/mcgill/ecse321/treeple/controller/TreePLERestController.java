@@ -123,15 +123,14 @@ public class TreePLERestController {
     // ==============================
 
     @GetMapping(value = {"/trees/{treeid}/"})
-    public TreeDto getTreeById(@PathVariable("treeid") int treeId) throws InvalidInputException {
+    public TreeDto getTreeById(@PathVariable("treeid") int treeId) throws Exception {
         Tree tree = service.getTreeById(treeId);
         return convertToDto(tree);
     }
 
     @GetMapping(value = {"/users/{username}/"})
-    public UserDto getUserByUsername(@PathVariable("username") String username) throws InvalidInputException {
+    public UserDto getUserByUsername(@PathVariable("username") String username) throws Exception {
         User user = service.getUserByUsername(username);
-        System.out.println(user + "name: " + user.getUsername());
         return convertToDto(user);
     }
 
@@ -164,25 +163,27 @@ public class TreePLERestController {
     // ==============================
 
     @PostMapping(value = {"/newtree/"})
-    public TreeDto createTree(@RequestBody String jsonBody) throws InvalidInputException {
+    public TreeDto createTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.createTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
     @PostMapping(value = {"/newuser/"})
-    public UserDto createUser(@RequestBody String jsonBody) throws InvalidInputException {
+    public UserDto createUser(@RequestBody String jsonBody) throws Exception {
+    	System.out.println(jsonBody);
         User user = service.createUser(new JSONObject(jsonBody));
+        System.out.println(user.getUsername());
         return convertToDto(user);
     }
 
     @PostMapping(value = {"/newspecies/"})
-    public SpeciesDto createSpecies(@RequestBody String jsonBody) throws InvalidInputException {
+    public SpeciesDto createSpecies(@RequestBody String jsonBody) throws Exception {
         Species species = service.createSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
     @PostMapping(value = {"/newmunicipality/"})
-    public MunicipalityDto createMunicipality(@RequestBody String jsonBody) throws InvalidInputException {
+    public MunicipalityDto createMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.createMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
@@ -238,8 +239,8 @@ public class TreePLERestController {
     // DELETE MAPPING API
     // ==============================
 
-    @DeleteMapping(value = {"/deletetree/"})
-    public TreeDto deleteTree(@RequestBody String jsonBody) throws InvalidInputException {
+    @PostMapping(value = {"/deletetree/"})
+    public TreeDto deleteTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.deleteTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }

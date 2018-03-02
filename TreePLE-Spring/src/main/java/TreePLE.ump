@@ -63,6 +63,10 @@ class Tree
     wasSet = true;
     return wasSet;
   }
+
+  public static int getNextTreeId() {
+    return nextTreeId;
+  }
 }
 
 class Species
@@ -90,6 +94,10 @@ class Location
     wasSet = true;
     return wasSet;
   }
+
+  public static int getNextLocationId() {
+    return nextLocationId;
+  }
 }
 
 class Municipality
@@ -116,6 +124,10 @@ class SurveyReport
     nextReportId = minReportId;
     wasSet = true;
     return wasSet;
+  }
+
+  public static int getNextReportId() {
+    return nextReportId;
   }
 }
 

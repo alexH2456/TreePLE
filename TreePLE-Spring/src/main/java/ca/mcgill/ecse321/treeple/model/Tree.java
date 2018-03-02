@@ -347,6 +347,11 @@ public class Tree
     return wasSet;
   }
 
+  // line 68 "../../../../../TreePLE.ump"
+   public static  int getNextTreeId(){
+    return nextTreeId;
+  }
+
 
   public String toString()
   {

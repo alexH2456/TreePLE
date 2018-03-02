@@ -4,7 +4,7 @@
 package ca.mcgill.ecse321.treeple.model;
 import java.util.*;
 
-// line 122 "../../../../../TreePLE.ump"
+// line 134 "../../../../../TreePLE.ump"
 public class User
 {
 

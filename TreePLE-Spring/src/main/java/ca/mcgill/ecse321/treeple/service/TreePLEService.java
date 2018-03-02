@@ -1,10 +1,11 @@
 package ca.mcgill.ecse321.treeple.service;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.*;
 
 import org.json.*;
-import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
@@ -29,7 +30,7 @@ public class TreePLEService {
     // ==============================
 
     // Create a new Tree
-    public Tree createTree(JSONObject jsonParams) throws InvalidInputException {
+    public Tree createTree(JSONObject jsonParams) throws Exception {
         // User data
         String username = jsonParams.getString("user");
 
@@ -94,11 +95,27 @@ public class TreePLEService {
                              Status.valueOf(status), Ownership.valueOf(ownership), speciesObj, locationObj, municipalityObj);
 
         tree.addReport(surveyReportObj);
-        sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
-                       locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()));
+        if (!sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
+                           locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()))) {
+            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
+            Location.setNextLocationId(Location.getNextLocationId() - 1);
+            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            throw new SQLException("SQL Tree insert query failed!");
+        }
 
-        sql.insertLocation(locationObj.getLocationId(), latitude, longitude);
-        sql.insertSurveyReport(surveyReportObj.getReportId(), surveyReportObj.getReportDate().toString(), username);
+        if (!sql.insertLocation(locationObj.getLocationId(), latitude, longitude)) {
+            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
+            Location.setNextLocationId(Location.getNextLocationId() - 1);
+            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            throw new SQLException("SQL Location insert query failed!");
+        }
+
+        if (!sql.insertSurveyReport(surveyReportObj.getReportId(), surveyReportObj.getReportDate().toString(), username)) {
+            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
+            Location.setNextLocationId(Location.getNextLocationId() - 1);
+            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            throw new SQLException("SQL Survey Report insert query failed!");
+        }
 
         userObj.addMyTree(locationObj.getLocationId());
         sql.updateUserTrees(username, userObj.getMyTrees().toString().replaceAll("(\\[)|(\\])", ""));
@@ -107,7 +124,7 @@ public class TreePLEService {
     }
 
     // Create a new User
-    public User createUser(JSONObject jsonParams) throws InvalidInputException {
+    public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
@@ -133,13 +150,16 @@ public class TreePLEService {
             }
         }
 
-        sql.insertUser(username, password, role, myAddresses, myTrees);
+        if (!sql.insertUser(username, password, role, myAddresses, myTrees)) {
+            user.delete();
+            throw new SQLException("SQL User insert query failed!");
+        }
 
         return user;
     }
 
     // Create a new Species
-    public Species createSpecies(JSONObject jsonParams) throws InvalidInputException {
+    public Species createSpecies(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name");
         String species = jsonParams.getString("species");
         String genus = jsonParams.getString("genus");
@@ -151,14 +171,17 @@ public class TreePLEService {
 
         Species speciesObj = new Species(name, species, genus);
 
-        sql.insertSpecies(name, species, genus);
+        if (!sql.insertSpecies(name, species, genus)) {
+            speciesObj.delete();
+            throw new SQLException("SQL Species insert query failed!");
+        }
 
         return speciesObj;
     }
 
 
     // Create a new Municipality
-    public Municipality createMunicipality(JSONObject jsonParams) throws InvalidInputException {
+    public Municipality createMunicipality(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name");
         int totalTrees = jsonParams.getInt("totalTrees");
         JSONArray borders = jsonParams.getJSONArray("borders");
@@ -180,10 +203,18 @@ public class TreePLEService {
             locationIdList.add(location.getLocationId());
         });
 
-        sql.insertMunicipality(name, totalTrees, locationIdList.toString().replaceAll("(\\[)|(\\])", ""));
+        if (!sql.insertMunicipality(name, totalTrees, locationIdList.toString().replaceAll("(\\[)|(\\])", ""))) {
+            Location.setNextLocationId(Location.getNextLocationId() - municipality.numberOfBorders());
+            municipality.delete();
+            throw new SQLException("SQL Municipality insert query failed!");
+        }
 
         for (Location location : municipality.getBorders()) {
-            sql.insertLocation(location.getLocationId(), location.getLatitude(), location.getLongitude());
+            if (!sql.insertLocation(location.getLocationId(), location.getLatitude(), location.getLongitude())) {
+                Location.setNextLocationId(Location.getNextLocationId() - municipality.numberOfBorders());
+                municipality.delete();
+                throw new SQLException("SQL Location insert query failed!");
+            }
         }
 
         return municipality;
@@ -230,15 +261,15 @@ public class TreePLEService {
     // ==============================
 
     // Get a specific Tree
-    public Tree getTreeById(int treeId) throws InvalidInputException {
+    public Tree getTreeById(int treeId) throws Exception {
         if (treeId <= 0)
-            throw new InvalidInputException("Tree ID cannot be negative!");
+            throw new InvalidInputException("Tree's ID cannot be negative!");
 
         return sql.getTree(treeId);
     }
 
     // Get a specific User
-    public User getUserByUsername(String username) throws InvalidInputException {
+    public User getUserByUsername(String username) throws Exception {
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
 
@@ -255,20 +286,27 @@ public class TreePLEService {
     // ==============================
 
     // Delete a Tree
-    public Tree deleteTree(JSONObject jsonParams) throws InvalidInputException {
+    public Tree deleteTree(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("user");
         int treeId = jsonParams.getInt("treeId");
 
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative or zero!");
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("User is not logged in/Missing username!");
 
         Tree tree = sql.getTree(treeId);
+        User user = sql.getUser(username);
 
-        if (tree != null) {
-            sql.deleteTree(treeId);
-        } else {
+        if (tree == null)
             throw new InvalidInputException("No Tree with that ID exists!");
-        }
+        if (user == null)
+            throw new InvalidInputException("That username doesn't exist!");
+        if (UserRole.Resident == user.getRole() && !ArrayUtils.contains(user.getMyTrees(), tree.getTreeId()))
+            throw new InvalidInputException("This Tree wasn't planted by you!");
 
+        if (!sql.deleteTree(treeId))
+            throw new SQLException("SQL Tree delete query failed!");
         return tree;
     }
 
@@ -276,51 +314,4 @@ public class TreePLEService {
     public boolean resetDatabase() {
         return sql.deleteDB();
     }
-
-    // public Location getLocationById(String id) throws InvalidInputException {
-    //     for (Location location : rm.getLocations()) {
-    //         if (location.getId().equals(id))
-    //             return location;
-    //     }
-    //     throw new InvalidInputException("Location does not exist!");
-    // }
-
-    // public User updateUserPoints(User u, int points) throws InvalidInputException {
-    //     int newPoints = u.getPoints() + points;
-
-    //     rm.getRMUsers().get(rm.indexOfUser(u)).setPoints(newPoints);
-    //     sql.updateUserPoints(u.getId(), newPoints);
-    //     u.setPoints(newPoints);
-    //     return u;
-    // }
-
-    // public User updateUserPassword(User u, String password) throws InvalidInputException {
-    //     rm.getRMUsers().get(rm.indexOfUser(u)).setPassword(password);
-    //     sql.updateUserPassword(u.getId(), password);
-    //     u.setPassword(password);
-    //     return u;
-    // }
-
-    // public User updateLocationPassword(User u, String password) throws InvalidInputException {
-    //     rm.getRMUsers().get(rm.indexOfUser(u)).setPassword(password);
-    //     sql.updateUserPassword(u.getId(), password);
-    //     u.setPassword(password);
-    //     return u;
-    // }
-
-    // public Location updateLocationCheckIn(String id, String username, String checkIn) throws InvalidInputException {
-    //     Location l = getLocationById(id);
-    //     JSONObject checkTimes = sql.updateLocationCheckIn(id, username, checkIn);
-    //     rm.getRMLocations().get(rm.indexOfLocation(l)).setCheckTimes(checkTimes);
-    //     l.setCheckTimes(checkTimes);
-    //     return l;
-    // }
-
-    // public Location updateLocationCheckOut(String id, String username, String checkOut) throws InvalidInputException {
-    //     Location l = getLocationById(id);
-    //     JSONObject checkTimes = sql.updateLocationCheckOut(id, username, checkOut);
-    //     rm.getRMLocations().get(rm.indexOfLocation(l)).setCheckTimes(checkTimes);
-    //     l.setCheckTimes(checkTimes);
-    //     return l;
-    // }
 }
