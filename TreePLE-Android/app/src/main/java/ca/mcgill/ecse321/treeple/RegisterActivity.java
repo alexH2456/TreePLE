@@ -65,14 +65,23 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_register);
         setupActionBar();
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
         mRoleView = (Spinner) findViewById(R.id.role_spinner);
+
+        //Populate spinner with enum
+        ArrayAdapter<CharSequence> roleAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.role_enum, R.layout.spinner_layout);
+        roleAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        mRoleView.setAdapter(roleAdapter);
+
         mAddressView = (EditText) findViewById(R.id.address);
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -406,6 +415,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             if (success) {
                 LoginActivity.loggedInUser = user;
                 switchToMap();
+                finish();
             } else if(accountExists) {
                 mEmailView.setError(getString(R.string.error_account_exists));
                 mEmailView.requestFocus();
