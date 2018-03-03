@@ -241,6 +241,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 TextView treeOwnership = (TextView) popupView.findViewById(R.id.tree_ownership);
                 TextView treeSpecies = (TextView) popupView.findViewById(R.id.tree_species);
                 TextView treeMunicipality = (TextView) popupView.findViewById(R.id.tree_municipality);
+                TextView treeID = (TextView) popupView.findViewById(R.id.treeID);
 
                 try {
                     treeHeight.setText(Integer.toString(tree.getInt("height")));
@@ -251,6 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     treeOwnership.setText(tree.getString("ownership"));
                     treeSpecies.setText(tree.getJSONObject("species").getString("name"));
                     treeMunicipality.setText(tree.getJSONObject("municipality").getString("name"));
+                    treeID.setText(tree.getString("treeId"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -589,10 +591,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void cutDownTree(Marker marker) throws JSONException {
 
         int treeID = (int) trees.get(marker).get("treeId");
+        System.out.println("TREEID: " + treeID);
 
         JSONObject treeDelete = new JSONObject();
         treeDelete.put("treeId", treeID);
-        treeDelete.put("user", LoginActivity.loggedInUser);
+        treeDelete.put("user", LoginActivity.loggedInUser.getString("username"));
 
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "deletetree/", treeDelete, new Response.Listener<JSONObject>() {
             @Override

@@ -68,6 +68,8 @@
     <string name="user_placeholder">User</string>
     <string name="backto_signin_button">Back to sign in</string>
     <string name="error_registration">Registration Error</string>
+    <string name="treeID">treeID</string>
+    <string name="treeID_placeholder">treeID</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>
@@ -86,7 +88,7 @@
     </string-array>
     <string-array name="role_enum">
         <item>Resident</item>
-        <item>Specialist</item>
+        <item>Scientist</item>
     </string-array>
 
 </resources>

@@ -117,7 +117,7 @@ public class TreePLEService {
             throw new SQLException("SQL Survey Report insert query failed!");
         }
 
-        userObj.addMyTree(locationObj.getLocationId());
+        userObj.addMyTree(tree.getTreeId());
         sql.updateUserTrees(username, userObj.getMyTrees().toString().replaceAll("(\\[)|(\\])", ""));
 
         return tree;
@@ -314,4 +314,11 @@ public class TreePLEService {
     public boolean resetDatabase() {
         return sql.deleteDB();
     }
+
+	public void deleteUser(String username) throws Exception {
+		User user = sql.getUser(username);
+		if (user == null)
+			throw new InvalidInputException("No user found");
+		sql.deleteUser(username);
+	}
 }
