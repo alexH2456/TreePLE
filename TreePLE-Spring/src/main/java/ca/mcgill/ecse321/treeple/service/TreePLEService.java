@@ -55,7 +55,7 @@ public class TreePLEService {
         if (datePlanted == null || !datePlanted.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
             throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
         if (username == null || username.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("User is not logged in/Missing username!");
+            throw new InvalidInputException("User is not logged in/Username is missing!");
         if (!EnumUtils.isValidEnum(Land.class, land))
             throw new InvalidInputException("That land type doesn't exist!");
         if (!EnumUtils.isValidEnum(Status.class, status))
@@ -293,7 +293,7 @@ public class TreePLEService {
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative or zero!");
         if (username == null || username.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("User is not logged in/Missing username!");
+            throw new InvalidInputException("User is not logged in/Username is missing!");
 
         Tree tree = sql.getTree(treeId);
         User user = sql.getUser(username);
@@ -307,18 +307,84 @@ public class TreePLEService {
 
         if (!sql.deleteTree(treeId))
             throw new SQLException("SQL Tree delete query failed!");
+
         return tree;
+    }
+
+    // Delete a User
+    public User deleteUser(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("User is not logged in/Username is missing!");
+
+        User user = sql.getUser(username);
+
+        if (user == null)
+            throw new InvalidInputException("That username doesn't exist!");
+
+        if (!sql.deleteUser(username))
+            throw new SQLException("SQL User delete query failed!");
+
+        return user;
+    }
+
+    // Delete a Species
+    public Species deleteSpecies(JSONObject jsonParams) throws Exception {
+        String name = jsonParams.getString("name");
+
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Species' name is missing!");
+
+        Species species = sql.getSpecies(name);
+
+        if (species == null)
+            throw new InvalidInputException("No Species with that name exists!");
+
+        if (!sql.deleteSpecies(name))
+            throw new SQLException("SQL Species delete query failed!");
+
+        return species;
+    }
+
+    // Delete a Location
+    public Location deleteLocation(JSONObject jsonParams) throws Exception {
+        int locationId = jsonParams.getInt("locationId");
+
+        if (locationId <= 0)
+            throw new InvalidInputException("Location's ID cannot be negative or zero!");
+
+        Location location = sql.getLocation(locationId);
+
+        if (location == null)
+            throw new InvalidInputException("No Location with that ID exists!");
+
+        if (!sql.deleteLocation(locationId))
+            throw new SQLException("SQL Location delete query failed!");
+
+        return location;
+    }
+
+    // Delete a Municipality
+    public Municipality deleteMunicipality(JSONObject jsonParams) throws Exception {
+        String name = jsonParams.getString("name");
+
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Municipality's name is missing!");
+
+        Municipality municipality = sql.getMunicipality(name);
+
+        if (municipality == null)
+            throw new InvalidInputException("No Municipality with that name exists!");
+
+        if (!sql.deleteMunicipality(name))
+            throw new SQLException("SQL Municipality delete query failed!");
+
+        return municipality;
     }
 
     // Delete the database
     public boolean resetDatabase() {
         return sql.deleteDB();
     }
-
-	public void deleteUser(String username) throws Exception {
-		User user = sql.getUser(username);
-		if (user == null)
-			throw new InvalidInputException("No user found");
-		sql.deleteUser(username);
-	}
 }

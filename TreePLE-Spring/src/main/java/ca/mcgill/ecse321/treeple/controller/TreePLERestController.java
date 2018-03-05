@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import ca.mcgill.ecse321.treeple.dto.*;
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
-import ca.mcgill.ecse321.treeple.service.InvalidInputException;
 
 @RestController
 public class TreePLERestController {
@@ -245,13 +244,32 @@ public class TreePLERestController {
         return convertToDto(tree);
     }
 
+    @PostMapping(value = {"/deleteuser/"})
+    public UserDto deleteUser(@RequestBody String jsonBody) throws Exception {
+        User user = service.deleteUser(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
+
+    @PostMapping(value = {"/deletespecies/"})
+    public SpeciesDto deleteSpecies(@RequestBody String jsonBody) throws Exception {
+        Species species = service.deleteSpecies(new JSONObject(jsonBody));
+        return convertToDto(species);
+    }
+
+    @PostMapping(value = {"/deletelocation/"})
+    public LocationDto deleteLocation(@RequestBody String jsonBody) throws Exception {
+        Location location = service.deleteLocation(new JSONObject(jsonBody));
+        return convertToDto(location);
+    }
+
+    @PostMapping(value = {"/deletemunicipality/"})
+    public MunicipalityDto deleteMunicipality(@RequestBody String jsonBody) throws Exception {
+        Municipality municipality = service.deleteMunicipality(new JSONObject(jsonBody));
+        return convertToDto(municipality);
+    }
+
     @DeleteMapping(value = {"/reset/"})
     public void resetDatabase() {
         service.resetDatabase();
-    }
-    
-    @DeleteMapping(value = {"/deleteuser/{username}/"})
-    public void deleteUser(@PathVariable("username") String username) throws Exception {
-    	service.deleteUser(username);
     }
 }
