@@ -1,0 +1,55 @@
+{
+  "name": "treeple-web",
+  "version": "1.0.0",
+  "description": "Webpage for TreePLE application",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.mcgill.ca/ECSE321-2018-Winter/Project-11.git"
+  },
+  "author": "Abbas Yadollahi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.mcgill.ca/ECSE321-2018-Winter/Project-11/issues"
+  },
+  "homepage": "https://github.mcgill.ca/ECSE321-2018-Winter/Project-11#readme",
+  "babel": {
+    "presets": [
+      "es2015",
+      "react",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
+  },
+  "dependencies": {
+    "css-loader": "^0.28.5",
+    "less-loader": "^4.0.5",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
+    "react-router-dom": "^4.2.2",
+    "react-router-redux": "^4.0.8",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.5.5"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "less": "^2.7.2",
+    "webpack-dev-server": "^2.7.1"
+  }
+}
