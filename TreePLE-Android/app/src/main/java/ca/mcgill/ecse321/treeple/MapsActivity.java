@@ -1,5 +1,6 @@
 package ca.mcgill.ecse321.treeple;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
@@ -75,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    private Map<Marker,JSONObject> trees = new HashMap<>();
+    private Map<Marker, JSONObject> trees = new HashMap<>();
 
     private View popupView;
     private PopupWindow popupWindow;
@@ -102,6 +103,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(false);
         }
+
+        refreshUser();
     }
 
     @Override
@@ -122,7 +125,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.option_refresh_markers) {
+            refreshUser();
             populateMap();
+        } else if (item.getItemId() == R.id.loggedin_user) {
+            Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
@@ -136,8 +142,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = map;
 
         getLocationPermission();
-        startLocationUpdates();
         updateLocationUI();
+        startLocationUpdates();
         getDeviceLocation();
         populateMap();
 
@@ -187,6 +193,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ownershipAdapter.setDropDownViewResource(R.layout.spinner_layout);
                 ownershipSpinner.setAdapter(ownershipAdapter);
 
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        populateMap();
+                    }
+                });
+
                 Button plantTreeButton = (Button) popupView.findViewById(R.id.add_tree);
                 plantTreeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -228,6 +241,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 TextView treeOwnership = (TextView) popupView.findViewById(R.id.tree_ownership);
                 TextView treeSpecies = (TextView) popupView.findViewById(R.id.tree_species);
                 TextView treeMunicipality = (TextView) popupView.findViewById(R.id.tree_municipality);
+                TextView treeID = (TextView) popupView.findViewById(R.id.treeID);
 
                 try {
                     treeHeight.setText(Integer.toString(tree.getInt("height")));
@@ -238,6 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     treeOwnership.setText(tree.getString("ownership"));
                     treeSpecies.setText(tree.getJSONObject("species").getString("name"));
                     treeMunicipality.setText(tree.getJSONObject("municipality").getString("name"));
+                    treeID.setText(tree.getString("treeId"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -247,6 +262,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
+
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        populateMap();
+                    }
+                });
 
                 Button cuttdownButton = (Button) popupView.findViewById(R.id.cutdown_tree);
                 cuttdownButton.setOnClickListener(new View.OnClickListener() {
@@ -300,6 +322,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
+    }
+
+    private void refreshUser() {
+
+        String username = "";
+
+        try {
+            username = LoginActivity.loggedInUser.getString("username");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + username + "/", null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                LoginActivity.loggedInUser = response;
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("User Refresh failed!");
+                Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
     public void getDeviceLocation() {
@@ -363,10 +411,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
+                    updateLocationUI();
                 }
             }
         }
-        updateLocationUI();
     }
 
     public void updateLocationUI() {
@@ -393,29 +441,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         trees.clear();
     }
 
-    @SuppressLint("MissingPermission")
     protected void startLocationUpdates() {
 
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        long UPDATE_INTERVAL = 10 * 1000;
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        long FASTEST_INTERVAL = 2000;
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        try {
+            if (mLocationPermissionGranted) {
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-        builder.addLocationRequest(mLocationRequest);
-        LocationSettingsRequest locationSettingsRequest = builder.build();
+                LocationRequest mLocationRequest = new LocationRequest();
+                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                long UPDATE_INTERVAL = 10 * 1000;
+                mLocationRequest.setInterval(UPDATE_INTERVAL);
+                long FASTEST_INTERVAL = 2000;
+                mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-        settingsClient.checkLocationSettings(locationSettingsRequest);
+                LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+                builder.addLocationRequest(mLocationRequest);
+                LocationSettingsRequest locationSettingsRequest = builder.build();
 
-        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                onLocationChanged(locationResult.getLastLocation());
+                SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+                settingsClient.checkLocationSettings(locationSettingsRequest);
+
+                getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                }, Looper.myLooper());
             }
-        }, Looper.myLooper());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onLocationChanged(Location location) {
@@ -537,10 +591,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void cutDownTree(Marker marker) throws JSONException {
 
         int treeID = (int) trees.get(marker).get("treeId");
+        System.out.println("TREEID: " + treeID);
 
         JSONObject treeDelete = new JSONObject();
         treeDelete.put("treeId", treeID);
-        treeDelete.put("user", LoginActivity.loggedInUser);
+        treeDelete.put("user", LoginActivity.loggedInUser.getString("username"));
 
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "deletetree/", treeDelete, new Response.Listener<JSONObject>() {
             @Override

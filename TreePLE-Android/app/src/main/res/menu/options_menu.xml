@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/loggedin_user"
+        android:title="@string/user_placeholder"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/option_refresh_markers"
         android:title="@string/refresh_markers"
         app:showAsAction="always" />

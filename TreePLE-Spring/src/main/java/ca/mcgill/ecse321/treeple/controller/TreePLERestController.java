@@ -249,4 +249,9 @@ public class TreePLERestController {
     public void resetDatabase() {
         service.resetDatabase();
     }
+    
+    @DeleteMapping(value = {"/deleteuser/{username}/"})
+    public void deleteUser(@PathVariable("username") String username) throws Exception {
+    	service.deleteUser(username);
+    }
 }
