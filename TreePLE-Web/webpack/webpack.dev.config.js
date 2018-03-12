@@ -1,11 +1,12 @@
-var webpack = require('webpack');
-var path = require('path');
+const path = require('path');
+const webpack = require('webpack');
 
 var parentDir = path.join(__dirname, '../');
 
 module.exports = {
   entry: [
-    path.join(parentDir, 'src/index.jsx')
+    path.join(parentDir, 'src/index.jsx'),
+    'webpack-dev-server/client?http://127.0.0.1:8087/'
   ],
   module: {
     loaders: [
@@ -18,7 +19,22 @@ module.exports = {
         }
       }, {
         test: /\.less$/,
-        loaders: ["style-loader", "css-loader", "less-loader"]
+        loaders: ['style-loader', 'css-loader', 'less-loader']
+      }, {
+        test: /\.css$/,
+        include: /node_modules/,
+        loaders: ['style-loader', 'css-loader']
+      }, {
+        test: /\.s[a|c]ss$/,
+        loaders: ['sass-loader', 'style-loader', 'css-loader']
+      }, {
+        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 100000,
+          },
+        },
       }
     ]
   },
@@ -29,9 +45,19 @@ module.exports = {
     path: parentDir + '/dist',
     filename: 'bundle.js'
   },
+  devtool: 'eval-source-map',
   devServer: {
     port: 8087,
+    host: '127.0.0.1',
     contentBase: parentDir,
-    historyApiFallback: true
+    historyApiFallback: true,
+    proxy: {
+      '/api/*': {
+        target: 'http://localhost:8088/',
+        pathRewrite: {
+          '/api': ''
+        }
+      }
+    }
   }
 };
