@@ -269,7 +269,12 @@ public class TreePLERestController {
     }
 
     @DeleteMapping(value = {"/reset/"})
-    public void resetDatabase() {
+    public void resetDatabase() throws Exception {
         service.resetDatabase();
+    }
+
+    @DeleteMapping(value = {"/delete/"})
+    public void deleteDatabase() throws Exception {
+        service.deleteDatabase();
     }
 }

@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
-import GoogleMapReact, {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
-import {getAllTrees} from './Requests';
+import GoogleMapReact, {Map, InfoWindow, Marker, Polygon, GoogleApiWrapper} from 'google-maps-react';
+import {getAllTrees, getAllMunicipalities} from './Requests';
 // import TreeMap from './TreeMap';
 
 export class TreeMapContainer extends PureComponent {
@@ -9,7 +9,8 @@ export class TreeMapContainer extends PureComponent {
     this.state = {
       zoom: 14,
       center: {},
-      trees: []
+      trees: [],
+      municipalities: []
     };
   }
 
@@ -54,6 +55,39 @@ export class TreeMapContainer extends PureComponent {
       });
   }
 
+  loadMunicipalities = () => {
+    getAllMunicipalities()
+      .then(response => {
+        let municipalities = [];
+
+        response.data.map(municipality => {
+          let borders = [];
+          municipality.borders.map(location => {
+            borders.push({
+              lat: location.latitude,
+              lng: location.longitude
+            });
+          });
+          borders.push(borders[0]);
+
+          municipalities.push({
+            name: municipality.name,
+            borders: borders
+          });
+        });
+
+        this.setState({municipalities: municipalities});
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
+  onReady = () => {
+    this.loadTrees();
+    this.loadMunicipalities();
+  }
+
   moveMap = (mapProps, map) => {
     console.log(mapProps);
     console.log(map);
@@ -74,8 +108,17 @@ export class TreeMapContainer extends PureComponent {
              style={style}
              zoom={this.state.zoom}
              initialCenter={this.state.center}
-             onReady={this.loadTrees}
+             onReady={this.onReady}
              onDragend={this.moveMap}>
+          {this.state.municipalities.map(municipality => {
+            return <Polygon key={municipality.name}
+                            paths={municipality.borders}
+                            strokeColor="#0000FF"
+                            strokeOpacity={0.8}
+                            strokeWeight={2}
+                            fillColor="#0000FF"
+                            fillOpacity={0.35}/>;
+          })}
           {this.state.trees.map(tree => {
             return <Marker key={tree.treeId} name={tree.treeId}
                            position={{lat: tree.location.latitude, lng: tree.location.longitude}}/>;

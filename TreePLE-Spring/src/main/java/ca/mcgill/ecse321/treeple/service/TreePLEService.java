@@ -383,8 +383,15 @@ public class TreePLEService {
         return municipality;
     }
 
+    // Reset the database
+    public void resetDatabase() throws Exception {
+        if (!sql.resetDB())
+            throw new SQLException("Unable to reset SQL database!");
+    }
+
     // Delete the database
-    public boolean resetDatabase() {
-        return sql.deleteDB();
+    public void deleteDatabase() throws Exception {
+        if (!sql.deleteDB())
+            throw new SQLException("Unable to delete SQL database!");
     }
 }
