@@ -69,11 +69,35 @@ class Tree
   }
 }
 
+class User
+{
+  unique String username;
+  String password;
+  UserRole role;
+  String[] myAddresses;
+  Integer[] myTrees;
+
+  enum UserRole {
+    Resident,
+    Scientist
+  }
+
+  public static boolean clearUsers() {
+    usersByUsername.clear();
+    return usersByUsername.isEmpty();
+  }
+}
+
 class Species
 {
   unique String name;
   String species;
   String genus;
+
+  public static boolean clearSpecies() {
+    speciessByName.clear();
+    return speciessByName.isEmpty();
+  }
 }
 
 class Location
@@ -105,6 +129,11 @@ class Municipality
   unique String name;
   int totalTrees;
   * -> * Location borders;
+
+  public static boolean clearMunicipalities() {
+    municipalitysByName.clear();
+    return municipalitysByName.isEmpty();
+  }
 }
 
 class SurveyReport
@@ -128,20 +157,6 @@ class SurveyReport
 
   public static int getNextReportId() {
     return nextReportId;
-  }
-}
-
-class User
-{
-  unique String username;
-  String password;
-  UserRole role;
-  String[] myAddresses;
-  Integer[] myTrees;
-
-  enum UserRole {
-    Resident,
-    Scientist
   }
 }
 

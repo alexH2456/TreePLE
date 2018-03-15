@@ -27,7 +27,7 @@ public class TestSQLiteJDBC {
 
     @After
     public void tearDown() throws Exception {
-        sql.deleteDB();
+        sql.resetDB();
     }
 
     @Test

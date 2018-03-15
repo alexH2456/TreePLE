@@ -1,5 +1,7 @@
 package ca.mcgill.ecse321.treeple;
 
+import javax.annotation.PreDestroy;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
 import org.modelmapper.convention.NamingConventions;
@@ -29,6 +31,8 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
 
     @Autowired
     private WebFrontendProperties webFrontendProperties;
+
+    private SQLiteJDBC sql;
 
     public static void main(String[] args) {
         SpringApplication.run(TreePLESpringApplication.class, args);
@@ -62,11 +66,17 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
     @Bean
     @EventListener(ApplicationReadyEvent.class)
     public SQLiteJDBC ModelIdCountInitializer() {
-        SQLiteJDBC sql = new SQLiteJDBC();
+        sql = new SQLiteJDBC();
         sql.connect();
         Tree.setNextTreeId(sql.getMaxTreeId() + 1);
         Location.setNextLocationId(sql.getMaxLocationId() + 1);
         SurveyReport.setNextReportId(sql.getMaxReportId() + 1);
         return sql;
+    }
+
+    @PreDestroy
+    public void CloseSQLite() {
+        if (sql != null)
+            sql.closeConnection();
     }
 }

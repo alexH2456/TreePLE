@@ -4,6 +4,8 @@ import java.sql.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;
 import ca.mcgill.ecse321.treeple.model.User.*;
@@ -106,6 +108,7 @@ public class SQLiteJDBC {
         try {
             if (c != null) {
                 c.close();
+                System.out.println("Connection to SQLite has been closed.");
                 return true;
             }
         } catch (Exception e) {
@@ -208,7 +211,7 @@ public class SQLiteJDBC {
                 Municipality municipality = getMunicipality(rs.getString("municipality"));
                 ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
 
-                for (String reportId : rs.getString("reports").split(",")) {
+                for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
                     if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
                         reports.add(getSurveyReport(Integer.parseInt(reportId)));
                     }
@@ -246,7 +249,7 @@ public class SQLiteJDBC {
                 Municipality municipality = getMunicipality(rs.getString("municipality"));
                 ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
 
-                for (String reportId : rs.getString("reports").split(",")) {
+                for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
                     if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
                         reports.add(getSurveyReport(Integer.parseInt(reportId)));
                     }
@@ -398,13 +401,13 @@ public class SQLiteJDBC {
                 } else {
                     User user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
 
-                    for (String addressId : rs.getString("myAddresses").split(",")) {
+                    for (String addressId : rs.getString("myAddresses").replaceAll("\\s", "").split(",")) {
                         if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
                             user.addMyAddress(addressId);
                         }
                     }
 
-                    for (String treeId : rs.getString("myTrees").split(",")) {
+                    for (String treeId : rs.getString("myTrees").replaceAll("\\s", "").split(",")) {
                         if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
                             user.addMyTree(Integer.parseInt(treeId));
                         }
@@ -435,13 +438,13 @@ public class SQLiteJDBC {
                 } else {
                     user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
 
-                    for (String addressId : rs.getString("myAddresses").split(",")) {
+                    for (String addressId : rs.getString("myAddresses").replaceAll("\\s", "").split(",")) {
                         if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
                             user.addMyAddress(addressId);
                         }
                     }
 
-                    for (String treeId : rs.getString("myTrees").split(",")) {
+                    for (String treeId : rs.getString("myTrees").replaceAll("\\s", "").split(",")) {
                         if (treeId.matches("^\\d+$") && getTree(Integer.parseInt(treeId)) != null) {
                             user.addMyTree(Integer.parseInt(treeId));
                         }
@@ -728,7 +731,7 @@ public class SQLiteJDBC {
                 } else {
                     Municipality municipality = new Municipality(name, rs.getInt("totalTrees"));
 
-                    for (String locationId : rs.getString("borders").split(",")) {
+                    for (String locationId : rs.getString("borders").replaceAll("\\s", "").split(",")) {
                         if (locationId.matches("^\\d+$") && getLocation(Integer.parseInt(locationId)) != null) {
                             municipality.addBorder(getLocation(Integer.parseInt(locationId)));
                         }
@@ -759,7 +762,7 @@ public class SQLiteJDBC {
                 } else {
                     municipality = new Municipality(name, rs.getInt("totalTrees"));
 
-                    for (String locationId : rs.getString("borders").split(",")) {
+                    for (String locationId : rs.getString("borders").replaceAll("\\s", "").split(",")) {
                         if (locationId.matches("^\\d+$") && getLocation(Integer.parseInt(locationId)) != null) {
                             municipality.addBorder(getLocation(Integer.parseInt(locationId)));
                         }

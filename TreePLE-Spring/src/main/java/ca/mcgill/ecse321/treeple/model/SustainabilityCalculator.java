@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse321.treeple.model;
 
-// line 148 "../../../../../TreePLE.ump"
+// line 163 "../../../../../TreePLE.ump"
 public class SustainabilityCalculator
 {
 
@@ -77,15 +77,15 @@ public class SustainabilityCalculator
   // DEVELOPER CODE - PROVIDED AS-IS
   //------------------------
 
-  // line 152 "../../../../../TreePLE.ump"
+  // line 167 "../../../../../TreePLE.ump"
   // int getShadeSize(this.tree) ;
-  // line 153 "../../../../../TreePLE.ump"
+  // line 168 "../../../../../TreePLE.ump"
   // int getCO2Reduced(this.tree) ;
-  // line 154 "../../../../../TreePLE.ump"
+  // line 169 "../../../../../TreePLE.ump"
   // int getEnergyConserved(this.tree) ;
-  // line 155 "../../../../../TreePLE.ump"
+  // line 170 "../../../../../TreePLE.ump"
   // int getStormWaterIntercepted(this.tree) ;
-  // line 156 "../../../../../TreePLE.ump"
+  // line 171 "../../../../../TreePLE.ump"
   // int getBioDiversityIndex(this.tree) ;
 
 

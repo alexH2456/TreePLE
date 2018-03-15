@@ -4,7 +4,7 @@
 package ca.mcgill.ecse321.treeple.model;
 import java.util.*;
 
-// line 103 "../../../../../TreePLE.ump"
+// line 108 "../../../../../TreePLE.ump"
 public class Municipality
 {
 
@@ -178,6 +178,12 @@ public class Municipality
   {
     municipalitysByName.remove(getName());
     borders.clear();
+  }
+
+  // line 115 "../../../../../TreePLE.ump"
+   public static  boolean clearMunicipalities(){
+    municipalitysByName.clear();
+    return municipalitysByName.isEmpty();
   }
 
 

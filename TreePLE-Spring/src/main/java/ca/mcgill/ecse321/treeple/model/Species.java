@@ -103,6 +103,12 @@ public class Species
     speciessByName.remove(getName());
   }
 
+  // line 79 "../../../../../TreePLE.ump"
+   public static  boolean clearSpecies(){
+    speciessByName.clear();
+    return speciessByName.isEmpty();
+  }
+
 
   public String toString()
   {

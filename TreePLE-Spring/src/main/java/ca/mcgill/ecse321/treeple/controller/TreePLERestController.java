@@ -109,6 +109,14 @@ public class TreePLERestController {
         return species;
     }
 
+    @GetMapping(value = {"/locations/"})
+    public List<LocationDto> getAllLocations() {
+        List<LocationDto> locations = new ArrayList<LocationDto>();
+        for (Location location : service.getAllLocations())
+            locations.add(convertToDto(location));
+        return locations;
+    }
+
     @GetMapping(value = {"/municipalities/"})
     public List<MunicipalityDto> getAllMunicipalities() {
         List<MunicipalityDto> municipalities = new ArrayList<MunicipalityDto>();
@@ -133,7 +141,11 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
-
+    @GetMapping(value = {"/municipalities/{name}/"})
+    public MunicipalityDto getMunicipalityByName(@PathVariable("name") String name) throws Exception {
+        Municipality municipality = service.getMunicipalityByName(name);
+        return convertToDto(municipality);
+    }
 
     // @GetMapping(value = {"/trees/{treeId}/"})
     // public TreeDto getTreeById(@PathVariable("treeId") int treeId) throws InvalidInputException {
@@ -169,9 +181,7 @@ public class TreePLERestController {
 
     @PostMapping(value = {"/newuser/"})
     public UserDto createUser(@RequestBody String jsonBody) throws Exception {
-    	System.out.println(jsonBody);
         User user = service.createUser(new JSONObject(jsonBody));
-        System.out.println(user.getUsername());
         return convertToDto(user);
     }
 

@@ -25,6 +25,18 @@ public class TreePLEService {
         this.sql = sql;
     }
 
+    public boolean setMaxId() {
+        return Tree.setNextTreeId(sql.getMaxTreeId() + 1) &&
+               Location.setNextLocationId(sql.getMaxLocationId() + 1) &&
+               SurveyReport.setNextReportId(sql.getMaxReportId() + 1);
+    }
+
+    public boolean reduceMaxId() {
+        return Tree.setNextTreeId(Tree.getNextTreeId() - 1) &&
+               Location.setNextLocationId(Location.getNextLocationId() - 1) &&
+               SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+    }
+
     // ==============================
     // CREATE API
     // ==============================
@@ -97,23 +109,17 @@ public class TreePLEService {
         tree.addReport(surveyReportObj);
         if (!sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
                            locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()))) {
-            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
-            Location.setNextLocationId(Location.getNextLocationId() - 1);
-            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            reduceMaxId();
             throw new SQLException("SQL Tree insert query failed!");
         }
 
         if (!sql.insertLocation(locationObj.getLocationId(), latitude, longitude)) {
-            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
-            Location.setNextLocationId(Location.getNextLocationId() - 1);
-            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            reduceMaxId();
             throw new SQLException("SQL Location insert query failed!");
         }
 
         if (!sql.insertSurveyReport(surveyReportObj.getReportId(), surveyReportObj.getReportDate().toString(), username)) {
-            Tree.setNextTreeId(Tree.getNextTreeId() - 1);
-            Location.setNextLocationId(Location.getNextLocationId() - 1);
-            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            reduceMaxId();
             throw new SQLException("SQL Survey Report insert query failed!");
         }
 
@@ -146,7 +152,7 @@ public class TreePLEService {
 
         for (String addressId : myAddresses.split(",")) {
             if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
-                user.addMyAddress(addressId);
+                user.addMyAddress(addressId.replaceAll("\\s", ""));
             }
         }
 
@@ -280,6 +286,17 @@ public class TreePLEService {
         }
     }
 
+    // Get a specific Municipality
+    public Municipality getMunicipalityByName(String name) throws Exception {
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+
+        if (Municipality.hasWithName(name)) {
+            return Municipality.getWithName(name);
+        } else {
+            return sql.getMunicipality(name);
+        }
+    }
 
     // ==============================
     // DELETE API
@@ -385,13 +402,23 @@ public class TreePLEService {
 
     // Reset the database
     public void resetDatabase() throws Exception {
-        if (!sql.resetDB())
+        if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to reset SQL database!");
+
+        if (!Tree.setNextTreeId(1) || !Location.setNextLocationId(1) || !SurveyReport.setNextReportId(1) || !sql.resetDB()) {
+            setMaxId();
+            throw new SQLException("Unable to reset SQL database!");
+        }
     }
 
     // Delete the database
     public void deleteDatabase() throws Exception {
-        if (!sql.deleteDB())
+        if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to delete SQL database!");
+
+        if (!Tree.setNextTreeId(1) || !Location.setNextLocationId(1) || !SurveyReport.setNextReportId(1) || !sql.deleteDB()) {
+            setMaxId();
+            throw new SQLException("Unable to delete SQL database!");
+        }
     }
 }
