@@ -1,0 +1,11 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Node Modules
+node_modules/
