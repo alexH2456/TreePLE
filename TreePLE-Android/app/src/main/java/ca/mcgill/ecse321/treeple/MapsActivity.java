@@ -1,6 +1,5 @@
 package ca.mcgill.ecse321.treeple;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
@@ -76,7 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    private Map<Marker, JSONObject> trees = new HashMap<>();
+    private Map<Marker,JSONObject> trees = new HashMap<>();
 
     private View popupView;
     private PopupWindow popupWindow;
@@ -125,7 +124,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.option_refresh_markers) {
-            refreshUser();
+//            refreshUser();
             populateMap();
         } else if (item.getItemId() == R.id.loggedin_user) {
             Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
@@ -145,8 +144,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         updateLocationUI();
         startLocationUpdates();
         getDeviceLocation();
+
+        //Refresh map with existing markers
         populateMap();
 
+        //Create marker and show popup for entering new tree info
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 
             @SuppressLint("InflateParams")
@@ -193,6 +195,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ownershipAdapter.setDropDownViewResource(R.layout.spinner_layout);
                 ownershipSpinner.setAdapter(ownershipAdapter);
 
+                //Remove created marker if tree not added to database
                 popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                     @Override
                     public void onDismiss() {
@@ -200,6 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
+                //Wait for plantTree button to be pressed then refresh map
                 Button plantTreeButton = (Button) popupView.findViewById(R.id.add_tree);
                 plantTreeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -207,6 +211,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         try {
                             plantTree(popupView);
                             populateMap();
+                            refreshUser();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -216,6 +221,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //Show tree info when marker pressed and cutDown button
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
             @SuppressLint({"SetTextI18n", "InflateParams"})
@@ -263,6 +269,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
 
+                //Refresh map if popup dismissed
                 popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                     @Override
                     public void onDismiss() {
@@ -270,13 +277,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-                Button cuttdownButton = (Button) popupView.findViewById(R.id.cutdown_tree);
-                cuttdownButton.setOnClickListener(new View.OnClickListener() {
+                //Wait for cutDown to be pressed then refresh map
+                Button cutdownButton = (Button) popupView.findViewById(R.id.cutdown_tree);
+                cutdownButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
                             cutDownTree(marker);
                             populateMap();
+                            refreshUser();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -289,8 +298,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void populateMap() {
 
+        //Remove current markers
         clearTrees();
 
+        //Query database for list of all trees and add each to the map + trees list
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "trees/", null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -324,6 +335,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //Get updated user info from database
     private void refreshUser() {
 
         String username = "";
@@ -441,6 +453,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         trees.clear();
     }
 
+    //Starts background location task
     protected void startLocationUpdates() {
 
         try {
@@ -514,6 +527,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         tv.setText(String.format("%04d-%02d-%02d", y, m + 1, d));
     }
 
+    //Parses entered info from fields and converts it into a JSON object, then issues a POST to the database
     public void plantTree(View view) throws JSONException {
 
         TextView currentView = popupView.findViewById(R.id.tree_height);
@@ -545,15 +559,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double latitude = Double.parseDouble(latlng[0]);
         Double longitude = Double.parseDouble(latlng[1]);
 
+        String username = LoginActivity.loggedInUser.getString("username");
+
         JSONObject plantObj = new JSONObject();
-
-        String username;
-        if (LoginActivity.loggedInUser != null) {
-            username = LoginActivity.loggedInUser.getString("username");
-        } else {
-            username = "TestUser";
-        }
-
         plantObj.put("user", username);
 
         JSONObject treeObj = new JSONObject();
@@ -587,7 +595,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    //Gets tree json from map and sends it to server for deletion
+    //Gets tree json from map and issues POST request to database
     public void cutDownTree(Marker marker) throws JSONException {
 
         int treeID = (int) trees.get(marker).get("treeId");
