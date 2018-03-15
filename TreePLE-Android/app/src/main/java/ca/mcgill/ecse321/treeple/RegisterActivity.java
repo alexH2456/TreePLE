@@ -57,6 +57,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private EditText mAddressView;
     private View mProgressView;
     private View mLoginFormView;
+    private EditText mReenterView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,17 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        mReenterView = (EditText) findViewById(R.id.password_reentry);
+        mReenterView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -185,11 +197,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mReenterView.setError(null);
         mAddressView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String reenter = mReenterView.getText().toString();
         String role = mRoleView.getSelectedItem().toString();
         String address = mAddressView.getText().toString();
 
@@ -207,6 +221,17 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             cancel = true;
         }
 
+        //Check if reentered password matches
+        if (TextUtils.isEmpty(reenter)) {
+            mReenterView.setError(getString(R.string.error_field_required));
+            focusView = mReenterView;
+            cancel = true;
+        } else if (!isPasswordSame(password, reenter)) {
+            mReenterView.setError(getString(R.string.error_not_matching));
+            focusView = mReenterView;
+            cancel = true;
+        }
+
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -219,7 +244,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         }
 
         if (TextUtils.isEmpty(address)) {
-            mAddressView.setError(getString(R.string.error_no_age));
+            mAddressView.setError(getString(R.string.error_no_address));
             focusView = mAddressView;
             cancel = true;
         }
@@ -241,6 +266,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mAuthTask = new UserLoginTask(email, password, role, address);
             mAuthTask.execute((Void) null);
         }
+    }
+
+    private boolean isPasswordSame(String password, String reenter) {
+        if (password.equals(reenter)) {
+            return true;
+        }
+        return false;
     }
 
     private boolean isEmailValid(String email) {
@@ -429,12 +461,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mAuthTask = null;
             showProgress(false);
         }
-    }
-
-    private void switchToLogin() {
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivity(loginIntent);
-        finish();
     }
 }
 

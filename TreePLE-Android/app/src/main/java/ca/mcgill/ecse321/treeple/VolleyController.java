@@ -16,7 +16,7 @@ class VolleyController {
 
     //Change this link when restarting ngrok
 //    static final String DEFAULT_BASE_URL = "http://192.168.43.163:8088/";
-    static final String DEFAULT_BASE_URL = "https://715dc9a2.ngrok.io/";
+    static final String DEFAULT_BASE_URL = "http://715dc9a2.ngrok.io/";
 
     private VolleyController(Context context) {
         mContext = context;
