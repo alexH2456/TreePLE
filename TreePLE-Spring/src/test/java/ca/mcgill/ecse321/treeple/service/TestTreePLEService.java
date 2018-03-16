@@ -49,6 +49,8 @@ public class TestTreePLEService {
 	@After
 	public void tearDown() throws Exception {
 		 this.sql.resetDB();
+		 if (this.sql != null)
+	            this.sql.closeConnection();
 	}
 
 	@Test
