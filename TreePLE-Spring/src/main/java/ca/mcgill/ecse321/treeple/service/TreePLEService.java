@@ -145,7 +145,7 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Residential") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
 
         User user = new User(username, password, UserRole.valueOf(role));
@@ -167,8 +167,18 @@ public class TreePLEService {
     // Create a new Species
     public Species createSpecies(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name");
-        String species = jsonParams.getString("species");
-        String genus = jsonParams.getString("genus");
+        String species;
+        String genus;
+        try {
+            species = jsonParams.getString("species");
+        } catch(JSONException e) {
+            species = "";
+        }
+        try {
+            genus = jsonParams.getString("genus");
+        } catch(JSONException e) {
+            genus = "";
+        }
 
         if (name == null || name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species cannot be empty!");
@@ -196,7 +206,7 @@ public class TreePLEService {
             throw new InvalidInputException("Municipality cannot be empty!");
         if (Municipality.hasWithName(name))
             throw new InvalidInputException("Municipality already exists!");
-        if (borders.length() < 3)
+        if (borders.length() > 0 && borders.length() < 3)
             throw new InvalidInputException("Municipality requires minimum 3 borders!");
 
         Municipality municipality = new Municipality(name, totalTrees);

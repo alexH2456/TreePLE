@@ -35,9 +35,7 @@ public class TestSQLiteJDBC {
 
     @After
     public void tearDown() {
-        if (sql != null) {
-            sql.resetDB();
-        }
+        sql.resetDB();
     }
 
     @Test

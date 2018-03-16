@@ -3,14 +3,13 @@ package ca.mcgill.ecse321.treeple.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.json.JSONObject;
+import org.json.*;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.mcgill.ecse321.treeple.model.*;
-import ca.mcgill.ecse321.treeple.service.TreePLEService;
 import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 public class TestTreePLEService {
@@ -34,7 +33,7 @@ public class TestTreePLEService {
 
     @After
     public void tearDown() throws Exception {
-        sql.resetDB();
+        service.resetDatabase();
     }
 
     @Test
@@ -44,6 +43,11 @@ public class TestTreePLEService {
         assertEquals(1, Location.getNextLocationId());
         assertEquals(1, SurveyReport.getNextReportId());
     }
+
+
+    // ==============================
+    // CREATE USER TEST
+    // ==============================
 
     @Test
     public void testCreateUser() {
@@ -55,369 +59,194 @@ public class TestTreePLEService {
 
         try {
             service.createUser(user);
+            assertEquals(true, User.hasWithUsername(user.getString("username")));
         } catch (Exception e) {
             fail();
         }
     }
 
-//     @Test
-//     public void testCreateUserNull() {
-//         assertEquals(0, rm.getUsers().size());
+    @Test(expected = JSONException.class)
+    public void testCreateUserNullUsername() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", (String) null);
+        user.put("password", "123yunus");
+        user.put("role", "Scientist");
+        user.put("myAddresses", "St-Lazare");
 
-//         String username = null;
-//         String password = null;
-//         int age = 20;
-//         int points = 100;
-//         String error = null;
+        service.createUser(user);
+    }
 
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createUser(username, password, age, points);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
+    @Test(expected = JSONException.class)
+    public void testCreateUserNullPassword() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Yunus");
+        user.put("password", (String) null);
+        user.put("role", "Scientist");
+        user.put("myAddresses", "St-Lazare");
 
-//         // Check error
-//         assertEquals("Username cannot be empty!", error);
-//         // Check no change in memory
-//         assertEquals(0, rm.getUsers().size());
-//     }
+        service.createUser(user);
+    }
 
-//     @Test
-//     public void testCreateUserEmpty() {
-//         assertEquals(0, rm.getUsers().size());
+    @Test(expected = JSONException.class)
+    public void testCreateUserNullRole() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Yunus");
+        user.put("password", "123yunus");
+        user.put("role", (String) null);
+        user.put("myAddresses", "St-Lazare");
 
-//         String username = "";
-//         String password = "";
-//         int age = 10;
-//         int points = 100;
-//         String error = null;
+        service.createUser(user);
+    }
 
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createUser(username, password, age, points);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
+    @Test(expected = JSONException.class)
+    public void testCreateUserNullAddress() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Yunus");
+        user.put("password", "123yunus");
+        user.put("role", "Scientist");
+        user.put("myAddresses", (String) null);
 
-//         // Check error
-//         assertEquals("Username cannot be empty!", error);
-//         // Check no change in memory
-//         assertEquals(0, rm.getUsers().size());
-//     }
+        service.createUser(user);
+    }
 
-//     @Test
-//     public void testCreateUserSpaces() {
-//         assertEquals(0, rm.getUsers().size());
+    @Test
+    public void testCreateUserBadRole() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Yunus");
+        user.put("password", "123yunus");
+        user.put("role", "NotARealRole");
+        user.put("myAddresses", "St-Lazare");
 
-//         String username = " ";
-//         String password = " ";
-//         int age = 25;
-//         int points = 100;
-//         String error = null;
+        try {
+            service.createUser(user);
+        } catch(InvalidInputException e) {
+            assertEquals("That role doesn't exist!", e.getMessage());
+        }
+    }
 
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createUser(username, password, age, points);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
+    @Test
+    public void testCreateUserResidentialWithEmptyAddress() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Yunus");
+        user.put("password", "123yunus");
+        user.put("role", "Resident");
+        user.put("myAddresses", "   ");
 
-//         // Check error
-//         assertEquals("Username cannot be empty!", error);
-//         // Check no change in memory
-//         assertEquals(0, rm.getUsers().size());
-//     }
+        try {
+            service.createUser(user);
+        } catch(InvalidInputException e) {
+            assertEquals("Address cannot be empty!", e.getMessage());
+        }
+    }
 
-//     @Test
-//     public void testFindAllUsers() {
-//         assertEquals(0, rm.getUsers().size());
 
-//         String[] usernames = {"John Doe", "Foo Bar"};
-//         String password = "fgtboi";
-//         int age = 20;
-//         int points = 100;
+    // ==============================
+    // CREATE SPECIES TEST
+    // ==============================
 
-//         TreePLEService erc = new TreePLEService(rm);
-//         for (String username : usernames) {
-//             try {
-//                 erc.createUser(username, password, age, points);
-//             } catch (InvalidInputException e) {
-//                 // Check that no error occurred
-//                 fail();
-//             }
-//         }
+    @Test
+    public void testCreateSpecies() {
+        JSONObject species = new JSONObject();
+        species.put("name", "Maple");
+        species.put("species", "Pseudoplatanus");
+        species.put("genus", "Acer");
 
-//         List<User> registeredUsers = erc.findAllUsers();
+        try {
+            service.createSpecies(species);
+            assertEquals(true, Species.hasWithName(species.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
-//         // Check number of registered participants
-//         assertEquals(2, registeredUsers.size());
-//         // Check each participant
-//         for (int i = 0; i < usernames.length; i++)
-//             assertEquals(usernames[i], registeredUsers.get(i).getUsername());
-//     }
+    @Test
+    public void testCreateSpeciesNullSpeciesNullGenus() {
+        JSONObject species = new JSONObject();
+        species.put("name", "Maple");
+        species.put("species", (String) null);
+        species.put("genus", (String) null);
 
-//     @Test
-//     public void testCreateEvent() {
-//         RegistrationManager rm = new RegistrationManager();
-//         assertEquals(0, rm.getEvents().size());
+        try {
+            service.createSpecies(species);
+            assertEquals(true, Species.hasWithName(species.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
-//         String name = "Soccer Game";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2017, Calendar.MARCH, 16, 9, 0, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2017, Calendar.MARCH, 16, 10, 30, 0);
-//         Time endTime = new Time(c.getTimeInMillis());
+    @Test(expected = JSONException.class)
+    public void testCreateSpeciesEmptyName() throws Exception {
+        JSONObject species = new JSONObject();
+        species.put("name", (String) null);
+        species.put("species", "Pseudoplatanus");
+        species.put("genus", "Acer");
 
-//         // Test model in memory
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createEvent(name, eventDate, startTime, endTime);
-//         } catch (InvalidInputException e) {
-//             fail();
-//         }
-//         checkResultEvent(name, eventDate, startTime, endTime, rm);
+        service.createSpecies(species);
+    }
 
-//         // Test file
-//         RegistrationManager rm2 = (RegistrationManager) PersistenceXStream.loadFromXMLwithXStream();
-//         checkResultEvent(name, eventDate, startTime, endTime, rm2);
-//         rm2.delete();
-//     }
 
-//     @Test
-//     public void testRegister() {
-//         RegistrationManager rm = new RegistrationManager();
-//         assertEquals(0, rm.getRegistrations().size());
+    // ==============================
+    // CREATE MUNICIPALITY TEST
+    // ==============================
 
-//         String nameU = "Oscar";
-//         String password = "Wild";
-//         int age = 40;
-//         int points = 1000;
-//         User user = new User(nameU, password, age, points);
-//         rm.addUser(user);
-//         assertEquals(1, rm.getUsers().size());
+    @Test
+    public void testCreateMunicipality() {
+        JSONObject municipality = new JSONObject();
+        municipality.put("name", "Saint-Laurent");
+        municipality.put("totalTrees", 12);
 
-//         String nameE = "Soccer Game";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2017, Calendar.MARCH, 16, 9, 0, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2017, Calendar.MARCH, 16, 10, 30, 0);
-//         Time endTime = new Time(c.getTimeInMillis());
-//         Event event = new Event(nameE, eventDate, startTime, endTime);
-//         rm.addEvent(event);
-//         assertEquals(1, rm.getEvents().size());
+        JSONArray borders = new JSONArray();
+        borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
+        borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
+        borders.put(new JSONArray(new double[]{45.460268, -73.750029}));
+        borders.put(new JSONArray(new double[]{45.481208, -73.723422}));
+        borders.put(new JSONArray(new double[]{45.459034, -73.683652}));
+        borders.put(new JSONArray(new double[]{45.526536, -73.651208}));
+        borders.put(new JSONArray(new double[]{45.522407, -73.730198}));
+        municipality.put("borders", borders);
 
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.register(user, event);
-//         } catch (InvalidInputException e) {
-//             fail();
-//         }
-//         checkResultRegister(nameU, nameE, eventDate, startTime, endTime, rm);
+        try {
+            service.createMunicipality(municipality);
+            assertEquals(true, Municipality.hasWithName(municipality.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
-//         RegistrationManager rm2 = (RegistrationManager) PersistenceXStream.loadFromXMLwithXStream();
 
-//         // Check file contents
-//         checkResultRegister(nameU, nameE, eventDate, startTime, endTime, rm2);
-//         rm2.delete();
-//     }
+    public void testCreateMunicipalityEmptyBorders() {
+        JSONObject municipality = new JSONObject();
+        municipality.put("name", "Saint-Laurent");
+        municipality.put("totalTrees", 12);
+        municipality.put("borders", new JSONArray());
 
-//     @Test
-//     public void testCreateEventNull() {
-//         assertEquals(0, rm.getRegistrations().size());
+        try {
+            service.createMunicipality(municipality);
+            assertEquals(true, Municipality.hasWithName(municipality.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
-//         String name = null;
-//         Date eventDate = null;
-//         Time startTime = null;
-//         Time endTime = null;
+    @Test(expected = InvalidInputException.class)
+    public void testCreateMunicipalityTwoBorders() throws Exception {
+        JSONObject municipality = new JSONObject();
+        municipality.put("name", "Saint-Laurent");
+        municipality.put("totalTrees", 12);
 
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createEvent(name, eventDate, startTime, endTime);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
+        JSONArray borders = new JSONArray();
+        borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
+        borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
+        municipality.put("borders", borders);
 
-//         // Check error
-//         assertEquals("Event name cannot be empty! Event date cannot be empty! Event start time cannot be empty! Event end time cannot be empty!", error);
-//         // Check model in memory
-//         assertEquals(0, rm.getEvents().size());
-//     }
+        service.createMunicipality(municipality);
+    }
 
-//     @Test
-//     public void testCreateEventEmpty() {
-//         assertEquals(0, rm.getEvents().size());
 
-//         String name = "";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2017, Calendar.FEBRUARY, 16, 10, 00, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2017, Calendar.FEBRUARY, 16, 11, 30, 0);
-//         Time endTime = new Time(c.getTimeInMillis());
-
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createEvent(name, eventDate, startTime, endTime);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
-
-//         // Check error
-//         assertEquals("Event name cannot be empty!", error);
-//         // Check model in memory
-//         assertEquals(0, rm.getEvents().size());
-//     }
-
-//     @Test
-//     public void testCreateEventSpaces() {
-//         assertEquals(0, rm.getEvents().size());
-
-//         String name = " ";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2016, Calendar.OCTOBER, 16, 9, 00, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2016, Calendar.OCTOBER, 16, 10, 30, 0);
-//         Time endTime = new Time(c.getTimeInMillis());
-
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createEvent(name, eventDate, startTime, endTime);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
-
-//         // Check error
-//         assertEquals("Event name cannot be empty!", error);
-//         // Check model in memory
-//         assertEquals(0, rm.getEvents().size());
-//     }
-
-//     @Test
-//     public void testCreateEventEndTimeBeforeStartTime() {
-//         assertEquals(0, rm.getEvents().size());
-
-//         String name = "Soccer Game";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2016, Calendar.OCTOBER, 16, 9, 00, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2016, Calendar.OCTOBER, 16, 8, 59, 59);
-//         Time endTime = new Time(c.getTimeInMillis());
-
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.createEvent(name, eventDate, startTime, endTime);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
-
-//         // Check error
-//         assertEquals("Event end time cannot be before event start time!", error);
-//         // Check model in memory
-//         assertEquals(0, rm.getEvents().size());
-//     }
-
-//     @Test
-//     public void testRegisterNull() {
-//         assertEquals(0, rm.getRegistrations().size());
-
-//         User user = null;
-//         assertEquals(0, rm.getUsers().size());
-
-//         Event event = null;
-//         assertEquals(0, rm.getEvents().size());
-
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.register(user, event);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
-
-//         // Check error
-//         assertEquals("User needs to be selected for registration! Event needs to be selected for registration!", error);
-//         // Check model in memory
-//         assertEquals(0, rm.getRegistrations().size());
-//         assertEquals(0, rm.getUsers().size());
-//         assertEquals(0, rm.getEvents().size());
-//     }
-
-//     @Test
-//     public void testRegisterUserAndEventDoNotExist() {
-//         assertEquals(0, rm.getRegistrations().size());
-
-//         String nameU = "Oscar";
-//         String password = "Wild";
-//         int age = 50;
-//         int points = 100;
-//         User user = new User(nameU, password, age, points);
-//         assertEquals(0, rm.getUsers().size());
-
-//         String nameE = "Soccer Game";
-//         Calendar c = Calendar.getInstance();
-//         c.set(2016, Calendar.OCTOBER, 16, 9, 00, 0);
-//         Date eventDate = new Date(c.getTimeInMillis());
-//         Time startTime = new Time(c.getTimeInMillis());
-//         c.set(2016, Calendar.OCTOBER, 16, 10, 30, 0);
-//         Time endTime = new Time(c.getTimeInMillis());
-//         Event event = new Event(nameE, eventDate, startTime, endTime);
-//         assertEquals(0, rm.getEvents().size());
-
-//         String error = null;
-//         TreePLEService erc = new TreePLEService(rm);
-//         try {
-//             erc.register(user, event);
-//         } catch (InvalidInputException e) {
-//             error = e.getMessage();
-//         }
-
-//         // Check error
-//         assertEquals("User does not exist! Event does not exist!", error);
-
-//         // Check model in memory
-//         assertEquals(0, rm.getRegistrations().size());
-//         assertEquals(0, rm.getUsers().size());
-//         assertEquals(0, rm.getEvents().size());
-//     }
+    // ==============================
+    // CREATE TREE TEST
+    // ==============================
 
 
 
-//     private void checkResultUser(String name, RegistrationManager rm2) {
-//         assertEquals(1, rm2.getUsers().size());
-//         assertEquals(name, rm2.getUser(0).getUsername());
-//         assertEquals(0, rm2.getEvents().size());
-//         assertEquals(0, rm2.getRegistrations().size());
-//     }
-
-//     private void checkResultEvent(String name, Date eventDate, Time startTime, Time endTime, RegistrationManager rm2) {
-//         assertEquals(0, rm2.getUsers().size());
-//         assertEquals(1, rm2.getEvents().size());
-//         assertEquals(name, rm2.getEvent(0).getName());
-//         assertEquals(eventDate.toString(), rm2.getEvent(0).getEventDate().toString());
-//         assertEquals(startTime.toString(), rm2.getEvent(0).getStartTime().toString());
-//         assertEquals(endTime.toString(), rm2.getEvent(0).getEndTime().toString());
-//         assertEquals(0, rm2.getRegistrations().size());
-//     }
-
-//     private void checkResultRegister(String nameP, String nameE, Date eventDate, Time startTime, Time endTime, RegistrationManager rm2) {
-//         assertEquals(1, rm2.getUsers().size());
-//         assertEquals(nameP, rm2.getUser(0).getUsername());
-//         assertEquals(1, rm2.getEvents().size());
-//         assertEquals(nameE, rm2.getEvent(0).getName());
-//         assertEquals(eventDate.toString(), rm2.getEvent(0).getEventDate().toString());
-//         assertEquals(startTime.toString(), rm2.getEvent(0).getStartTime().toString());
-//         assertEquals(endTime.toString(), rm2.getEvent(0).getEndTime().toString());
-//         assertEquals(1, rm2.getRegistrations().size());
-//         assertEquals(rm2.getEvent(0), rm2.getRegistration(0).getEvent());
-//         assertEquals(rm2.getUser(0), rm2.getRegistration(0).getUser());
-//     }
 }
