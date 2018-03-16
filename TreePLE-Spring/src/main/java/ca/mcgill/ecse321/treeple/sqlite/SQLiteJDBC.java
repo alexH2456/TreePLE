@@ -4,7 +4,6 @@ import java.sql.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;

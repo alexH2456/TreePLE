@@ -16,8 +16,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.mcgill.ecse321.treeple.model.User;
-import ca.mcgill.ecse321.treeple.model.RegistrationManager;
-import ca.mcgill.ecse321.treeple.persistence.PersistenceXStream;
 import ca.mcgill.ecse321.treeple.service.InvalidInputException;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
