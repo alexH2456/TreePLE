@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.json.JSONObject;
 
@@ -19,14 +20,24 @@ public class TestSQLiteJDBC {
     private static final String dbPath = "/output/treeple_test.db";
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() {
         sql = new SQLiteJDBC(dbPath);
         dbFile =  (new File(System.getProperty("user.dir") + dbPath)).getAbsoluteFile();
     }
 
+    @AfterClass
+    public static void tearDownAfterClass() {
+        if (sql != null) {
+            sql.deleteDB();
+            sql.closeConnection();
+        }
+    }
+
     @After
-    public void tearDown() throws Exception {
-        sql.resetDB();
+    public void tearDown() {
+        if (sql != null) {
+            sql.resetDB();
+        }
     }
 
     @Test
