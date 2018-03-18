@@ -143,14 +143,7 @@ public class TestSQLiteJDBC {
     		i++;
     	}
     	
-//    	Integer[] treeList = user.getMyTrees();
-//    	System.out.println(treeList.length);
-//    	i = 0;
-//    	for (String s : trees.replaceAll(" ", "").split(",")) {
-//    		Integer tree = Integer.parseInt(s);
-//    		assertEquals(tree, treeList[i]);
-//    		i++;
-//    	}
+    	// New user should have no trees
     	assertEquals(user.getMyTrees().length, 0);
     }
     
@@ -240,6 +233,7 @@ public class TestSQLiteJDBC {
     		assertEquals(true, success);
     	}
     	
+    	// Check if all users removed
     	assertEquals(0, sql.getAllUsers().size());
     }
     
