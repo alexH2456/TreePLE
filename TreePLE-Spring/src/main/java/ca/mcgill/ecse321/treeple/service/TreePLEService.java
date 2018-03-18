@@ -171,12 +171,12 @@ public class TreePLEService {
         String genus;
         try {
             species = jsonParams.getString("species");
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             species = "";
         }
         try {
             genus = jsonParams.getString("genus");
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             genus = "";
         }
 

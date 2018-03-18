@@ -3,6 +3,8 @@ package ca.mcgill.ecse321.treeple.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.sql.Date;
+
 import org.json.*;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -10,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.mcgill.ecse321.treeple.model.*;
+import ca.mcgill.ecse321.treeple.model.Tree.*;
 import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 public class TestTreePLEService {
@@ -18,11 +21,21 @@ public class TestTreePLEService {
     private static TreePLEService service;
     private static final String dbPath = "/output/treeple_test.db";
 
+    private static JSONObject testTree;
+    private static JSONObject testUser;
+    private static JSONObject testSpecies;
+    private static JSONObject testMunicipality;
+
     @BeforeClass
     public static void setUpBeforeClass() {
         sql = new SQLiteJDBC(dbPath);
         sql.connect();
         service = new TreePLEService(sql);
+
+        testTree = buildTestTree();
+        testUser = buildTestUser();
+        testSpecies = buildTestSpecies();
+        testMunicipality = buildTestMunicipality();
     }
 
     @AfterClass
@@ -51,15 +64,9 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateUser() {
-        JSONObject user = new JSONObject();
-        user.put("username", "Yunus");
-        user.put("password", "123yunus");
-        user.put("role", "Scientist");
-        user.put("myAddresses", "St-Lazare");
-
         try {
-            service.createUser(user);
-            assertEquals(true, User.hasWithUsername(user.getString("username")));
+            service.createUser(testUser);
+            assertEquals(true, User.hasWithUsername(testUser.getString("username")));
         } catch (Exception e) {
             fail();
         }
@@ -119,7 +126,7 @@ public class TestTreePLEService {
 
         try {
             service.createUser(user);
-        } catch(InvalidInputException e) {
+        } catch (InvalidInputException e) {
             assertEquals("That role doesn't exist!", e.getMessage());
         }
     }
@@ -134,7 +141,7 @@ public class TestTreePLEService {
 
         try {
             service.createUser(user);
-        } catch(InvalidInputException e) {
+        } catch (InvalidInputException e) {
             assertEquals("Address cannot be empty!", e.getMessage());
         }
     }
@@ -146,14 +153,9 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateSpecies() {
-        JSONObject species = new JSONObject();
-        species.put("name", "Maple");
-        species.put("species", "Pseudoplatanus");
-        species.put("genus", "Acer");
-
         try {
-            service.createSpecies(species);
-            assertEquals(true, Species.hasWithName(species.getString("name")));
+            service.createSpecies(testSpecies);
+            assertEquals(true, Species.hasWithName(testSpecies.getString("name")));
         } catch (Exception e) {
             fail();
         }
@@ -178,7 +180,7 @@ public class TestTreePLEService {
     public void testCreateSpeciesEmptyName() throws Exception {
         JSONObject species = new JSONObject();
         species.put("name", (String) null);
-        species.put("species", "Pseudoplatanus");
+        species.put("species", "Acer Pseudoplatanus");
         species.put("genus", "Acer");
 
         service.createSpecies(species);
@@ -191,32 +193,18 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateMunicipality() {
-        JSONObject municipality = new JSONObject();
-        municipality.put("name", "Saint-Laurent");
-        municipality.put("totalTrees", 12);
-
-        JSONArray borders = new JSONArray();
-        borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
-        borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
-        borders.put(new JSONArray(new double[]{45.460268, -73.750029}));
-        borders.put(new JSONArray(new double[]{45.481208, -73.723422}));
-        borders.put(new JSONArray(new double[]{45.459034, -73.683652}));
-        borders.put(new JSONArray(new double[]{45.526536, -73.651208}));
-        borders.put(new JSONArray(new double[]{45.522407, -73.730198}));
-        municipality.put("borders", borders);
-
         try {
-            service.createMunicipality(municipality);
-            assertEquals(true, Municipality.hasWithName(municipality.getString("name")));
+            service.createMunicipality(testMunicipality);
+            assertEquals(true, Municipality.hasWithName(testMunicipality.getString("name")));
         } catch (Exception e) {
             fail();
         }
     }
 
-
+    @Test
     public void testCreateMunicipalityEmptyBorders() {
         JSONObject municipality = new JSONObject();
-        municipality.put("name", "Saint-Laurent");
+        municipality.put("name", "Saint-Lazare");
         municipality.put("totalTrees", 12);
         municipality.put("borders", new JSONArray());
 
@@ -231,12 +219,12 @@ public class TestTreePLEService {
     @Test(expected = InvalidInputException.class)
     public void testCreateMunicipalityTwoBorders() throws Exception {
         JSONObject municipality = new JSONObject();
-        municipality.put("name", "Saint-Laurent");
+        municipality.put("name", "Saint-Lazare");
         municipality.put("totalTrees", 12);
 
         JSONArray borders = new JSONArray();
-        borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
-        borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
+        borders.put(new JSONArray(new double[]{45.397067, -74.152067}));
+        borders.put(new JSONArray(new double[]{45.411974, -74.152188}));
         municipality.put("borders", borders);
 
         service.createMunicipality(municipality);
@@ -247,6 +235,127 @@ public class TestTreePLEService {
     // CREATE TREE TEST
     // ==============================
 
+    @Test
+    public void testCreateTree() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        try {
+            JSONObject testTreeObj = testTree.getJSONObject("tree");
+            Tree tree = service.createTree(testTree);
+
+            assertEquals(testTreeObj.getInt("treeId") + 1, Tree.getNextTreeId());
+            assertEquals(testTreeObj.getInt("height"), tree.getHeight());
+            assertEquals(testTreeObj.getInt("diameter"), tree.getDiameter());
+            assertEquals(Date.valueOf(testTreeObj.getString("datePlanted")), tree.getDatePlanted());
+            assertEquals(Land.valueOf(testTreeObj.getString("land")), tree.getLand());
+            assertEquals(Status.valueOf(testTreeObj.getString("status")), tree.getStatus());
+            assertEquals(Ownership.valueOf(testTreeObj.getString("ownership")), tree.getOwnership());
+            assertEquals(testTreeObj.getString("species"), tree.getSpecies().getName());
+            assertEquals(testTreeObj.getDouble("latitude"), tree.getLocation().getLatitude(), 0);
+            assertEquals(testTreeObj.getDouble("longitude"), tree.getLocation().getLongitude(), 0);
+            assertEquals(testTreeObj.getString("municipality"), tree.getMunicipality().getName());
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
 
+    // ==============================
+    // GET TEST
+    // ==============================
+
+    @Test
+    public void testGetTree() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+            JSONObject testTreeObj = testTree.getJSONObject("tree");
+            Tree tree = service.getTreeById(testTreeObj.getInt("treeId"));
+
+            assertEquals(testTreeObj.getInt("height"), tree.getHeight());
+            assertEquals(testTreeObj.getInt("diameter"), tree.getDiameter());
+            assertEquals(Date.valueOf(testTreeObj.getString("datePlanted")), tree.getDatePlanted());
+            assertEquals(Land.valueOf(testTreeObj.getString("land")), tree.getLand());
+            assertEquals(Status.valueOf(testTreeObj.getString("status")), tree.getStatus());
+            assertEquals(Ownership.valueOf(testTreeObj.getString("ownership")), tree.getOwnership());
+            assertEquals(testTreeObj.getString("species"), tree.getSpecies().getName());
+            assertEquals(testTreeObj.getDouble("latitude"), tree.getLocation().getLatitude(), 0);
+            assertEquals(testTreeObj.getDouble("longitude"), tree.getLocation().getLongitude(), 0);
+            assertEquals(testTreeObj.getString("municipality"), tree.getMunicipality().getName());
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+
+    // ==============================
+    // BUILD TEST OBJECTS API
+    // ==============================
+
+    public static JSONObject buildTestTree() {
+        JSONObject testTree = new JSONObject();
+        JSONObject tree = new JSONObject();
+
+        tree.put("treeId", 1);
+        tree.put("height", 420);
+        tree.put("diameter", 40);
+        tree.put("datePlanted", "2018-03-16");
+        tree.put("land", "Residential");
+        tree.put("status", "Planted");
+        tree.put("ownership", "Private");
+        tree.put("species", "Weeping Willow");
+        tree.put("latitude", 45.515883);
+        tree.put("longitude", -73.685552);
+        tree.put("municipality", "Saint-Laurent");
+
+        testTree.put("user", "Abbas");
+        testTree.put("tree", tree);
+
+        return testTree;
+    }
+
+    public static JSONObject buildTestUser() {
+        JSONObject testUser = new JSONObject();
+
+        testUser.put("username", "Abbas");
+        testUser.put("password", "ecse321pw");
+        testUser.put("role", "Resident");
+        testUser.put("myAddresses", "ChIJfU7AfWwYyUwRBfXBtBkniXI");
+
+        return testUser;
+    }
+
+    public static JSONObject buildTestSpecies() {
+        JSONObject testSpecies = new JSONObject();
+
+        testSpecies.put("name", "Weeping Willow");
+        testSpecies.put("species", "Salix Babylonica");
+        testSpecies.put("genus", "Salix");
+
+        return testSpecies;
+    }
+
+    public static JSONObject buildTestMunicipality() {
+        JSONObject testMunicipality = new JSONObject();
+        JSONArray borders = new JSONArray();
+
+        borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
+        borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
+        borders.put(new JSONArray(new double[]{45.460268, -73.750029}));
+        borders.put(new JSONArray(new double[]{45.481208, -73.723422}));
+        borders.put(new JSONArray(new double[]{45.459034, -73.683652}));
+        borders.put(new JSONArray(new double[]{45.526536, -73.651208}));
+        borders.put(new JSONArray(new double[]{45.522407, -73.730198}));
+
+        testMunicipality.put("name", "Saint-Laurent");
+        testMunicipality.put("totalTrees", 55);
+        testMunicipality.put("borders", borders);
+
+        return testMunicipality;
+    }
 }
