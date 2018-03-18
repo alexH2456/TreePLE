@@ -37,6 +37,7 @@ public class TestSQLiteJDBC {
     private static final int numSpecies = 50;
     private static final int numLocations = 50;
     private static final int numMunicipalities = 50;
+    private static final int numTrees = 50;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -917,6 +918,41 @@ public class TestSQLiteJDBC {
     	assertEquals(tree.getSpecies().getName(), species);
     	assertEquals(tree.getLocation().getLocationId(), location);
     	assertEquals(tree.getMunicipality().getName(), municipality);
+    }
+    
+    @Test
+    public void testGetMaxTreeId() {
+    	
+    	int treeId1 = 1;
+    	int height = 10;
+    	int diameter = 20;
+    	String address = defaultUser.getString("addresses");
+    	String datePlanted = "2001-12-22";
+    	String land = "Residential";
+    	String status = "Planted";
+    	String ownership = "Private";
+    	String species = "Maple";
+    	int location1 = 3;
+    	String municipality = "Pointe-Claire";
+    	String reports = "";
+    	
+    	boolean success = sql.insertLocation(1, 40.9, 34.5);
+		assertEquals(true, success);
+		success = sql.insertLocation(2, 50.8, 40.2);
+		assertEquals(true, success);
+    	
+    	success = sql.insertLocation(location1, defaultLocation.getDouble("latitude") + 1, defaultLocation.getDouble("longitude") - 1);
+    	assertEquals(true, success);
+    	success = sql.insertSpecies(defaultSpecies.getString("name"), defaultSpecies.getString("species"), defaultSpecies.getString("genus"));
+    	assertEquals(true, success);
+    	success = sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
+    	assertEquals(true, success);
+    	
+    	for (int i = 0; i < numTrees; i++) {
+    		success = sql.insertTree(treeId1 + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
+        	assertEquals(true, success);
+    	}
+    	assertEquals(numTrees + treeId1 - 1, sql.getMaxTreeId());
     }
     
     @Test
