@@ -281,7 +281,11 @@ public class TreePLEService {
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative!");
 
-        return sql.getTree(treeId);
+        Tree tree;
+        if ((tree = sql.getTree(treeId)) == null)
+            throw new InvalidInputException("No Tree with that ID exists!");
+
+        return tree;
     }
 
     // Get a specific User
@@ -292,7 +296,11 @@ public class TreePLEService {
         if (User.hasWithUsername(username)) {
             return User.getWithUsername(username);
         } else {
-            return sql.getUser(username);
+            User user;
+            if ((user = sql.getUser(username)) == null)
+                throw new InvalidInputException("That username doesn't exist!");
+
+            return user;
         }
     }
 
@@ -304,7 +312,11 @@ public class TreePLEService {
         if (Municipality.hasWithName(name)) {
             return Municipality.getWithName(name);
         } else {
-            return sql.getMunicipality(name);
+            Municipality municipality;
+            if ((municipality = sql.getMunicipality(name)) == null)
+                throw new InvalidInputException("No Municipality with that name exists!");
+
+            return municipality;
         }
     }
 
@@ -350,6 +362,7 @@ public class TreePLEService {
         if (user == null)
             throw new InvalidInputException("That username doesn't exist!");
 
+        user.delete();
         if (!sql.deleteUser(username))
             throw new SQLException("SQL User delete query failed!");
 
@@ -368,6 +381,7 @@ public class TreePLEService {
         if (species == null)
             throw new InvalidInputException("No Species with that name exists!");
 
+        species.delete();
         if (!sql.deleteSpecies(name))
             throw new SQLException("SQL Species delete query failed!");
 
@@ -404,6 +418,7 @@ public class TreePLEService {
         if (municipality == null)
             throw new InvalidInputException("No Municipality with that name exists!");
 
+        municipality.delete();
         if (!sql.deleteMunicipality(name))
             throw new SQLException("SQL Municipality delete query failed!");
 

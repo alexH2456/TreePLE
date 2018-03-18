@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;
+import ca.mcgill.ecse321.treeple.model.User.*;
 import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 public class TestTreePLEService {
@@ -261,13 +262,25 @@ public class TestTreePLEService {
         }
     }
 
+    @Test
+    public void testCreateTreeWrongDateFormat() throws Exception {
+        try {
+            JSONObject tree = new JSONObject(testTree.toString());
+            tree.getJSONObject("tree").put("datePlanted", "18-03-2018");
+
+            service.createTree(tree);
+        } catch (InvalidInputException e) {
+            assertEquals("Date doesn't match YYYY-(M)M-(D)D format!", e.getMessage());
+        }
+    }
+
 
     // ==============================
-    // GET TEST
+    // GET TREE TEST
     // ==============================
 
     @Test
-    public void testGetTree() throws Exception {
+    public void testGetTreeById() throws Exception {
         service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
@@ -289,6 +302,176 @@ public class TestTreePLEService {
             assertEquals(testTreeObj.getString("municipality"), tree.getMunicipality().getName());
         } catch (Exception e) {
             fail();
+        }
+    }
+
+    @Test
+    public void testGetTreeByIdNegativeId() throws Exception {
+        try {
+            service.getTreeById(-1);
+        } catch (InvalidInputException e) {
+            assertEquals("Tree's ID cannot be negative!", e.getMessage());
+        }
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void testGetTreeByIdNonExistantTree() throws Exception {
+        service.getTreeById(100);
+    }
+
+
+    // ==============================
+    // GET USER TEST
+    // ==============================
+
+    @Test
+    public void testGetUserByUsername() throws Exception {
+        service.createUser(testUser);
+
+        try {
+            User user = service.getUserByUsername(testUser.getString("username"));
+
+            assertEquals(testUser.getString("username"), user.getUsername());
+            assertEquals(testUser.getString("password"), user.getPassword());
+            assertEquals(UserRole.valueOf(testUser.getString("role")) ,user.getRole());
+            assertEquals(testUser.getString("myAddresses"), user.getMyAddress(0));
+            assertEquals(1, user.getMyAddresses().length);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testGetUserByUsernameNull() throws Exception {
+        String username = null;
+
+        try {
+            service.getUserByUsername(username);
+        } catch (InvalidInputException e) {
+            assertEquals("Username cannot be empty!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetUserByUsernameEmpty() throws Exception {
+        String username = "                   ";
+
+        try {
+            service.getUserByUsername(username);
+        } catch (InvalidInputException e) {
+            assertEquals("Username cannot be empty!", e.getMessage());
+        }
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void testGetUserByUsernameNonExistant() throws Exception {
+        service.getUserByUsername("Filip");
+    }
+
+
+    // ==============================
+    // GET MUNICIPALITY TEST
+    // ==============================
+
+    @Test
+    public void testGetMunicipalityByName() throws Exception {
+        service.createMunicipality(testMunicipality);
+
+        try {
+            Municipality municipality = service.getMunicipalityByName(testMunicipality.getString("name"));
+
+            assertEquals(testMunicipality.getString("name"), municipality.getName());
+            assertEquals(testMunicipality.getInt("totalTrees"), municipality.getTotalTrees());
+
+            JSONArray borders = testMunicipality.getJSONArray("borders");
+            for (int i = 0; i < borders.length(); i++) {
+                assertEquals(borders.getJSONArray(i).getDouble(0), municipality.getBorder(i).getLatitude(), 0);
+                assertEquals(borders.getJSONArray(i).getDouble(1), municipality.getBorder(i).getLongitude(), 0);
+            }
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testGetMunicipalityByNameEmpty() throws Exception {
+        String name = "      ";
+
+        try {
+            service.getMunicipalityByName(name);
+        } catch (InvalidInputException e) {
+            assertEquals("Name cannot be empty!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetMunicipalityByNameNull() throws Exception{
+        String name = null;
+
+        try {
+            service.getMunicipalityByName(name);
+        } catch (InvalidInputException e) {
+            assertEquals("Name cannot be empty!", e.getMessage());
+        }
+
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void testGetMunicipalityByNameNonExistant() throws Exception{
+        service.getMunicipalityByName("Laval");
+    }
+
+
+    // ==============================
+    // DELETE USER TEST
+    // ==============================
+
+    @Test
+    public void testDeleteUser() throws Exception {
+        service.createUser(testUser);
+
+        try {
+            User user = service.deleteUser(testUser);
+
+            assertEquals(testUser.getString("username"), user.getUsername());
+            assertEquals(testUser.getString("password"), user.getPassword());
+            assertEquals(UserRole.valueOf(testUser.getString("role")), user.getRole());
+            assertEquals(testUser.getString("myAddresses"), user.getMyAddress(0));
+            try {
+                service.getUserByUsername(testUser.getString("username"));
+            } catch (InvalidInputException e) {
+                assertEquals("That username doesn't exist!", e.getMessage());
+            }
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testDeleteUserEmpty() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "      ");
+
+        try {
+            service.deleteUser(user);
+        } catch (InvalidInputException e) {
+            assertEquals ("User is not logged in/Username is missing!", e.getMessage());
+        }
+    }
+
+    @Test(expected = JSONException.class)
+    public void testDeleteUserNull() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", (String) null);
+
+        service.deleteUser(user);
+    }
+
+    public void testDeleteUserNonExistant() throws Exception {
+        try {
+            service.deleteUser(testUser);
+        } catch (InvalidInputException e) {
+            assertEquals("That username doesn't exist!", e.getMessage());
         }
     }
 
