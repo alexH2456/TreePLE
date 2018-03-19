@@ -7,7 +7,7 @@ import java.util.*;
 import org.json.*;
 import org.apache.commons.lang3.*;
 import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
@@ -84,10 +84,14 @@ public class TreePLEService {
             if (statusCode >= 200 && statusCode < 300) {
                 JSONObject gmapsJSON = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
                 address = gmapsJSON.getJSONArray("results").getJSONObject(0).getString("place_id");
+            } else if (statusCode >= 400) {
+                throw new InvalidInputException("Invalid Google Maps API request!");
             }
             response.close();
+        } catch (InvalidInputException e) {
+            throw e;
         } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            throw new Exception(e.getMessage());
         }
 
         User userObj;
@@ -103,12 +107,12 @@ public class TreePLEService {
         Location locationObj = new Location(latitude, longitude);
         SurveyReport surveyReportObj = new SurveyReport(Date.valueOf(datePlanted), username);
 
-        Tree tree = new Tree(height, diameter, address, Date.valueOf(datePlanted), Land.valueOf(land),
-                             Status.valueOf(status), Ownership.valueOf(ownership), speciesObj, locationObj, municipalityObj);
+        Tree treeObj = new Tree(height, diameter, address, Date.valueOf(datePlanted), Land.valueOf(land),
+                                Status.valueOf(status), Ownership.valueOf(ownership), speciesObj, locationObj, municipalityObj);
 
-        tree.addReport(surveyReportObj);
-        if (!sql.insertTree(tree.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
-                           locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()))) {
+        treeObj.addReport(surveyReportObj);
+        if (!sql.insertTree(treeObj.getTreeId(), height, diameter, address, datePlanted, land, status, ownership, species,
+                            locationObj.getLocationId(), municipality, Integer.toString(surveyReportObj.getReportId()))) {
             reduceMaxId();
             throw new SQLException("SQL Tree insert query failed!");
         }
@@ -123,12 +127,13 @@ public class TreePLEService {
             throw new SQLException("SQL Survey Report insert query failed!");
         }
 
-        userObj.addMyTree(tree.getTreeId());
+        userObj.addMyTree(treeObj.getTreeId());
         sql.updateUserTrees(username, userObj.getMyTrees().toString().replaceAll("(\\[)|(\\])", ""));
 
-        return tree;
+        return treeObj;
     }
 
+    // TODO: PlaceId for user registration
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");

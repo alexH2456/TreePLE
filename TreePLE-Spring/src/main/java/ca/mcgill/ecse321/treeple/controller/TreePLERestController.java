@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +31,6 @@ public class TreePLERestController {
     // ==============================
 
     private TreeDto convertToDto(Tree tree) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return new TreeDto(tree.getTreeId(), tree.getHeight(), tree.getDiameter(), tree.getAddress(),
                            tree.getDatePlanted(), tree.getLand(), tree.getStatus(), tree.getOwnership(),
                            convertToDto(tree.getSpecies()), convertToDto(tree.getLocation()),
@@ -40,28 +38,23 @@ public class TreePLERestController {
     }
 
     private UserDto convertToDto(User user) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(user, UserDto.class);
     }
 
     private SpeciesDto convertToDto(Species species) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(species, SpeciesDto.class);
     }
 
     private LocationDto convertToDto(Location location) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(location, LocationDto.class);
     }
 
     private MunicipalityDto convertToDto(Municipality municipality) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return new MunicipalityDto(municipality.getName(), municipality.getTotalTrees(),
                                    createLocationDtos(municipality.getBorders()));
     }
 
     private SurveyReportDto convertToDto(SurveyReport report) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(report, SurveyReportDto.class);
     }
 
@@ -80,6 +73,7 @@ public class TreePLERestController {
         }
         return locationDtos;
     }
+
 
     // ==============================
     // GET ALL MAPPING API
@@ -124,6 +118,7 @@ public class TreePLERestController {
             municipalities.add(convertToDto(municipality));
         return municipalities;
     }
+
 
     // ==============================
     // GET ONE MAPPING API
@@ -243,6 +238,7 @@ public class TreePLERestController {
     //     Location location = service.updateLocationCheckOut(id, username, checkOut);
     //     return convertToDto(location);
     // }
+
 
     // ==============================
     // DELETE MAPPING API

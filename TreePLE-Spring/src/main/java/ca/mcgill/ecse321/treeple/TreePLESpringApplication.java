@@ -4,7 +4,7 @@ import javax.annotation.PreDestroy;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
-import org.modelmapper.convention.NamingConventions;
+import org.modelmapper.convention.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,15 +12,10 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 
-import ca.mcgill.ecse321.treeple.controller.configuration.AndroidProperties;
-import ca.mcgill.ecse321.treeple.controller.configuration.WebFrontendProperties;
-import ca.mcgill.ecse321.treeple.model.Location;
-import ca.mcgill.ecse321.treeple.model.SurveyReport;
-import ca.mcgill.ecse321.treeple.model.Tree;
+import ca.mcgill.ecse321.treeple.controller.configuration.*;
+import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 @SpringBootApplication
@@ -44,6 +39,7 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
         // Let the model matcher map corresponding fields by name
         modelMapper.getConfiguration().setFieldMatchingEnabled(true).setFieldAccessLevel(AccessLevel.PRIVATE);
         modelMapper.getConfiguration().setSourceNamingConvention(NamingConventions.NONE).setDestinationNamingConvention(NamingConventions.NONE);
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper;
     }
 

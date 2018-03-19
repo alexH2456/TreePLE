@@ -1,15 +1,11 @@
 package ca.mcgill.ecse321.treeple.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.sql.Date;
 
 import org.json.*;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;
@@ -247,6 +243,8 @@ public class TestTreePLEService {
             Tree tree = service.createTree(testTree);
 
             assertEquals(testTreeObj.getInt("treeId") + 1, Tree.getNextTreeId());
+            assertEquals(testTreeObj.getInt("treeId") + testMunicipality.getJSONArray("borders").length() + 1, Location.getNextLocationId());
+            assertEquals(testTreeObj.getInt("treeId") + 1, SurveyReport.getNextReportId());
             assertEquals(testTreeObj.getInt("height"), tree.getHeight());
             assertEquals(testTreeObj.getInt("diameter"), tree.getDiameter());
             assertEquals(Date.valueOf(testTreeObj.getString("datePlanted")), tree.getDatePlanted());
@@ -271,6 +269,63 @@ public class TestTreePLEService {
             service.createTree(tree);
         } catch (InvalidInputException e) {
             assertEquals("Date doesn't match YYYY-(M)M-(D)D format!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTreeEmptyUser() throws Exception {
+        try {
+            JSONObject tree = new JSONObject(testTree.toString());
+            tree.put("user", "   ");
+
+            service.createTree(tree);
+        } catch (InvalidInputException e) {
+            assertEquals("User is not logged in/Username is missing!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTreeInvalidLocation() throws Exception {
+        try {
+            JSONObject tree = new JSONObject(testTree.toString());
+            tree.getJSONObject("tree").put("latitude", "91");
+            tree.getJSONObject("tree").put("longitude", "-181");
+
+            service.createTree(tree);
+        } catch (InvalidInputException e) {
+            assertEquals("Invalid Google Maps API request!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTreeUserNonExistant() throws Exception {
+        try {
+            service.createTree(testTree);
+        } catch (InvalidInputException e) {
+            assertEquals("User does not exist!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTreeSpeciesNonExistant() throws Exception {
+        service.createUser(testUser);
+
+        try {
+            service.createTree(testTree);
+        } catch (InvalidInputException e) {
+            assertEquals("Species does not exist!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTreeMunicipalityNonExistant() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+
+        try {
+            service.createTree(testTree);
+        } catch (InvalidInputException e) {
+            assertEquals("Municipality does not exist!", e.getMessage());
         }
     }
 
