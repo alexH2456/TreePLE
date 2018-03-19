@@ -486,7 +486,10 @@ public class TestTreePLEService {
         service.createUser(testUser);
 
         try {
-            User user = service.deleteUser(testUser);
+            JSONObject deleteUser = new JSONObject();
+            deleteUser.put("username", testUser.getString("username"));
+
+            User user = service.deleteUser(deleteUser);
 
             assertEquals(testUser.getString("username"), user.getUsername());
             assertEquals(testUser.getString("password"), user.getPassword());
@@ -524,140 +527,83 @@ public class TestTreePLEService {
 
     public void testDeleteUserNonExistant() throws Exception {
         try {
-            service.deleteUser(testUser);
+            JSONObject deleteUser = new JSONObject();
+            deleteUser.put("username", testUser.getString("username"));
+
+            service.deleteUser(deleteUser);
         } catch (InvalidInputException e) {
             assertEquals("That username doesn't exist!", e.getMessage());
         }
     }
-    
+
+
+    // ==============================
+    // DELETE TREE TEST
+    // ==============================
+
     @Test
-    public void testDeleteTree() throws Exception{
-    	 int treesBefore =sql.getAllTrees().size();
-    	 
-    	 JSONObject testTree = new JSONObject();
-         JSONObject tree = new JSONObject();
-
-         testTree.put("treeId", 1);
-         tree.put("height", 420);
-         tree.put("diameter", 40);
-         tree.put("datePlanted", "2018-03-16");
-         tree.put("land", "Residential");
-         tree.put("status", "Planted");
-         tree.put("ownership", "Private");
-         tree.put("species", "Weeping Willow");
-         tree.put("latitude", 45.515883);
-         tree.put("longitude", -73.685552);
-         tree.put("municipality", "Saint-Laurent");
-
-         testTree.put("user", "Abbas");
-         testTree.put("tree", tree);
-
-    	 service.createUser(testUser);
-         service.createSpecies(testSpecies);
-         service.createMunicipality(testMunicipality);
-         service.createTree(testTree);
-        
-    	 
-    	 try {
-             service.deleteTree(testTree);
-         } catch (InvalidInputException e) {
-            fail();
-         }
-    	
-    	int treesAfter= sql.getAllTrees().size();
-    	
-    	//check DATABSE INTEGRITY
-    	assertEquals(0, treesBefore);
-    	assertEquals(0, treesAfter);
-    	
-    }
-    
-    @Test
-    public void testDeleteTreeNoSuchUserInSystem() throws Exception
-    {
-      //we initially create the user.
+    public void testDeleteTree() throws Exception {
+        // int treesBefore = Tree.getNextTreeId();
         service.createUser(testUser);
-    	service.createSpecies(testSpecies);
+        service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
-        JSONObject testTree = new JSONObject();
-        JSONObject tree = new JSONObject();
-
-        testTree.put("treeId", 1);
-        tree.put("height", 420);
-        tree.put("diameter", 40);
-        tree.put("datePlanted", "2018-03-16");
-        tree.put("land", "Residential");
-        tree.put("status", "Planted");
-        tree.put("ownership", "Private");
-        tree.put("species", "Weeping Willow");
-        tree.put("latitude", 45.515883);
-        tree.put("longitude", -73.685552);
-        tree.put("municipality", "Saint-Laurent");
-
-        testTree.put("user", "Abbas");
-        testTree.put("tree", tree);
         service.createTree(testTree);
-        String error = null;
-        
-       //then delete the user
-        String username = testUser.getString("username");
-        User user = sql.getUser(username);
-        user.delete();
-        
+
         try {
-            service.deleteTree(testTree);
+            JSONObject treeObj = testTree.getJSONObject("tree");
+            JSONObject deleteTree = new JSONObject();
+            deleteTree.put("user", testUser.getString("username"));
+            deleteTree.put("treeId", treeObj.getInt("treeId"));
+
+            Tree tree = service.deleteTree(deleteTree);
+            // int treesAfter = Tree.getNextTreeId();
+
+            assertEquals(treeObj.getInt("height"), tree.getHeight());
+            assertEquals(treeObj.getInt("diameter"), tree.getDiameter());
+            assertEquals(Date.valueOf(treeObj.getString("datePlanted")), tree.getDatePlanted());
+            assertEquals(Land.valueOf(treeObj.getString("land")), tree.getLand());
+            assertEquals(Status.valueOf(treeObj.getString("status")), tree.getStatus());
+            assertEquals(Ownership.valueOf(treeObj.getString("ownership")), tree.getOwnership());
+            assertEquals(treeObj.getString("species"), tree.getSpecies().getName());
+            assertEquals(treeObj.getDouble("latitude"), tree.getLocation().getLatitude(), 0);
+            assertEquals(treeObj.getDouble("longitude"), tree.getLocation().getLongitude(), 0);
+            assertEquals(treeObj.getString("municipality"), tree.getMunicipality().getName());
+            // assertEquals(treesBefore, treesAfter);
         } catch (InvalidInputException e) {
-        	error = e.getMessage();
+            fail();
         }
-        
-        assertEquals("This Tree wasn't planted by you!", error);
-    	
-    	
-    	
-    	
     }
-    
+
+    @Test
+    public void testDeleteTreeNonExistantUser() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+            JSONObject deleteTree = new JSONObject();
+            deleteTree.put("user", "IDONTEXIST");
+            deleteTree.put("treeId", testTree.getInt("treeId"));
+
+            service.deleteTree(deleteTree);
+        } catch (InvalidInputException e) {
+            assertEquals("This Tree wasn't planted by you!", e.getMessage());
+        }
+
+    }
+
    @Test
-    public void testDeleteTreeTreeAlreadyDeleted() throws Exception
-    {
-    	 service.createUser(testUser);
-     	 service.createSpecies(testSpecies);
-         service.createMunicipality(testMunicipality);
+    public void testDeleteTreeNonExistant() throws Exception {
+        try {
+            JSONObject deleteTree = new JSONObject();
+            deleteTree.put("user", "IDONTEXIST");
+            deleteTree.put("treeId", testTree.getJSONObject("tree").getInt("treeId"));
 
-         JSONObject testTree = new JSONObject();
-         JSONObject tree = new JSONObject();
-         testTree.put("treeId", 1);
-         tree.put("height", 420);
-         tree.put("diameter", 40);
-         tree.put("datePlanted", "2018-03-16");
-         tree.put("land", "Residential");
-         tree.put("status", "Planted");
-         tree.put("ownership", "Private");
-         tree.put("species", "Weeping Willow");
-         tree.put("latitude", 45.515883);
-         tree.put("longitude", -73.685552);
-         tree.put("municipality", "Saint-Laurent");
-
-         testTree.put("user", "Abbas");
-         testTree.put("tree", tree);
-         service.createTree(testTree);
-         String error = null;
-         
-         try {
-             service.deleteTree(testTree);
-         } catch (InvalidInputException e) {
-         	fail();
-         }
-         
-         try {
-             service.deleteTree(testTree);
-         } catch (InvalidInputException e) {
-         	error = e.getMessage();
-         }
-         
-         assertEquals("No Tree with that ID exists!", error);
-         
-    
+            service.deleteTree(deleteTree);
+        } catch (InvalidInputException e) {
+            assertEquals("No Tree with that ID exists!", e.getMessage());
+        }
     }
 
 
