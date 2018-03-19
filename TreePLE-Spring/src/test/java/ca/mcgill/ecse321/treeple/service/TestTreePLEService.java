@@ -478,7 +478,25 @@ public class TestTreePLEService {
     @Test
     public void testDeleteTree() throws Exception{
     	 int treesBefore =sql.getAllTrees().size();
-    	
+    	 
+    	 JSONObject testTree = new JSONObject();
+         JSONObject tree = new JSONObject();
+
+         testTree.put("treeId", 1);
+         tree.put("height", 420);
+         tree.put("diameter", 40);
+         tree.put("datePlanted", "2018-03-16");
+         tree.put("land", "Residential");
+         tree.put("status", "Planted");
+         tree.put("ownership", "Private");
+         tree.put("species", "Weeping Willow");
+         tree.put("latitude", 45.515883);
+         tree.put("longitude", -73.685552);
+         tree.put("municipality", "Saint-Laurent");
+
+         testTree.put("user", "Abbas");
+         testTree.put("tree", tree);
+
     	 service.createUser(testUser);
          service.createSpecies(testSpecies);
          service.createMunicipality(testMunicipality);
@@ -506,6 +524,23 @@ public class TestTreePLEService {
         service.createUser(testUser);
     	service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
+        JSONObject testTree = new JSONObject();
+        JSONObject tree = new JSONObject();
+
+        testTree.put("treeId", 1);
+        tree.put("height", 420);
+        tree.put("diameter", 40);
+        tree.put("datePlanted", "2018-03-16");
+        tree.put("land", "Residential");
+        tree.put("status", "Planted");
+        tree.put("ownership", "Private");
+        tree.put("species", "Weeping Willow");
+        tree.put("latitude", 45.515883);
+        tree.put("longitude", -73.685552);
+        tree.put("municipality", "Saint-Laurent");
+
+        testTree.put("user", "Abbas");
+        testTree.put("tree", tree);
         service.createTree(testTree);
         String error = null;
         
@@ -527,7 +562,7 @@ public class TestTreePLEService {
     	
     }
     
-    @Test
+   /* @Test
     public void testDeleteTreeTreeAlreadyDeleted() throws Exception
     {
     	 service.createUser(testUser);
@@ -548,7 +583,7 @@ public class TestTreePLEService {
          assertEquals("This Tree wasn't planted by you!", error);
          
     
-    }
+    }*/
 
 
     // ==============================
