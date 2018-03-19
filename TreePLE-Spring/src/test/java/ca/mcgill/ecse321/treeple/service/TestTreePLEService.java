@@ -529,6 +529,136 @@ public class TestTreePLEService {
             assertEquals("That username doesn't exist!", e.getMessage());
         }
     }
+    
+    @Test
+    public void testDeleteTree() throws Exception{
+    	 int treesBefore =sql.getAllTrees().size();
+    	 
+    	 JSONObject testTree = new JSONObject();
+         JSONObject tree = new JSONObject();
+
+         testTree.put("treeId", 1);
+         tree.put("height", 420);
+         tree.put("diameter", 40);
+         tree.put("datePlanted", "2018-03-16");
+         tree.put("land", "Residential");
+         tree.put("status", "Planted");
+         tree.put("ownership", "Private");
+         tree.put("species", "Weeping Willow");
+         tree.put("latitude", 45.515883);
+         tree.put("longitude", -73.685552);
+         tree.put("municipality", "Saint-Laurent");
+
+         testTree.put("user", "Abbas");
+         testTree.put("tree", tree);
+
+    	 service.createUser(testUser);
+         service.createSpecies(testSpecies);
+         service.createMunicipality(testMunicipality);
+         service.createTree(testTree);
+        
+    	 
+    	 try {
+             service.deleteTree(testTree);
+         } catch (InvalidInputException e) {
+            fail();
+         }
+    	
+    	int treesAfter= sql.getAllTrees().size();
+    	
+    	//check DATABSE INTEGRITY
+    	assertEquals(0, treesBefore);
+    	assertEquals(0, treesAfter);
+    	
+    }
+    
+    @Test
+    public void testDeleteTreeNoSuchUserInSystem() throws Exception
+    {
+      //we initially create the user.
+        service.createUser(testUser);
+    	service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        JSONObject testTree = new JSONObject();
+        JSONObject tree = new JSONObject();
+
+        testTree.put("treeId", 1);
+        tree.put("height", 420);
+        tree.put("diameter", 40);
+        tree.put("datePlanted", "2018-03-16");
+        tree.put("land", "Residential");
+        tree.put("status", "Planted");
+        tree.put("ownership", "Private");
+        tree.put("species", "Weeping Willow");
+        tree.put("latitude", 45.515883);
+        tree.put("longitude", -73.685552);
+        tree.put("municipality", "Saint-Laurent");
+
+        testTree.put("user", "Abbas");
+        testTree.put("tree", tree);
+        service.createTree(testTree);
+        String error = null;
+        
+       //then delete the user
+        String username = testUser.getString("username");
+        User user = sql.getUser(username);
+        user.delete();
+        
+        try {
+            service.deleteTree(testTree);
+        } catch (InvalidInputException e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals("This Tree wasn't planted by you!", error);
+    	
+    	
+    	
+    	
+    }
+    
+   @Test
+    public void testDeleteTreeTreeAlreadyDeleted() throws Exception
+    {
+    	 service.createUser(testUser);
+     	 service.createSpecies(testSpecies);
+         service.createMunicipality(testMunicipality);
+
+         JSONObject testTree = new JSONObject();
+         JSONObject tree = new JSONObject();
+         testTree.put("treeId", 1);
+         tree.put("height", 420);
+         tree.put("diameter", 40);
+         tree.put("datePlanted", "2018-03-16");
+         tree.put("land", "Residential");
+         tree.put("status", "Planted");
+         tree.put("ownership", "Private");
+         tree.put("species", "Weeping Willow");
+         tree.put("latitude", 45.515883);
+         tree.put("longitude", -73.685552);
+         tree.put("municipality", "Saint-Laurent");
+
+         testTree.put("user", "Abbas");
+         testTree.put("tree", tree);
+         service.createTree(testTree);
+         String error = null;
+         
+         try {
+             service.deleteTree(testTree);
+         } catch (InvalidInputException e) {
+         	fail();
+         }
+         
+         try {
+             service.deleteTree(testTree);
+         } catch (InvalidInputException e) {
+         	error = e.getMessage();
+         }
+         
+         assertEquals("No Tree with that ID exists!", error);
+         
+    
+    }
 
 
     // ==============================
