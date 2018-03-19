@@ -48,6 +48,38 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
+    
+    @Test
+    public void testGetAllUsersEmptyDB() throws Exception {
+        mockMvc.perform(get("/users/").contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            .andExpect(content().string("[]"));
+    }
+    
+    @Test
+    public void testGetAllSpeciesEmptyDB() throws Exception {
+        mockMvc.perform(get("/species/").contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            .andExpect(content().string("[]"));
+    }
+    
+    @Test
+    public void testGetAllLocationsEmptyDB() throws Exception {
+        mockMvc.perform(get("/locations/").contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            .andExpect(content().string("[]"));
+    }
+    
+    @Test
+    public void testGetAllMunicipalitiesEmptyDB() throws Exception {
+        mockMvc.perform(get("/municipalities/").contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            .andExpect(content().string("[]"));
+    }
 
     // @Test(expected = InvalidInputException.class)
     // public void testGetTreeNonExistant() throws Exception {
