@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import ca.mcgill.ecse321.treeple.service.InvalidInputException;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -81,7 +80,7 @@ public class TestTreePLERestController {
             .andExpect(content().string("[]"));
     }
 
-    // @Test(expected = InvalidInputException.class)
+    // @Test
     // public void testGetTreeNonExistant() throws Exception {
     //     mockMvc.perform(get("/trees/10/").contentType(APPLICATION_JSON))
     //     .andExpect(status().isInternalServerError())

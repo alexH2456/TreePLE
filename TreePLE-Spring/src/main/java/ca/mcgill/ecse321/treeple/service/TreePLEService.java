@@ -352,6 +352,8 @@ public class TreePLEService {
         if (!sql.deleteTree(treeId))
             throw new SQLException("SQL Tree delete query failed!");
 
+        Tree.setNextTreeId(Tree.getNextTreeId() - 1);
+
         return tree;
     }
 
@@ -407,6 +409,8 @@ public class TreePLEService {
 
         if (!sql.deleteLocation(locationId))
             throw new SQLException("SQL Location delete query failed!");
+
+        Location.setNextLocationId(Location.getNextLocationId() - 1);
 
         return location;
     }
