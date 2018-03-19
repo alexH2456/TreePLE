@@ -584,7 +584,7 @@ public class TestTreePLEService {
         try {
             JSONObject deleteTree = new JSONObject();
             deleteTree.put("user", "IDONTEXIST");
-            deleteTree.put("treeId", testTree.getInt("treeId"));
+            deleteTree.put("treeId", testTree.getJSONObject("tree").getInt("treeId"));
 
             service.deleteTree(deleteTree);
         } catch (InvalidInputException e) {
