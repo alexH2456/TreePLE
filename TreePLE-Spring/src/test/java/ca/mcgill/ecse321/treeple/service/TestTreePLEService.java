@@ -498,6 +498,57 @@ public class TestTreePLEService {
     	assertEquals(0, treesAfter);
     	
     }
+    
+    @Test
+    public void testDeleteTreeNoSuchUserInSystem() throws Exception
+    {
+      //we initially create the user.
+        service.createUser(testUser);
+    	service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+        String error = null;
+        
+       //then delete the user
+        String username = testUser.getString("username");
+        User user = sql.getUser(username);
+        user.delete();
+        
+        try {
+            service.deleteTree(testTree);
+        } catch (InvalidInputException e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals("This Tree wasn't planted by you!", error);
+    	
+    	
+    	
+    	
+    }
+    
+    @Test
+    public void testDeleteTreeTreeAlreadyDeleted() throws Exception
+    {
+    	 service.createUser(testUser);
+     	 service.createSpecies(testSpecies);
+         service.createMunicipality(testMunicipality);
+         service.createTree(testTree);
+         String error = null;
+         
+         int treeId= testTree.getJSONObject("tree").getInt("treeId");
+         Tree tree = sql.getTree(treeId);
+         
+         try {
+             service.deleteTree(testTree);
+         } catch (InvalidInputException e) {
+         	error = e.getMessage();
+         }
+         
+         assertEquals("This Tree wasn't planted by you!", error);
+         
+    
+    }
 
 
     // ==============================
