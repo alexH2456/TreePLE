@@ -474,6 +474,30 @@ public class TestTreePLEService {
             assertEquals("That username doesn't exist!", e.getMessage());
         }
     }
+    
+    @Test
+    public void testDeleteTree() throws Exception{
+    	 int treesBefore =sql.getAllTrees().size();
+    	
+    	 service.createUser(testUser);
+         service.createSpecies(testSpecies);
+         service.createMunicipality(testMunicipality);
+         service.createTree(testTree);
+        
+    	 
+    	 try {
+             service.deleteTree(testTree);
+         } catch (InvalidInputException e) {
+            fail();
+         }
+    	
+    	int treesAfter= sql.getAllTrees().size();
+    	
+    	//check DATABSE INTEGRITY
+    	assertEquals(0, treesBefore);
+    	assertEquals(0, treesAfter);
+    	
+    }
 
 
     // ==============================

@@ -327,7 +327,8 @@ public class TreePLEService {
     // Delete a Tree
     public Tree deleteTree(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("user");
-        int treeId = jsonParams.getInt("treeId");
+        JSONObject treeParams = jsonParams.getJSONObject("tree");
+        int treeId = treeParams.getInt("treeId");
 
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative or zero!");
