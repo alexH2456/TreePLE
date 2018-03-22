@@ -434,6 +434,11 @@ public class TreePLEService {
         return municipality;
     }
 
+
+    // ==============================
+    // DATABASE RESET API
+    // ==============================
+
     // Reset the database
     public void resetDatabase() throws Exception {
         if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
