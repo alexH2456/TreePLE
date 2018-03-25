@@ -2,18 +2,33 @@ package ca.mcgill.ecse321.treeple.service;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.json.*;
-import org.apache.commons.lang3.*;
-import org.apache.http.client.methods.*;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import ca.mcgill.ecse321.treeple.model.*;
-import ca.mcgill.ecse321.treeple.model.Tree.*;
-import ca.mcgill.ecse321.treeple.model.User.*;
+import ca.mcgill.ecse321.treeple.model.Location;
+import ca.mcgill.ecse321.treeple.model.Municipality;
+import ca.mcgill.ecse321.treeple.model.Species;
+import ca.mcgill.ecse321.treeple.model.SurveyReport;
+import ca.mcgill.ecse321.treeple.model.Tree;
+import ca.mcgill.ecse321.treeple.model.Tree.Land;
+import ca.mcgill.ecse321.treeple.model.Tree.Ownership;
+import ca.mcgill.ecse321.treeple.model.Tree.Status;
+import ca.mcgill.ecse321.treeple.model.User;
+import ca.mcgill.ecse321.treeple.model.User.UserRole;
 import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 @Service
@@ -324,6 +339,16 @@ public class TreePLEService {
             return municipality;
         }
     }
+    
+    public List<Species> getUniqueSpecies(List<Tree> trees){
+    	ArrayList<Species> uniqueSpecies = new ArrayList<Species>();
+    	for(Tree tree:trees) {
+    		if(!uniqueSpecies.contains(tree.getSpecies()));{
+    			uniqueSpecies.add(tree.getSpecies());
+    		}
+    	}
+    	return uniqueSpecies;
+    }
 
     // ==============================
     // DELETE API
@@ -459,5 +484,82 @@ public class TreePLEService {
             setMaxId();
             throw new SQLException("Unable to delete SQL database!");
         }
+    }
+    
+    // ==============================
+    // SUSTAINABILITY ATTRIBUTES
+    // ==============================
+    
+    public int getApproximateAgeOfTree(Tree tree) {
+    	double diameter= cmToInches(tree.getDiameter());
+    	
+    	 //Average growth rate of a tree is about 6yrs/inch
+    	return (int) Math.round(6*diameter);
+    }
+    //Returns the amount of CO2 sequestered by the tree each year (kg/yr)
+    public double getCO2Sequestered(Tree tree) {
+    	double weight = getWeightOfTree(tree);
+    	
+    	//To account for the dry weight of the tree. Survey was done at
+    	//University of Nebraska showing avg dry weight percentage is 72.5%
+    	double dryWeight = 0.725 * weight;
+    	
+    	//Percentage of Carbon in a tree is about 50% of the dry weight
+    	double carbonWeight = 0.5 * dryWeight;
+    	
+    	//CO2 to Carbon ratio in a CO2 molecule is 3.6663
+    	double co2Sequestered = 3.6663 * carbonWeight;
+    	
+    	return co2Sequestered/getApproximateAgeOfTree(tree);
+    }
+    
+    //Returns the weight of the tree in kg
+    public double getWeightOfTree(Tree tree) {
+    	int height = tree.getHeight();
+    	int diameter = tree.getDiameter();
+    	double weight = 0;
+    	
+    	//A rough estimation of a weight calculation for trees. For different species, the 0.25 and 0.15
+    	//will be slightly different.
+    	if(diameter<11) {
+    		weight = 0.25 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+    	}else {
+    		weight = 0.15 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+    	}
+    	
+    	//To account for the underground weight of the tree. This weight is also in pounds
+    	weight = 1.2 * weight;
+    	return poundsToKG(weight);
+    	
+    }
+    //Returns the forecasted impact of removing a list of trees
+    public double forecastCO2SequesteredReduced(List<Tree> trees) {
+    	double impactOfCutdown = 0;
+    	for (Tree tree: trees) {
+    		impactOfCutdown += getCO2Sequestered(tree);
+    	}
+    	return impactOfCutdown;
+    }
+    
+    //Calculates the biodiversity index of a list of trees
+    public double biodiversityIndex(List<Tree> trees) {
+    	int totalTrees = trees.size();
+    	int totalSpecies = getUniqueSpecies(trees).size();
+    	
+    	return totalTrees/totalSpecies;
+    	
+    }
+    
+    // ==============================
+    // CONVERSIONS
+    // ==============================
+    public double cmToFeet(int centimeters) {
+    	return centimeters*0.0328084;
+    }
+    public double cmToInches(int centimeters) {
+    	return cmToFeet(centimeters)*12;
+    }
+    public double poundsToKG(double weight) {
+    	return weight * 0.453592;
     }
 }
