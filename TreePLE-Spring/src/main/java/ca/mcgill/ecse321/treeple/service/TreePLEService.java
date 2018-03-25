@@ -541,14 +541,6 @@ public class TreePLEService {
     	return impactOfCutdown;
     }
     
-    //Calculates the biodiversity index in a municipality.
-    public double biodiversityIndex(Municipality municipality) {
-    	int totalTrees = municipality.getTotalTrees();
-    	int totalSpecies = 0;
-    	
-    	return (double) totalTrees/totalSpecies;
-    }
-    
     //Calculates the biodiversity index of a list of trees
     public double biodiversityIndex(List<Tree> trees) {
     	int totalTrees = trees.size();
