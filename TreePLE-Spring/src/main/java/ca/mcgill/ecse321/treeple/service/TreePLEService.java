@@ -4,11 +4,12 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.*;
 
-import org.json.*;
 import org.apache.commons.lang3.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.*;
+import org.junit.internal.runners.statements.ExpectException;
 import org.springframework.stereotype.Service;
 
 import ca.mcgill.ecse321.treeple.model.*;
@@ -325,6 +326,7 @@ public class TreePLEService {
         }
     }
 
+
     // ==============================
     // DELETE API
     // ==============================
@@ -459,5 +461,113 @@ public class TreePLEService {
             setMaxId();
             throw new SQLException("Unable to delete SQL database!");
         }
+    }
+
+
+    // ==============================
+    // SUSTAINABILITY ATTRIBUTES
+    // ==============================
+
+    // Get the approximate age of the tree using height and diameter (in years)
+    public int getAgeOfTree(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double diameter = cmToInches(tree.getDiameter());
+
+        // Average growth rate of a tree is about 6 yrs/inch
+        return (int) Math.round(6*diameter);
+    }
+
+    // Returns the weight of the tree in kg
+    public double getWeightOfTree(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        int height = tree.getHeight();
+        int diameter = tree.getDiameter();
+        double weight = 0;
+
+        // A rough estimation of a weight for trees (in pounds)
+        // Times 0.25 or 0.15 depending on the species
+        // Times 1.2 to account for the underground weight of the tree
+        if (diameter < 11) {
+            weight = 0.25 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+        } else {
+            weight = 0.15 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+        }
+
+        return poundsToKG(weight);
+
+    }
+
+    // Returns the amount of CO2 sequestered by the tree (in kg/yr)
+    public double getCO2Sequestered(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double weight = getWeightOfTree(tree);
+
+        // To account for the dry weight of the tree
+        // Survey was done at University of Nebraska showing avg dry weight 72.5%
+        double dryWeight = 0.725 * weight;
+
+        // Percentage of Carbon in a tree is about 50% of the dry weight
+        double carbonWeight = 0.5 * dryWeight;
+
+        // CO2 to Carbon ratio in a CO2 molecule is 3.6663
+        double co2Sequestered = 3.6663 * carbonWeight;
+
+        return co2Sequestered/getAgeOfTree(tree);
+    }
+
+    // Returns the forecasted impact of removing a list of trees
+    public double forecastCO2SequesteredReduced(List<Tree> trees) throws Exception {
+        double impactOfCutdown = 0;
+
+        for (Tree tree: trees) {
+            impactOfCutdown += getCO2Sequestered(tree);
+        }
+
+        return impactOfCutdown;
+    }
+
+    // Calculates the biodiversity index of a list of trees
+    public double biodiversityIndex(List<Tree> trees) {
+        int totalTrees = trees.size();
+        int totalSpecies = getUniqueSpecies(trees).size();
+
+        return (double) totalTrees/totalSpecies;
+    }
+
+    // ==============================
+    // HELPER METHODS
+    // ==============================
+
+    // Get list of unique species from list of trees
+    public List<Species> getUniqueSpecies(List<Tree> trees) {
+        HashSet<Species> uniqueSpecies = new HashSet<Species>();
+
+        for (Tree tree : trees) {
+            uniqueSpecies.add(tree.getSpecies());
+        }
+
+        return new ArrayList<Species>(uniqueSpecies);
+    }
+
+
+    // ==============================
+    // CONVERSIONS
+    // ==============================
+    public double cmToFeet(int centimeters) {
+        return 0.0328084 * centimeters;
+    }
+
+    public double cmToInches(int centimeters) {
+        return 12 * cmToFeet(centimeters);
+    }
+
+    public double poundsToKG(double weight) {
+        return 0.453592 * weight;
     }
 }
