@@ -27,4 +27,8 @@ TreePLE enables forecasting to analyze sustainability attributes in what-if scen
 
 ## Questions
 
-* Print vs Throw exception in SQL
+* Print vs Throw exception in SQL -> Turn into error code
+
+## Answers
+
+* Forecast - Create sustainability report

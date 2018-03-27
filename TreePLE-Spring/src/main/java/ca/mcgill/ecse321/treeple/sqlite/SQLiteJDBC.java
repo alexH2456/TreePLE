@@ -436,7 +436,7 @@ public class SQLiteJDBC {
                     User user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
 
                     for (String addressId : rs.getString("myAddresses").replaceAll("\\s", "").split(",")) {
-                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
+                        if (addressId != null && !addressId.isEmpty()) {
                             user.addMyAddress(addressId);
                         }
                     }
@@ -473,7 +473,7 @@ public class SQLiteJDBC {
                     user = new User(username, rs.getString("password"), UserRole.valueOf(rs.getString("role")));
 
                     for (String addressId : rs.getString("myAddresses").replaceAll("\\s", "").split(",")) {
-                        if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
+                        if (addressId != null && !addressId.isEmpty()) {
                             user.addMyAddress(addressId);
                         }
                     }

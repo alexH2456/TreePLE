@@ -137,7 +137,7 @@ public class TreePLERestController {
     }
 
     @GetMapping(value = {"/locations/{locationid}/"})
-    public LocationDto getLocationById(@PathVariable("locationid") String locationId) throws Exception {
+    public LocationDto getLocationById(@PathVariable("locationid") int locationId) throws Exception {
         Location location = service.getLocationById(locationId);
         return convertToDto(location);
     }
@@ -149,9 +149,9 @@ public class TreePLERestController {
     }
 
     @GetMapping(value = {"/reports/{reportid}/"})
-    public SurveyReportDto getSurveyReportById(@PathVariable("reportid") String reportId) throws Exception {
+    public SurveyReportDto getSurveyReportById(@PathVariable("reportid") int reportId) throws Exception {
         SurveyReport report = service.getSurveyReportById(reportId);
-        return convertToDto(location);
+        return convertToDto(report);
     }
 
 
@@ -190,25 +190,25 @@ public class TreePLERestController {
 
     @PatchMapping(value = {"/trees/update/"})
     public TreeDto updateTree(@RequestBody String jsonBody) throws Exception {
-        Tree tree = service.updateTree(jsonBody);
+        Tree tree = service.updateTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
     @PatchMapping(value = {"/users/update/"})
     public UserDto patchDto(@RequestBody String jsonBody) throws Exception {
-        User user = service.updateUser(jsonBody);
+        User user = service.updateUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
     @PatchMapping(value = {"/species/update/"})
     public SpeciesDto updateUserPoints(@RequestBody String jsonBody) throws Exception {
-        Species species = service.updateSpecies(jsonBody);
+        Species species = service.updateSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
     @PatchMapping(value = {"/municipalities/update/"})
     public MunicipalityDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
-        Municipality municipality = service.updateMunicipality(jsonBody);
+        Municipality municipality = service.updateMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
 

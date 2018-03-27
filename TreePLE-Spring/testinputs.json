@@ -15,6 +15,22 @@
     }
 }
 
+{
+    "user": "Gang",
+    "tree": {
+        "height": 420,
+        "diameter": 40,
+        "datePlanted": "2018-04-01",
+        "land": "Residential",
+        "status": "Planted",
+        "ownership": "Public",
+        "species": "Human",
+        "latitude": 45.515883,
+        "longitude": -73.685552,
+        "municipality": "Saint-Lazare"
+    }
+}
+
 
 // Species
 {
@@ -74,4 +90,11 @@
     "password": "gayboi",
     "role": "Scientist",
     "myAddresses": "gayyyyyy"
+}
+
+{
+    "username": "Gang",
+    "password": "skrt",
+    "role": "Resident",
+    "myAddresses": "H4L3N1"
 }

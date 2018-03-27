@@ -4,7 +4,7 @@
 package ca.mcgill.ecse321.treeple.model;
 import java.sql.Date;
 
-// line 120 "../../../../../TreePLE.ump"
+// line 143 "../../../../../TreePLE.ump"
 public class SurveyReport
 {
 
@@ -74,14 +74,14 @@ public class SurveyReport
   public void delete()
   {}
 
-  // line 127 "../../../../../TreePLE.ump"
+  // line 150 "../../../../../TreePLE.ump"
    public  SurveyReport(Date aReportDate, String aReportingUser, int aReportId){
     reportDate = aReportDate;
     reportingUser = aReportingUser;
     reportId = aReportId;
   }
 
-  // line 133 "../../../../../TreePLE.ump"
+  // line 156 "../../../../../TreePLE.ump"
    public static  boolean setNextReportId(int minReportId){
     boolean wasSet = false;
     nextReportId = minReportId;
@@ -89,7 +89,7 @@ public class SurveyReport
     return wasSet;
   }
 
-  // line 140 "../../../../../TreePLE.ump"
+  // line 163 "../../../../../TreePLE.ump"
    public static  int getNextReportId(){
     return nextReportId;
   }

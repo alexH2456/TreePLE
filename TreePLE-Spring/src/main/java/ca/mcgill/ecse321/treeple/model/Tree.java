@@ -329,13 +329,13 @@ public class Tree
     treeId = aTreeId;
     reports = aSurveyReports;
     if (!setSpecies(aSpecies)) {
-    throw new RuntimeException("Unable to create Tree due to aSpecies");
+      throw new RuntimeException("Unable to create Tree due to aSpecies");
     }
     if (!setLocation(aLocation)) {
-    throw new RuntimeException("Unable to create Tree due to aLocation");
+      throw new RuntimeException("Unable to create Tree due to aLocation");
     }
     if (!setMunicipality(aMunicipality)) {
-    throw new RuntimeException("Unable to create Tree due to aMunicipality");
+      throw new RuntimeException("Unable to create Tree due to aMunicipality");
     }
   }
 

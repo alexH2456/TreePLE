@@ -133,7 +133,7 @@ public class TreePLEService {
         }
 
         userObj.addMyTree(treeObj.getTreeId());
-        sql.updateUserTrees(username, userObj.getMyTrees().toString().replaceAll("(\\[)|(\\])", ""));
+        sql.updateUserTrees(username, Arrays.toString(userObj.getMyTrees()).replaceAll("(\\[)|(\\])", ""));
 
         return treeObj;
     }
@@ -159,9 +159,9 @@ public class TreePLEService {
 
         User user = new User(username, password, UserRole.valueOf(role));
 
-        for (String addressId : myAddresses.split(",")) {
-            if (addressId != null && !addressId.replaceAll("\\s", "").isEmpty()) {
-                user.addMyAddress(addressId.replaceAll("\\s", ""));
+        for (String addressId : myAddresses.replaceAll("\\s", "").split(",")) {
+            if (addressId != null && !addressId.isEmpty()) {
+                user.addMyAddress(addressId);
             }
         }
 
@@ -350,17 +350,17 @@ public class TreePLEService {
     }
 
     // Update a User
-    public Tree updateUser(JSONObject jsonParams) throws Exception {
+    public User updateUser(JSONObject jsonParams) throws Exception {
 
     }
 
     // Update a Species
-    public Tree updateSpecies(JSONObject jsonParams) throws Exception {
+    public Species updateSpecies(JSONObject jsonParams) throws Exception {
 
     }
 
     // Update a Municipality
-    public Tree updateMunicipality(JSONObject jsonParams) throws Exception {
+    public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
 
     }
 
@@ -467,7 +467,7 @@ public class TreePLEService {
         if (municipality == null)
             throw new InvalidInputException("No Municipality with that name exists!");
 
-        municipality.delete();
+        municipality.deleteKeepBorders();
         if (!sql.deleteMunicipality(name))
             throw new SQLException("SQL Municipality delete query failed!");
 

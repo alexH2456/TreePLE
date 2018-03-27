@@ -4,7 +4,7 @@
 package ca.mcgill.ecse321.treeple.model;
 import java.util.*;
 
-// line 144 "../../../../../TreePLE.ump"
+// line 72 "../../../../../TreePLE.ump"
 public class User
 {
 
@@ -201,7 +201,7 @@ public class User
     usersByUsername.remove(getUsername());
   }
 
-  // line 158 "../../../../../TreePLE.ump"
+  // line 86 "../../../../../TreePLE.ump"
    public static  boolean clearUsers(){
     usersByUsername.clear();
     return usersByUsername.isEmpty();
