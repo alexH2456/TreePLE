@@ -262,9 +262,28 @@ public class SQLiteJDBC {
         return tree;
     }
 
+    // Get all Trees from a Municipality
+    public ArrayList<Tree> getAllTreesFromMunicipality(String municipality) {
+        ArrayList<Tree> trees = new ArrayList<>();
+        String getTreesFromMunicipality = String.format("SELECT * FROM TREES WHERE municipality = '%s';", municipality);
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery(getTreesFromMunicipality);
+
+            while (rs.next()) {
+                trees.add(createTree(rs));
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+
+        return trees;
+    }
+
     // Get the highest treeId
     public int getMaxTreeId() {
         int getMaxTreeId = -1;
+
         try {
             ResultSet rs = c.createStatement().executeQuery("SELECT MAX(treeId) AS maxTreeId FROM TREES;");
 
@@ -289,6 +308,31 @@ public class SQLiteJDBC {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
         return false;
+    }
+
+    // Create a Tree object
+    private Tree createTree(ResultSet rs) throws Exception {
+        int treeId = rs.getInt("treeId");
+        int height = rs.getInt("height");
+        int diameter = rs.getInt("diameter");
+        String address = rs.getString("address");
+        Date datePlanted = Date.valueOf(rs.getString("datePlanted"));
+        Land land = Land.valueOf(rs.getString("land"));
+        Status status = Status.valueOf(rs.getString("status"));
+        Ownership ownership = Ownership.valueOf(rs.getString("ownership"));
+        Species species = getSpecies(rs.getString("species"));
+        Location location = getLocation(rs.getInt("location"));
+        Municipality municipality = getMunicipality(rs.getString("municipality"));
+        ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
+
+        for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
+            if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
+                reports.add(getSurveyReport(Integer.parseInt(reportId)));
+            }
+        }
+
+        return new Tree(height, diameter, address, datePlanted, land, status,
+                        ownership, species, location, municipality, treeId, reports);
     }
 
 
