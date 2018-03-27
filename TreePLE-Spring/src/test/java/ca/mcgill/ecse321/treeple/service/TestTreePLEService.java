@@ -477,7 +477,82 @@ public class TestTreePLEService {
     public void testGetTreeByIdNonExistantTree() throws Exception {
         service.getTreeById(100);
     }
+    // ==============================
+    // UPDATE TREE TEST
+    // ==============================
+    
+    // ==============================
+    // UPDATE USER TEST
+    // ==============================
+    
+    // ==============================
+    // UPDATE SPECIES TEST
+    // ==============================
+    
+    @Test
+    public void testUpdateSpecies() throws Exception {
+    	service.createSpecies(testSpecies);
+    	JSONObject newSpecies = new JSONObject();
+    	newSpecies.put("name", "Weeping Willow");
+        newSpecies.put("species", "Salix Alba");
+        newSpecies.put("genus", "Willow");
+        
+        Species species = null;
+        try {
+            species = service.updateSpecies(newSpecies); 
+        } catch (Exception e) {
+            fail();
+        }
+        assertEquals("Weeping Willow" , species.getName());
+        assertEquals("Salix Alba" , species.getSpecies());
+        assertEquals("Willow" , species.getGenus());
+    }
 
+    @Test
+    public void testUpdateSpeciesNullSpeciesNullGenus() throws Exception {
+    	service.createSpecies(testSpecies);
+        JSONObject species = new JSONObject();
+        species.put("name", "Weeping Willow");
+        species.put("species", (String) null);
+        species.put("genus", (String) null);
+
+        try {
+            service.updateSpecies(species);
+            assertEquals(true, Species.hasWithName(species.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test(expected = JSONException.class)
+    public void testUpdateSpeciesEmptyName() throws Exception {
+        JSONObject species = new JSONObject();
+        species.put("name", (String) null);
+        species.put("species", "Acer Pseudoplatanus");
+        species.put("genus", "Acer");
+
+        service.updateSpecies(species);
+    }
+    
+    @Test
+    public void testUpdateSpeciesSpacesName() throws Exception {
+    	String error = "";
+        JSONObject species = new JSONObject();
+        species.put("name", "               ");
+        species.put("species", "Acer Pseudoplatanus");
+        species.put("genus", "Acer");
+
+        try{
+        	service.updateSpecies(species);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals("Species cannot be empty!", error);
+    }
+    // ==============================
+    // UPDATE MUNICIPALITY TEST
+    // ==============================
 
     // ==============================
     // DELETE USER TEST
