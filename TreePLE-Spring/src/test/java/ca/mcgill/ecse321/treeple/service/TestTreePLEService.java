@@ -844,7 +844,7 @@ public class TestTreePLEService {
         testUser.put("username", "Abbas");
         testUser.put("password", "ecse321pw");
         testUser.put("role", "Resident");
-        testUser.put("myAddresses", "ChIJfU7AfWwYyUwRBfXBtBkniXI");
+        testUser.put("myAddresses", "H4L3N1");
 
         return testUser;
     }

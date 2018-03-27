@@ -136,32 +136,23 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
+    @GetMapping(value = {"/locations/{locationid}/"})
+    public LocationDto getLocationById(@PathVariable("locationid") String locationId) throws Exception {
+        Location location = service.getLocationById(locationId);
+        return convertToDto(location);
+    }
+
     @GetMapping(value = {"/municipalities/{name}/"})
     public MunicipalityDto getMunicipalityByName(@PathVariable("name") String name) throws Exception {
         Municipality municipality = service.getMunicipalityByName(name);
         return convertToDto(municipality);
     }
 
-    // @GetMapping(value = {"/trees/{treeId}/"})
-    // public TreeDto getTreeById(@PathVariable("treeId") int treeId) throws InvalidInputException {
-    //     Tree tree = service.getTreeById(treeId);
-    //     return convertToDto(tree);
-    // }
-
-
-    // @GetMapping(value = {"/locations/"})
-    // public List<LocationDto> findAllLocations() {
-    //     List<LocationDto> locations = new ArrayList<LocationDto>();
-    //     for (Location location : service.findAllLocations())
-    //         locations.add(convertToDto(location));
-    //     return locations;
-    // }
-
-    // @GetMapping(value = {"/locations/{id}", "/locations/{id}/"})
-    // public LocationDto getLocationById(@PathVariable("id") String id) throws InvalidInputException {
-    //     Location location = service.getLocationById(id);
-    //     return convertToDto(location);
-    // }
+    @GetMapping(value = {"/reports/{reportid}/"})
+    public SurveyReportDto getSurveyReportById(@PathVariable("reportid") String reportId) throws Exception {
+        SurveyReport report = service.getSurveyReportById(reportId);
+        return convertToDto(location);
+    }
 
 
     // ==============================
@@ -192,52 +183,34 @@ public class TreePLERestController {
         return convertToDto(municipality);
     }
 
-    // @PostMapping(value = {"/locations/{id}", "/locations/{id}/"})
-    // public LocationDto createLocation(@PathVariable("id") String id,
-    //                                      @RequestParam String name,
-    //                                      @RequestParam String strtNum,
-    //                                   @RequestParam String address,
-    //                                   @RequestParam(value="qTime", defaultValue="-1") int qTime
-    //                                      ) throws InvalidInputException {
-    //     Location location = service.createLocation(id, name, strtNum, address, qTime, emptyJSON());
-    //     return convertToDto(location);
-    // }
 
-    // @PatchMapping(value = {"/users/points/{username}", "/users/points/{username}/"})
-    // public UserDto updateUserPoints(@PathVariable("username") String username,
-    //                                 @RequestParam int points
-    //                                 ) throws InvalidInputException {
-    //     User user = service.getUserByName(username);
-    //     user = service.updateUserPoints(user, points);
-    //     return convertToDto(user);
-    // }
+    // ==============================
+    // PATCH MAPPING API
+    // ==============================
 
-    // @PatchMapping(value = {"/users/pass/{username}", "/users/pass/{username}/"})
-    // public UserDto updateUserPassword(@PathVariable("username") String username,
-    //                                    @RequestParam String password
-    //                                    ) throws InvalidInputException {
-    //     User user = service.getUserByName(username);
-    //     user = service.updateUserPassword(user, password);
-    //     return convertToDto(user);
-    // }
+    @PatchMapping(value = {"/trees/update/"})
+    public TreeDto updateTree(@RequestBody String jsonBody) throws Exception {
+        Tree tree = service.updateTree(jsonBody);
+        return convertToDto(tree);
+    }
 
-    // @PatchMapping(value = {"/locations/checkIn/{id}", "/locations/checkIn/{id}/"})
-    // public LocationDto updateLocationCheckIn(@PathVariable("id") String id,
-    //                                          @RequestParam String username,
-    //                                          @RequestParam String checkIn
-    //                                          ) throws InvalidInputException {
-    //     Location location = service.updateLocationCheckIn(id, username, checkIn);
-    //     return convertToDto(location);
-    // }
+    @PatchMapping(value = {"/users/update/"})
+    public UserDto patchDto(@RequestBody String jsonBody) throws Exception {
+        User user = service.updateUser(jsonBody);
+        return convertToDto(user);
+    }
 
-    // @PatchMapping(value = {"/locations/checkOut/{id}", "/locations/checkOut/{id}/"})
-    // public LocationDto updateLocationCheckOut(@PathVariable("id") String id,
-    //                                           @RequestParam String username,
-    //                                           @RequestParam String checkOut
-    //                                           ) throws InvalidInputException {
-    //     Location location = service.updateLocationCheckOut(id, username, checkOut);
-    //     return convertToDto(location);
-    // }
+    @PatchMapping(value = {"/species/update/"})
+    public SpeciesDto updateUserPoints(@RequestBody String jsonBody) throws Exception {
+        Species species = service.updateSpecies(jsonBody);
+        return convertToDto(species);
+    }
+
+    @PatchMapping(value = {"/municipalities/update/"})
+    public MunicipalityDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
+        Municipality municipality = service.updateMunicipality(jsonBody);
+        return convertToDto(municipality);
+    }
 
 
     // ==============================

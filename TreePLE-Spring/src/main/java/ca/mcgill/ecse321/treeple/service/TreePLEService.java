@@ -4,11 +4,11 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.*;
 
-import org.json.*;
 import org.apache.commons.lang3.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.*;
 import org.springframework.stereotype.Service;
 
 import ca.mcgill.ecse321.treeple.model.*;
@@ -76,6 +76,7 @@ public class TreePLEService {
             throw new InvalidInputException("That ownership doesn't exist!");
 
         String address = "";
+        String postalCode = "";
         try {
             String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
                                             latitude, longitude, gmapsKey);
@@ -83,7 +84,9 @@ public class TreePLEService {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode >= 200 && statusCode < 300) {
                 JSONObject gmapsJSON = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                JSONArray addressInfo = gmapsJSON.getJSONArray("results").getJSONObject(0).getJSONArray("address_components");
                 address = gmapsJSON.getJSONArray("results").getJSONObject(0).getString("place_id");
+                postalCode = addressInfo.getJSONObject(addressInfo.length() - 1).getString("long_name").replaceAll("\\s", "");
             } else if (statusCode >= 400) {
                 throw new InvalidInputException("Invalid Google Maps API request!");
             }
@@ -99,6 +102,8 @@ public class TreePLEService {
         Municipality municipalityObj;
         if ((userObj = sql.getUser(username)) == null)
             throw new InvalidInputException("User does not exist!");
+        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), postalCode))
+            throw new InvalidInputException("You cannot plant on someone else's property!");
         if ((speciesObj = sql.getSpecies(species)) == null)
             throw new InvalidInputException("Species does not exist!");
         if ((municipalityObj = sql.getMunicipality(municipality)) == null)
@@ -133,7 +138,6 @@ public class TreePLEService {
         return treeObj;
     }
 
-    // TODO: PlaceId for user registration
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
@@ -309,6 +313,11 @@ public class TreePLEService {
         }
     }
 
+    // Get a specific Location
+    public Location getLocationById(int locationId) {
+
+    }
+
     // Get a specific Municipality
     public Municipality getMunicipalityByName(String name) throws Exception {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
@@ -324,6 +333,37 @@ public class TreePLEService {
             return municipality;
         }
     }
+
+    // Get a specific Survey Report
+    public SurveyReport getSurveyReportById(int reportId) {
+
+    }
+
+
+    // ==============================
+    // UPDATE API
+    // ==============================
+
+    // Update a Tree
+    public Tree updateTree(JSONObject jsonParams) throws Exception {
+
+    }
+
+    // Update a User
+    public Tree updateUser(JSONObject jsonParams) throws Exception {
+
+    }
+
+    // Update a Species
+    public Tree updateSpecies(JSONObject jsonParams) throws Exception {
+
+    }
+
+    // Update a Municipality
+    public Tree updateMunicipality(JSONObject jsonParams) throws Exception {
+
+    }
+
 
     // ==============================
     // DELETE API
@@ -459,5 +499,113 @@ public class TreePLEService {
             setMaxId();
             throw new SQLException("Unable to delete SQL database!");
         }
+    }
+
+
+    // ==============================
+    // SUSTAINABILITY ATTRIBUTES
+    // ==============================
+
+    // Get the approximate age of the tree using height and diameter (in years)
+    public int getAgeOfTree(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double diameter = cmToInches(tree.getDiameter());
+
+        // Average growth rate of a tree is about 6 yrs/inch
+        return (int) Math.round(6*diameter);
+    }
+
+    // Returns the weight of the tree in kg
+    public double getWeightOfTree(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        int height = tree.getHeight();
+        int diameter = tree.getDiameter();
+        double weight = 0;
+
+        // A rough estimation of a weight for trees (in pounds)
+        // Times 0.25 or 0.15 depending on the species
+        // Times 1.2 to account for the underground weight of the tree
+        if (diameter < 11) {
+            weight = 0.25 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+        } else {
+            weight = 0.15 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+        }
+
+        return poundsToKG(weight);
+
+    }
+
+    // Returns the amount of CO2 sequestered by the tree (in kg/yr)
+    public double getCO2Sequestered(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double weight = getWeightOfTree(tree);
+
+        // To account for the dry weight of the tree
+        // Survey was done at University of Nebraska showing avg dry weight 72.5%
+        double dryWeight = 0.725 * weight;
+
+        // Percentage of Carbon in a tree is about 50% of the dry weight
+        double carbonWeight = 0.5 * dryWeight;
+
+        // CO2 to Carbon ratio in a CO2 molecule is 3.6663
+        double co2Sequestered = 3.6663 * carbonWeight;
+
+        return co2Sequestered/getAgeOfTree(tree);
+    }
+
+    // Returns the forecasted impact of removing a list of trees
+    public double forecastCO2SequesteredReduced(List<Tree> trees) throws Exception {
+        double impactOfCutdown = 0;
+
+        for (Tree tree: trees) {
+            impactOfCutdown += getCO2Sequestered(tree);
+        }
+
+        return impactOfCutdown;
+    }
+
+    // Calculates the biodiversity index of a list of trees
+    public double biodiversityIndex(List<Tree> trees) {
+        int totalTrees = trees.size();
+        int totalSpecies = getUniqueSpecies(trees).size();
+
+        return (double) totalTrees/totalSpecies;
+    }
+
+    // ==============================
+    // HELPER METHODS
+    // ==============================
+
+    // Get list of unique species from list of trees
+    public List<Species> getUniqueSpecies(List<Tree> trees) {
+        HashSet<Species> uniqueSpecies = new HashSet<Species>();
+
+        for (Tree tree : trees) {
+            uniqueSpecies.add(tree.getSpecies());
+        }
+
+        return new ArrayList<Species>(uniqueSpecies);
+    }
+
+
+    // ==============================
+    // CONVERSIONS
+    // ==============================
+    public double cmToFeet(int centimeters) {
+        return 0.0328084 * centimeters;
+    }
+
+    public double cmToInches(int centimeters) {
+        return 12 * cmToFeet(centimeters);
+    }
+
+    public double poundsToKG(double weight) {
+        return 0.453592 * weight;
     }
 }

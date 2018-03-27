@@ -159,14 +159,3 @@ class SurveyReport
     return nextReportId;
   }
 }
-
-class SustainabilityCalculator
-{
-  * -> 1 Tree tree;
-  * -> 1 Municipality municipality;
-  int getShadeSize(this.tree);
-  int getCO2Reduced(this.tree);
-  int getEnergyConserved(this.tree);
-  int getStormWaterIntercepted(this.tree);
-  int getBioDiversityIndex(this.tree);
-}
