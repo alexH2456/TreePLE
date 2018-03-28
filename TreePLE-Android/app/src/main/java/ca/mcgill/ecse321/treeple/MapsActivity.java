@@ -62,6 +62,10 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    // TODO: Add autocomplete for address
+    // TODO: Add update function for tree properties
+    // TODO: Replace tree icon with default marker, color based on ownership
+
     private GoogleMap mMap;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
