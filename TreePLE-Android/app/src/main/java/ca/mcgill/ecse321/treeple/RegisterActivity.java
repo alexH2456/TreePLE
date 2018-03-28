@@ -41,6 +41,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -54,10 +56,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private Spinner mRoleView;
-    private EditText mAddressView;
     private View mProgressView;
     private View mLoginFormView;
     private EditText mReenterView;
+    private EditText mPostalView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         roleAdapter.setDropDownViewResource(R.layout.spinner_layout);
         mRoleView.setAdapter(roleAdapter);
 
-        mAddressView = (EditText) findViewById(R.id.address);
+        mPostalView = (EditText) findViewById(R.id.postal_code);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -198,14 +200,14 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         mEmailView.setError(null);
         mPasswordView.setError(null);
         mReenterView.setError(null);
-        mAddressView.setError(null);
+        mPostalView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String reenter = mReenterView.getText().toString();
         String role = mRoleView.getSelectedItem().toString();
-        String address = mAddressView.getText().toString();
+        String postalCode = mPostalView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -243,9 +245,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(address)) {
-            mAddressView.setError(getString(R.string.error_no_address));
-            focusView = mAddressView;
+        if (TextUtils.isEmpty(postalCode)) {
+            mPostalView.setError(getString(R.string.error_no_postal));
+            focusView = mPostalView;
+            cancel = true;
+        } else if (!isPostalCodeValid(postalCode)) {
+            mPostalView.setError(getString(R.string.error_wrong_postal));
+            focusView = mPostalView;
             cancel = true;
         }
 
@@ -263,24 +269,30 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password, role, address);
+            mAuthTask = new UserLoginTask(email, password, role, postalCode);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isPasswordSame(String password, String reenter) {
-        if (password.equals(reenter)) {
-            return true;
-        }
-        return false;
-    }
+    private boolean isPostalCodeValid(String postalCode) {
+        String regex = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$";
+        Matcher matcher = Pattern.compile(regex).matcher(postalCode);
 
-    private boolean isEmailValid(String email) {
-        return email.length() > 1;
+        return matcher.matches();
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 5;
+    }
+
+    private boolean isPasswordSame(String password, String reenter) {
+       return password.equals(reenter);
+    }
+
+    private boolean isEmailValid(String email) {
+        String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+        Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(email);
+        return matcher.matches();
     }
 
     /**
@@ -382,16 +394,16 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         private final String mUsername;
         private final String mPassword;
         private final String mRole;
-        private final String mAddress;
+        private final String mPostalCode;
 
         private JSONObject user;
         private boolean accountExists = false;
 
-        UserLoginTask(String username, String password, String role, String address) {
+        UserLoginTask(String username, String password, String role, String postalCode) {
             mUsername = username;
             mPassword = password;
             mRole = role;
-            mAddress = address;
+            mPostalCode = postalCode;
         }
 
         @Override
@@ -417,7 +429,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 user.put("username", mUsername);
                 user.put("password", mPassword);
                 user.put("role", mRole);
-                user.put("myAddresses", mAddress);
+                user.put("myAddresses", mPostalCode);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
