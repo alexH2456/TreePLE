@@ -4,9 +4,9 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This username is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_invalid_email">Enter a valid email</string>
+    <string name="error_invalid_password">Password is too short</string>
+    <string name="error_incorrect_password">Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing username completions."</string>
     <string name="title_activity_maps">Map</string>
@@ -14,7 +14,7 @@
     <string name="maps_button">Go to Map</string>
     <string name="title_activity_register">Sign up</string>
     <string name="action_sign_up">Sign up</string>
-    <string name="error_account_exists">This account already exists</string>
+    <string name="error_account_exists">Account already exists</string>
     <string name="error_no_account">Login Error</string>
     <string name="prompt_height">Height(in cm)</string>
     <string name="prompt_diameter">Diameter(in cm)</string>
@@ -53,6 +53,9 @@
     <string name="repassword_prompt">Re-enter Password</string>
     <string name="error_not_matching">Passwords do not match</string>
     <string name="error_no_address">Please enter an address</string>
+    <string name="prompt_postal_code">Postal Code</string>
+    <string name="error_no_postal">Enter a postal code</string>
+    <string name="error_wrong_postal">Enter a valid postal code</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>
