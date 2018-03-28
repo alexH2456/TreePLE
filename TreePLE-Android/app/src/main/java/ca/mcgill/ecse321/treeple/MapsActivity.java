@@ -463,7 +463,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             if (mLocationPermissionGranted) {
 
-                LocationRequest mLocationRequest = new LocationRequest();
+                LocationRequest mLocationRequest = LocationRequest.create();
                 mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 long UPDATE_INTERVAL = 10 * 1000;
                 mLocationRequest.setInterval(UPDATE_INTERVAL);
