@@ -136,6 +136,12 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
+    @GetMapping(value = {"/species/{name}/"})
+    public SpeciesDto getSpeciesByName(@PathVariable("name") String name) throws Exception {
+        Species species = service.getSpeciesByName(name);
+        return convertToDto(species);
+    }
+
     @GetMapping(value = {"/locations/{locationid}/"})
     public LocationDto getLocationById(@PathVariable("locationid") int locationId) throws Exception {
         Location location = service.getLocationById(locationId);

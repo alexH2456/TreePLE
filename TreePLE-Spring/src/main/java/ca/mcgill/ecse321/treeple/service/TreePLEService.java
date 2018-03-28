@@ -190,7 +190,7 @@ public class TreePLEService {
         }
 
         if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Species cannot be empty!");
+            throw new InvalidInputException("Species name cannot be empty!");
         if (Species.hasWithName(name))
             throw new InvalidInputException("Species already exists!");
 
@@ -313,9 +313,12 @@ public class TreePLEService {
         }
     }
 
+    // Get a specific Species
+    public Species getSpeciesByName(String name) {
+    }
+
     // Get a specific Location
     public Location getLocationById(int locationId) {
-
     }
 
     // Get a specific Municipality
@@ -336,7 +339,6 @@ public class TreePLEService {
 
     // Get a specific Survey Report
     public SurveyReport getSurveyReportById(int reportId) {
-
     }
 
 
@@ -356,7 +358,35 @@ public class TreePLEService {
 
     // Update a Species
     public Species updateSpecies(JSONObject jsonParams) throws Exception {
+        String name = jsonParams.getString("name");
+        String species;
+        String genus;
+        try {
+            species = jsonParams.getString("species");
+        } catch (JSONException e) {
+            species = "";
+        }
+        try {
+            genus = jsonParams.getString("genus");
+        } catch (JSONException e) {
+            genus = "";
+        }
 
+        Species speciesObj;
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Species name cannot be empty!");
+        if ((speciesObj = sql.getSpecies(name)) == null)
+            throw new InvalidInputException("Species does not exist!");
+
+        speciesObj.setGenus(genus);
+        speciesObj.setSpecies(species);
+
+        if (!sql.updateSpecies(name, species, genus)) {
+            speciesObj.delete();
+            throw new SQLException("SQL Species update query failed!");
+        }
+
+        return speciesObj;
     }
 
     // Update a Municipality
