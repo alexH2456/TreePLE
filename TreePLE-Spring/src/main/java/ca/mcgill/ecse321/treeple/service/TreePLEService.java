@@ -312,13 +312,17 @@ public class TreePLEService {
             return user;
         }
     }
-
+    
+    //TODO: Remove stub
     // Get a specific Species
     public Species getSpeciesByName(String name) {
+    	return null;
     }
-
+    
+    //TODO: Remove stub
     // Get a specific Location
     public Location getLocationById(int locationId) {
+    	return null;
     }
 
     // Get a specific Municipality
@@ -336,24 +340,28 @@ public class TreePLEService {
             return municipality;
         }
     }
-
+    
+    //TODO: Remove stub
     // Get a specific Survey Report
     public SurveyReport getSurveyReportById(int reportId) {
+    	return null;
     }
 
 
     // ==============================
     // UPDATE API
     // ==============================
-
+    
+  //TODO: Remove stub
     // Update a Tree
     public Tree updateTree(JSONObject jsonParams) throws Exception {
-
+    	return null;
     }
-
+    
+  //TODO: Remove stub
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
-
+    	return null;
     }
 
     // Update a Species
@@ -388,10 +396,11 @@ public class TreePLEService {
 
         return speciesObj;
     }
-
+    
+    //TODO: Remove stub
     // Update a Municipality
     public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
-
+    	return null;
     }
 
 
