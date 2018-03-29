@@ -15,7 +15,7 @@ class VolleyController {
     private static Context mContext;
 
     //Change this link when restarting ngrok
-    static final String DEFAULT_BASE_URL = "http://ecse321-11.ece.mcgill.ca:8088/";
+    static final String DEFAULT_BASE_URL = "http://ecse321-11.ece.mcgill.ca:8080/";
 
     private VolleyController(Context context) {
         mContext = context;
