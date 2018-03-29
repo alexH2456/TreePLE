@@ -106,7 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeButtonEnabled(false);
         }
 
-        refreshUser();
+//        refreshUser();
     }
 
     @Override
