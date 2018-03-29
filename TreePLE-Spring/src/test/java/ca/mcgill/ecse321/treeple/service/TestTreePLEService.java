@@ -564,8 +564,64 @@ public class TestTreePLEService {
     // ==============================
     // UPDATE MUNICIPALITY TEST
     // ==============================
+    
+    /*
+    @Test
+    public void testUpdateMunicipality() throws Exception {
+    	JSONObject oldMunicipality = new JSONObject();
+    	oldMunicipality.put("name", testMunicipality.get("name"));
+    	oldMunicipality.put("totalTrees", testMunicipality.get("totalTrees"));
+    	JSONArray borders = new JSONArray();
 
+        borders.put(new JSONArray(new double[]{35.497470, -73.772830}));
+        borders.put(new JSONArray(new double[]{35.481864, -73.773715}));
+        borders.put(new JSONArray(new double[]{35.460268, -73.750029}));
+        borders.put(new JSONArray(new double[]{35.481208, -73.723422}));
+        borders.put(new JSONArray(new double[]{35.459034, -73.683652}));
+        borders.put(new JSONArray(new double[]{35.526536, -73.651208}));
+        borders.put(new JSONArray(new double[]{35.522407, -73.730198}));
+        borders.put(new JSONArray(new double[]{35.528407, -73.730198}));
+        borders.put(new JSONArray(new double[]{35.538407, -73.730198}));
+        
+        oldMunicipality.put("borders", borders);
+        
+        service.createMunicipality(oldMunicipality);
+        try {
+            service.updateMunicipality(testMunicipality);
+            assertEquals(true, Municipality.hasWithName(testMunicipality.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
+    @Test
+    public void testUpdateMunicipalityEmptyBorders() {
+        JSONObject municipality = new JSONObject();
+        municipality.put("name", "Saint-Lazare");
+        municipality.put("totalTrees", 12);
+        municipality.put("borders", new JSONArray());
+
+        try {
+            service.createMunicipality(municipality);
+            assertEquals(true, Municipality.hasWithName(municipality.getString("name")));
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void testUpdateMunicipalityTwoBorders() throws Exception {
+        JSONObject municipality = new JSONObject();
+        municipality.put("name", "Saint-Lazare");
+        municipality.put("totalTrees", 12);
+
+        JSONArray borders = new JSONArray();
+        borders.put(new JSONArray(new double[]{45.397067, -74.152067}));
+        borders.put(new JSONArray(new double[]{45.411974, -74.152188}));
+        municipality.put("borders", borders);
+
+        service.createMunicipality(municipality);
+    }*/
 
     // ==============================
     // DELETE USER TEST
