@@ -385,7 +385,45 @@ public class TreePLEService {
 
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
-        return null;
+    	String username = jsonParams.getString("username");
+        String password = jsonParams.getString("password");
+        String role = jsonParams.getString("role");
+        String myAddresses = jsonParams.getString("myAddresses");
+        String myTrees = "";
+        
+        User userObj;
+
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (!username.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Username must be alphanumeric!");
+        if ((userObj = sql.getUser(username)) == null)
+            throw new InvalidInputException("Username does not exist!");
+        if (password == null || password.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Password cannot be empty!");
+        if (!password.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Password must be alphanumeric!");
+        if (!EnumUtils.isValidEnum(UserRole.class, role))
+            throw new InvalidInputException("That role doesn't exist!");
+        if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
+            throw new InvalidInputException("Address cannot be empty!");
+        
+        userObj.setPassword(password);
+        userObj.setRole(User.UserRole.valueOf(role));
+        userObj.clearMyAddresses();
+
+        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
+            if (addressId != null && !addressId.isEmpty()) {
+                userObj.addMyAddress(addressId);
+            }
+        }
+
+        if (!sql.updateUser(username, password, role, myAddresses)) {
+            userObj.delete();
+            throw new SQLException("SQL User insert query failed!");
+        }
+
+        return userObj;
     }
 
     // Update a Species
@@ -422,9 +460,60 @@ public class TreePLEService {
     }
 
     // Update a Municipality
-    public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
-        return null;
+    public Municipality updateMunicipality(JSONObject jsonParams){
+    	return null;
     }
+    
+    /*public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
+    	String name = jsonParams.getString("name").trim();
+        int totalTrees = jsonParams.getInt("totalTrees");
+        JSONArray borders = jsonParams.getJSONArray("borders");
+
+        
+        Municipality municipalityObj;
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Municipality cannot be empty!");
+        if ((municipalityObj = sql.getMunicipality(name)) == null)
+            throw new InvalidInputException("Municipality does not exist!");
+        if (borders.length() > 0 && borders.length() < 3)
+            throw new InvalidInputException("Municipality requires minimum 3 borders!");
+        
+        ArrayList<Location> prevLocations = new ArrayList<Location>(municipalityObj.getBorders());
+        municipalityObj.getBorders().clear();
+        
+        int prevLength = prevLocations.size();
+        int nextLocationId = Location.getNextLocationId();
+        Location.setNextLocationId(prevLocations.get(0).getLocationId());
+        
+        int iteration = 0;
+        ArrayList<Integer> locationIdList = new ArrayList<>();
+        borders.forEach(border -> {
+            JSONArray locationJSON = (JSONArray) border;
+            Location location = new Location(locationJSON.getDouble(0), locationJSON.getDouble(1));
+            municipalityObj.addBorder(location);
+            locationIdList.add(location.getLocationId());
+            if(iteration == prevLength) {
+            	Location.setNextLocationId(nextLocationId);
+            }
+        });
+        
+    
+        if (!sql.updateMunicipality(name, totalTrees, locationIdList.toString().replaceAll("(\\[)|(\\])", ""))) {
+            Location.setNextLocationId(Location.getNextLocationId() - municipalityObj.numberOfBorders());
+            municipalityObj.delete();
+            throw new SQLException("SQL Municipality insert query failed!");
+        }
+        
+        for (Location location : municipalityObj.getBorders()) {
+            if (!sql.insertLocation(location.getLocationId(), location.getLatitude(), location.getLongitude())) {
+                Location.setNextLocationId(Location.getNextLocationId() - municipalityObj.numberOfBorders());
+                municipalityObj.delete();
+                throw new SQLException("SQL Location insert query failed!");
+            }
+        }
+
+        return municipalityObj;
+    } */
 
 
     // ==============================
