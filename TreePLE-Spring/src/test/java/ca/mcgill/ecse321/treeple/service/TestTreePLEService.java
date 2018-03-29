@@ -564,14 +564,14 @@ public class TestTreePLEService {
     // ==============================
     // UPDATE MUNICIPALITY TEST
     // ==============================
-    
+
     /*
     @Test
     public void testUpdateMunicipality() throws Exception {
-    	JSONObject oldMunicipality = new JSONObject();
-    	oldMunicipality.put("name", testMunicipality.get("name"));
-    	oldMunicipality.put("totalTrees", testMunicipality.get("totalTrees"));
-    	JSONArray borders = new JSONArray();
+        JSONObject oldMunicipality = new JSONObject();
+        oldMunicipality.put("name", testMunicipality.get("name"));
+        oldMunicipality.put("totalTrees", testMunicipality.get("totalTrees"));
+        JSONArray borders = new JSONArray();
 
         borders.put(new JSONArray(new double[]{35.497470, -73.772830}));
         borders.put(new JSONArray(new double[]{35.481864, -73.773715}));
@@ -582,9 +582,9 @@ public class TestTreePLEService {
         borders.put(new JSONArray(new double[]{35.522407, -73.730198}));
         borders.put(new JSONArray(new double[]{35.528407, -73.730198}));
         borders.put(new JSONArray(new double[]{35.538407, -73.730198}));
-        
+
         oldMunicipality.put("borders", borders);
-        
+
         service.createMunicipality(oldMunicipality);
         try {
             service.updateMunicipality(testMunicipality);
@@ -622,6 +622,7 @@ public class TestTreePLEService {
 
         service.createMunicipality(municipality);
     }*/
+
 
     // ==============================
     // DELETE USER TEST

@@ -243,8 +243,10 @@ public class TestSQLiteJDBC {
         }
 
         String newPassword = "newPassword";
+        String newRole = "Scientist";
+        String newAddress = "H9O1O2";
         for (int i = 0; i < numUsers; i++) {
-            boolean success = sql.updateUserPassword(defaultUser.getString("username") + i, newPassword + i);
+            boolean success = sql.updateUser(defaultUser.getString("username") + i, newPassword + i, newRole, newAddress);
             assertEquals(true, success);
         }
 
@@ -252,72 +254,6 @@ public class TestSQLiteJDBC {
         for (User user : sql.getAllUsers()) {
             assertEquals(newPassword + i, user.getPassword());
             i++;
-        }
-    }
-
-    @Test
-    public void testUpdateUserRole() {
-        for (int i = 0; i < numUsers; i++) {
-            JSONObject newUser = new JSONObject();
-            newUser.put("username", defaultUser.getString("username") + i);
-            newUser.put("password", defaultUser.getString("password") + i);
-            newUser.put("role", defaultUser.getString("role"));
-            newUser.put("addresses", defaultUser.getString("addresses"));
-            newUser.put("trees", defaultUser.getString("trees"));
-
-            boolean success = sql.insertUser(
-                    newUser.getString("username"),
-                    newUser.getString("password"),
-                    newUser.getString("role"),
-                    newUser.getString("addresses"),
-                    newUser.getString("trees"));
-            assertEquals(true, success);
-        }
-
-        String newRole = "Scientist";
-        for (int i = 0; i < numUsers; i++) {
-            boolean success = sql.updateUserRole(defaultUser.getString("username") + i, newRole);
-            assertEquals(true, success);
-        }
-
-        for (User user : sql.getAllUsers()) {
-            assertEquals(newRole, user.getRole().name());
-        }
-    }
-
-    @Test
-    public void testUpdateUserAddresses() {
-        for (int i = 0; i < numUsers; i++) {
-            JSONObject newUser = new JSONObject();
-            newUser.put("username", defaultUser.getString("username") + i);
-            newUser.put("password", defaultUser.getString("password") + i);
-            newUser.put("role", defaultUser.getString("role"));
-            newUser.put("addresses", defaultUser.getString("addresses"));
-            newUser.put("trees", defaultUser.getString("trees"));
-
-            boolean success = sql.insertUser(
-                    newUser.getString("username"),
-                    newUser.getString("password"),
-                    newUser.getString("role"),
-                    newUser.getString("addresses"),
-                    newUser.getString("trees"));
-            assertEquals(true, success);
-        }
-
-        String newAddress = "1234 Big Street, Toronto, ON, Canada H90 102";
-        for (int i = 0; i < numUsers; i++) {
-            boolean success = sql.updateUserAddresses(defaultUser.getString("username") + i, newAddress);
-            assertEquals(true, success);
-        }
-
-        String[] newAddresses = newAddress.replaceAll(" ", "").split(",");
-        for (User user : sql.getAllUsers()) {
-            String[] addresses = user.getMyAddresses();
-            int i = 0;
-            for (String s : addresses) {
-                assertEquals(newAddresses[i], s);
-                i++;
-            }
         }
     }
 

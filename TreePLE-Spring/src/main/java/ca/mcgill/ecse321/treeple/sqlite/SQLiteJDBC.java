@@ -372,8 +372,6 @@ public class SQLiteJDBC {
         return false;
     }
 
-    
-
     // Update a User's trees
     public boolean updateUserTrees(String username, String myTrees) {
         String updateUserTrees = String.format(
