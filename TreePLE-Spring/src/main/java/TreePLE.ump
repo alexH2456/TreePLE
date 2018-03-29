@@ -163,3 +163,27 @@ class SurveyReport
     return nextReportId;
   }
 }
+
+class Forecast
+{
+  autounique forecastId;
+  Date forecastDate;
+  String forecastingUser;
+
+  public Forecast(Date aForecastDate, String aForecastingUser, int aForecastId) {
+    forecastDate = aForecastDate;
+    forecastingUser = aForecastingUser;
+    forecastId = aForecastId;
+  }
+
+  public static boolean setNextForecastId(int minForecastId) {
+    boolean wasSet = false;
+    nextForecastId = minForecastId;
+    wasSet = true;
+    return wasSet;
+  }
+
+  public static int getNextForecastId() {
+    return nextForecastId;
+  }
+}
