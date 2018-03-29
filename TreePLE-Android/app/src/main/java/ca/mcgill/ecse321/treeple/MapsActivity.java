@@ -62,7 +62,6 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    // TODO: Add autocomplete for address
     // TODO: Add update function for tree properties
     // TODO: Replace tree icon with default marker, color based on ownership
 
@@ -305,6 +304,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Remove current markers
         clearTrees();
 
+        //TODO: Don't display trees if they have status cutDown
         //Query database for list of all trees and add each to the map + trees list
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "trees/", null, new Response.Listener<JSONArray>() {
             @Override
@@ -599,6 +599,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
+    //TODO: Change to updateTree and update status to cutDown instead of deleting
     //Gets tree json from map and issues POST request to database
     public void cutDownTree(Marker marker) throws JSONException {
 
