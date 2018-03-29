@@ -4,7 +4,7 @@
 package ca.mcgill.ecse321.treeple.model;
 import java.util.*;
 
-// line 91 "../../../../../TreePLE.ump"
+// line 99 "../../../../../TreePLE.ump"
 public class Species
 {
 
@@ -103,7 +103,7 @@ public class Species
     speciessByName.remove(getName());
   }
 
-  // line 98 "../../../../../TreePLE.ump"
+  // line 106 "../../../../../TreePLE.ump"
    public static  boolean clearSpecies(){
     speciessByName.clear();
     return speciessByName.isEmpty();

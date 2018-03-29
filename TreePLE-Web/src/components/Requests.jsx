@@ -2,15 +2,18 @@ import React, {PureComponent} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
 
-// const backendUrl = '';
-// const frontendUrl = '';
 const backendUrl = 'http://localhost:8088/';
 const frontendUrl = 'http://localhost:8087/';
+// const backendUrl = '';
+// const frontendUrl = '';
 
 const AXIOS = axios.create({
   baseURL: backendUrl,
-  // headers: {'Access-Control-Allow-Origin': frontendUrl},
-  headers: {'Access-Control-Allow-Origin': '*'},
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE',
+    'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+  },
   timeout: 5000
 });
 

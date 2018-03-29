@@ -318,7 +318,7 @@ public class Tree
   }
 
   // line 40 "../../../../../TreePLE.ump"
-   public  Tree(int aHeight, int aDiameter, String aAddress, Date aDatePlanted, Land aLand, Status aStatus, Ownership aOwnership, Species aSpecies, Location aLocation, Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aSurveyReports){
+   public  Tree(int aHeight, int aDiameter, String aAddress, Date aDatePlanted, Land aLand, Status aStatus, Ownership aOwnership, Species aSpecies, Location aLocation, Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aReports){
     height = aHeight;
     diameter = aDiameter;
     address = aAddress;
@@ -327,7 +327,7 @@ public class Tree
     status = aStatus;
     ownership = aOwnership;
     treeId = aTreeId;
-    reports = aSurveyReports;
+    reports = aReports;
     if (!setSpecies(aSpecies)) {
       throw new RuntimeException("Unable to create Tree due to aSpecies");
     }

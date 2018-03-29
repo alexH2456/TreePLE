@@ -4,7 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.mcgill.ecse321.treeple.model.Tree.*;;
+import ca.mcgill.ecse321.treeple.model.Tree.*;
 
 public class TreeDto {
 

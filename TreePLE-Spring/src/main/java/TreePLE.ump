@@ -36,7 +36,7 @@ class Tree
 
   public Tree(int aHeight, int aDiameter, String aAddress, Date aDatePlanted, Land aLand,
               Status aStatus, Ownership aOwnership, Species aSpecies, Location aLocation,
-              Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aSurveyReports) {
+              Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aReports) {
     height = aHeight;
     diameter = aDiameter;
     address = aAddress;
@@ -45,7 +45,7 @@ class Tree
     status = aStatus;
     ownership = aOwnership;
     treeId = aTreeId;
-    reports = aSurveyReports;
+    reports = aReports;
     if (!setSpecies(aSpecies)) {
       throw new RuntimeException("Unable to create Tree due to aSpecies");
     }
@@ -80,6 +80,14 @@ class User
   enum UserRole {
     Resident,
     Scientist
+  }
+
+  public void clearMyAddresses() {
+    myAddresses.clear();
+  }
+
+  public void clearMyTrees() {
+    myTrees.clear();
   }
 
   public static boolean clearUsers() {
@@ -130,6 +138,10 @@ class Municipality
   int totalTrees;
   * -> * Location borders;
 
+  public void clearBorders() {
+    borders.clear();
+  }
+
   public void deleteKeepBorders() {
     municipalitysByName.remove(getName());
   }
@@ -167,13 +179,27 @@ class SurveyReport
 class Forecast
 {
   autounique forecastId;
-  Date forecastDate;
-  String forecastingUser;
+  Date fcDate;
+  String fcUser;
+  double co2Reduced;
+  double biodiversity;
+  double stormwater;
+  double energyConserved;
+  String fcMunicipality;
+  * -> * Tree fcTrees;
 
-  public Forecast(Date aForecastDate, String aForecastingUser, int aForecastId) {
-    forecastDate = aForecastDate;
-    forecastingUser = aForecastingUser;
+  public Forecast(Date aFcDate, String aFcUser, double aCo2Reduced, double aBiodiversity,
+                  double aStormwater, double aEnergyConserved, String aFcMunicipality,
+                  int aForecastId, ArrayList<Tree> aFcTrees) {
+    fcDate = aFcDate;
+    fcUser = aFcUser;
+    co2Reduced = aCo2Reduced;
+    biodiversity = aBiodiversity;
+    stormwater = aStormwater;
+    energyConserved = aEnergyConserved;
+    fcMunicipality = aFcMunicipality;
     forecastId = aForecastId;
+    fcTrees = aFcTrees;
   }
 
   public static boolean setNextForecastId(int minForecastId) {
