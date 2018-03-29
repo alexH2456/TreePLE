@@ -26,7 +26,7 @@ android {
             signingConfig getSigningConfig()
             applicationVariants.all{ variant ->
                 variant.outputs.all {
-                    outputFileName = "${applicationId}_${variant.buildType.name}_${defaultConfig.versionName}.apk"
+                    outputFileName = "${applicationId}_${variant.buildType.name}_${defaultConfig.versionName}-unsigned.apk"
                 }
             }
         }
