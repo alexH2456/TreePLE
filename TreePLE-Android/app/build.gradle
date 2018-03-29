@@ -23,6 +23,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig getSigningConfig()
+            applicationVariants.all{ variant ->
+                variant.outputs.all {
+                    outputFileName = "${applicationName}_${variant.buildType.name}_${defaultConfig.versionName}.apk"
+                }
+            }
         }
     }
     packagingOptions {
