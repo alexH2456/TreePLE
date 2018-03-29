@@ -26,7 +26,9 @@ android {
             signingConfig getSigningConfig()
             applicationVariants.all{ variant ->
                 variant.outputs.all {
-                    outputFileName = "${applicationId}_${variant.buildType.name}_${defaultConfig.versionName}-unsigned.apk"
+                    def date = new Date();
+                    def formattedDate = date.format('yyyyMMddHHmmss')
+                    outputFileName = "${applicationId}_${variant.buildType.name}_formattedDate_${defaultConfig.versionName}-unsigned.apk"
                 }
             }
         }
