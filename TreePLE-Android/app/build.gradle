@@ -27,7 +27,7 @@ android {
             applicationVariants.all{ variant ->
                 variant.outputs.all {
                     def date = new Date();
-                    def formattedDate = date.format('yyyy-MM-dd-HH:mm:ss')
+                    def formattedDate = date.format('yyyy-MM-dd-HH-mm-ss')
                     outputFileName = "${applicationId}-${defaultConfig.versionName}-" + formattedDate + "-${variant.buildType.name}-unsigned.apk"
                 }
             }
@@ -35,6 +35,31 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/ASL2.0'
+    }
+
+    task deployDebug(type: Copy) {
+        delete file('/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/debug')
+
+        from('build/outputs/apk/debug') {
+            include '*-debug-unsigned.apk'
+            include 'output.json'
+        }
+        into '/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/debug'
+    }
+
+    task deployRelease(type: Copy) {
+        delete file('/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/release')
+
+        from('build/outputs/apk/release') {
+            include '*-release.apk'
+            include 'output.json'
+        }
+        into '/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/release'
+    }
+
+    afterEvaluate {
+        assembleDebug.finalizedBy(deployDebug)
+        assembleRelease.finalizedBy(deployRelease)
     }
 }
 
