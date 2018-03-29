@@ -358,14 +358,14 @@ public class SQLiteJDBC {
 
     // Update a User's password
     public boolean updateUser(String username, String password, String role, String myAddresses) {
-        String updateUserPassword = String.format(
+        String updateUser = String.format(
             "UPDATE USERS " +
             "SET password = '%s', role = '%s', myAddresses = '%s' " +
             "WHERE username = '%s';",
-            password, username);
+            password, role, myAddresses, username);
 
         try {
-            return c.createStatement().executeUpdate(updateUserPassword) <= 0 ? false : true;
+            return c.createStatement().executeUpdate(updateUser) <= 0 ? false : true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
