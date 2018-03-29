@@ -148,10 +148,14 @@ public class TreePLEService {
 
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
+        if (!username.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Username must be alphanumeric!");
         if (User.hasWithUsername(username))
             throw new InvalidInputException("Username is already taken!");
         if (password == null || password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
+        if (!password.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
@@ -159,7 +163,7 @@ public class TreePLEService {
 
         User user = new User(username, password, UserRole.valueOf(role));
 
-        for (String addressId : myAddresses.replaceAll("\\s", "").split(",")) {
+        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
             if (addressId != null && !addressId.isEmpty()) {
                 user.addMyAddress(addressId);
             }
@@ -175,16 +179,16 @@ public class TreePLEService {
 
     // Create a new Species
     public Species createSpecies(JSONObject jsonParams) throws Exception {
-        String name = jsonParams.getString("name");
+        String name = jsonParams.getString("name").trim();
         String species;
         String genus;
         try {
-            species = jsonParams.getString("species");
+            species = jsonParams.getString("species").trim();
         } catch (JSONException e) {
             species = "";
         }
         try {
-            genus = jsonParams.getString("genus");
+            genus = jsonParams.getString("genus").trim();
         } catch (JSONException e) {
             genus = "";
         }
@@ -207,7 +211,7 @@ public class TreePLEService {
 
     // Create a new Municipality
     public Municipality createMunicipality(JSONObject jsonParams) throws Exception {
-        String name = jsonParams.getString("name");
+        String name = jsonParams.getString("name").trim();
         int totalTrees = jsonParams.getInt("totalTrees");
         JSONArray borders = jsonParams.getJSONArray("borders");
 
@@ -312,17 +316,33 @@ public class TreePLEService {
             return user;
         }
     }
-    
-    //TODO: Remove stub
+
     // Get a specific Species
-    public Species getSpeciesByName(String name) {
-    	return null;
+    public Species getSpeciesByName(String name) throws Exception {
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+
+        if (Species.hasWithName(name)) {
+            return Species.getWithName(name);
+        } else {
+            Species species;
+            if ((species = sql.getSpecies(name)) == null)
+                throw new InvalidInputException("No Species with that name exists!");
+
+            return species;
+        }
     }
-    
-    //TODO: Remove stub
+
     // Get a specific Location
-    public Location getLocationById(int locationId) {
-    	return null;
+    public Location getLocationById(int locationId) throws Exception {
+        if (locationId <= 0)
+            throw new InvalidInputException("Location's ID cannot be negative!");
+
+        Location location;
+        if ((location = sql.getLocation(locationId)) == null)
+            throw new InvalidInputException("No Location with that ID exists!");
+
+        return location;
     }
 
     // Get a specific Municipality
@@ -340,28 +360,32 @@ public class TreePLEService {
             return municipality;
         }
     }
-    
-    //TODO: Remove stub
+
     // Get a specific Survey Report
-    public SurveyReport getSurveyReportById(int reportId) {
-    	return null;
+    public SurveyReport getSurveyReportById(int reportId) throws Exception {
+        if (reportId <= 0)
+            throw new InvalidInputException("Report's ID cannot be negative!");
+
+        SurveyReport report;
+        if ((report = sql.getSurveyReport(reportId)) == null)
+            throw new InvalidInputException("No Survey Report with that ID exists!");
+
+        return report;
     }
 
 
     // ==============================
     // UPDATE API
     // ==============================
-    
-  //TODO: Remove stub
+
     // Update a Tree
     public Tree updateTree(JSONObject jsonParams) throws Exception {
-    	return null;
+        return null;
     }
-    
-  //TODO: Remove stub
+
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
-    	return null;
+        return null;
     }
 
     // Update a Species
@@ -370,12 +394,12 @@ public class TreePLEService {
         String species;
         String genus;
         try {
-            species = jsonParams.getString("species");
+            species = jsonParams.getString("species").trim();
         } catch (JSONException e) {
             species = "";
         }
         try {
-            genus = jsonParams.getString("genus");
+            genus = jsonParams.getString("genus").trim();
         } catch (JSONException e) {
             genus = "";
         }
@@ -396,11 +420,10 @@ public class TreePLEService {
 
         return speciesObj;
     }
-    
-    //TODO: Remove stub
+
     // Update a Municipality
     public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
-    	return null;
+        return null;
     }
 
 
@@ -636,6 +659,7 @@ public class TreePLEService {
     // ==============================
     // CONVERSIONS
     // ==============================
+
     public double cmToFeet(int centimeters) {
         return 0.0328084 * centimeters;
     }

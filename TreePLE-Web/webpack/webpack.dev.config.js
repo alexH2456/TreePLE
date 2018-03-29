@@ -8,6 +8,10 @@ module.exports = {
     path.join(parentDir, 'src/index.jsx'),
     'webpack-dev-server/client?http://127.0.0.1:8087/'
   ],
+  output: {
+    path: parentDir + '/dist',
+    filename: 'bundle.js'
+  },
   module: {
     loaders: [
       {
@@ -34,16 +38,12 @@ module.exports = {
           options: {
             limit: 100000,
           },
-        },
+        }
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
-  },
-  output: {
-    path: parentDir + '/dist',
-    filename: 'bundle.js'
+    extensions: ['.js', '.jsx']
   },
   devtool: 'eval-source-map',
   devServer: {
@@ -51,6 +51,7 @@ module.exports = {
     host: '127.0.0.1',
     contentBase: parentDir,
     historyApiFallback: true,
+    disableHostCheck: true,
     proxy: {
       '/api/*': {
         target: 'http://localhost:8088/',

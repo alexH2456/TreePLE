@@ -9,7 +9,8 @@ const frontendUrl = 'http://localhost:8087/';
 
 const AXIOS = axios.create({
   baseURL: backendUrl,
-  headers: {'Access-Control-Allow-Origin': frontendUrl},
+  // headers: {'Access-Control-Allow-Origin': frontendUrl},
+  headers: {'Access-Control-Allow-Origin': '*'},
   timeout: 5000
 });
 

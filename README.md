@@ -24,12 +24,8 @@ TreePLE enables forecasting to analyze sustainability attributes in what-if scen
 * Filters (Backend, Frontend)
 * Create species (Android)
 * Different icons (Android)
-* Remove leading/trailing spaces species/genus
+* Forecast - Create sustainability report
 
 ## Questions
 
 * Print vs Throw exception in SQL -> Turn into error code
-
-## Answers
-
-* Forecast - Create sustainability report
