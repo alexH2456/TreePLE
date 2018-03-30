@@ -27,8 +27,8 @@ android {
             applicationVariants.all{ variant ->
                 variant.outputs.all {
                     def date = new Date();
-                    def formattedDate = date.format('yyyy-MM-dd-HH-mm-ss')
-                    outputFileName = "${applicationId}-${defaultConfig.versionName}-" + formattedDate + "-${variant.buildType.name}-unsigned.apk"
+                    def formattedDate = date.format('yyyy_MM_dd_HH_mm')
+                    outputFileName = "${applicationId}_" + "v" + "${defaultConfig.versionName}_" + formattedDate + "-${variant.buildType.name}-unsigned.apk"
                 }
             }
         }
@@ -37,16 +37,7 @@ android {
         exclude 'META-INF/ASL2.0'
     }
 
-    task deployDebug(type: Copy) {
-        delete file('/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/debug')
-
-        from('build/outputs/apk/debug') {
-            include '*-debug-unsigned.apk'
-            include 'output.json'
-        }
-        into '/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/debug'
-    }
-
+    //TODO: Remove deploy tasks after integrating them into jenkins
     task deployRelease(type: Copy) {
         delete file('/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/release')
 
@@ -58,8 +49,7 @@ android {
     }
 
     afterEvaluate {
-        assembleDebug.finalizedBy(deployDebug)
-        assembleRelease.finalizedBy(deployRelease)
+        assemble.finalizedBy(deployRelease)
     }
 }
 
