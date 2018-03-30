@@ -28,7 +28,7 @@ android {
                 variant.outputs.all {
                     def date = new Date();
                     def formattedDate = date.format('yyyy_MM_dd_HH_mm')
-                    outputFileName = "${applicationId}_" + "v" + "${defaultConfig.versionName}_" + formattedDate + "-${variant.buildType.name}-unsigned.apk"
+                    outputFileName = "${applicationId}_" + "v" + "${defaultConfig.versionName}_" + formattedDate + "-${variant.buildType.name}.apk"
                 }
             }
         }
