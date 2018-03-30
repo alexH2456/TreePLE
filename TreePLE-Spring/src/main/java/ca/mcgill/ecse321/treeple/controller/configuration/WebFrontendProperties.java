@@ -9,7 +9,7 @@ public class WebFrontendProperties {
 
     // The IP adress of the web frontend client
     // private String ip = "192.168.56.50";
-    private String ip = "192.168.56.50";
+    private String ip = "132.206.4.80";
 
     // The port on which the web frontend listens
     private int port = 8087;
