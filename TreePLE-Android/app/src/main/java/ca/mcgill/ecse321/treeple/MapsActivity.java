@@ -106,8 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeButtonEnabled(false);
         }
 
-        //This kills the app if backend isn't running
-//        refreshUser();
+        refreshUser();
     }
 
     @Override
