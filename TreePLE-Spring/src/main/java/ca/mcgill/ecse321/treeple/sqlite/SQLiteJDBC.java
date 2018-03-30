@@ -357,52 +357,22 @@ public class SQLiteJDBC {
     }
 
     // Update a User's password
-    public boolean updateUserPassword(String username, String password) {
-        String updateUserPassword = String.format(
+    public boolean updateUser(String username, String password, String role, String myAddresses) {
+        String updateUser = String.format(
             "UPDATE USERS " +
-            "SET password = '%s' " +
+            "SET password = '%s', role = '%s', myAddresses = '%s' " +
             "WHERE username = '%s';",
-            password, username);
+            password, role, myAddresses, username);
 
         try {
-            return c.createStatement().executeUpdate(updateUserPassword) <= 0 ? false : true;
+            return c.createStatement().executeUpdate(updateUser) <= 0 ? false : true;
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
         return false;
     }
 
-    // Update a User's role
-    public boolean updateUserRole(String username, String role) {
-        String updateUserRole = String.format(
-            "UPDATE USERS " +
-            "SET role = '%s' " +
-            "WHERE username = '%s';",
-            role, username);
-
-        try {
-            return c.createStatement().executeUpdate(updateUserRole) <= 0 ? false : true;
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return false;
-    }
-
-    // Update a User's addresses
-    public boolean updateUserAddresses(String username, String myAddresses) {
-        String updateUserAddresses = String.format(
-            "UPDATE USERS " +
-            "SET myAddresses = '%s' " +
-            "WHERE username = '%s';",
-            myAddresses, username);
-
-        try {
-            return c.createStatement().executeUpdate(updateUserAddresses) <= 0 ? false : true;
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return false;
-    }
+    
 
     // Update a User's trees
     public boolean updateUserTrees(String username, String myTrees) {
