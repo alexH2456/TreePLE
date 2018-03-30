@@ -36,21 +36,6 @@ android {
     packagingOptions {
         exclude 'META-INF/ASL2.0'
     }
-
-    //TODO: Remove deploy tasks after integrating them into jenkins
-    task deployRelease(type: Copy) {
-        delete file('/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/release')
-
-        from('build/outputs/apk/release') {
-            include '*-release.apk'
-            include 'output.json'
-        }
-        into '/var/lib/tomcat8/webapps/ROOT/TreePLE-Android/release'
-    }
-
-    afterEvaluate {
-        assemble.finalizedBy(deployRelease)
-    }
 }
 
 dependencies {
