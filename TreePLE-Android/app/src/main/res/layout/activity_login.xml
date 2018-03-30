@@ -60,15 +60,15 @@
         android:text="@string/action_sign_up" />
 
     <!--Debug button-->
-    <Button
-        android:id="@+id/action_goto_map"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_bg_rounded_corners"
-        android:text="@string/action_goto_map"
-        android:textStyle="bold" />
+    <!--<Button-->
+        <!--android:id="@+id/action_goto_map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/button_bg_rounded_corners"-->
+        <!--android:text="@string/action_goto_map"-->
+        <!--android:textStyle="bold" />-->
 
 </LinearLayout>
 

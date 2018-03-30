@@ -102,13 +102,13 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //Debug method
-        Button gotoMapButton = findViewById(R.id.action_goto_map);
-        gotoMapButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchToMap();
-            }
-        });
+//        Button gotoMapButton = findViewById(R.id.action_goto_map);
+//        gotoMapButton.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                switchToMap();
+//            }
+//        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
