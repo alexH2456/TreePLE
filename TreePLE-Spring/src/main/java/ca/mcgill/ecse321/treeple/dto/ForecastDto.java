@@ -11,9 +11,9 @@ public class ForecastDto {
     private int forecastId;
     private Date fcDate;
     private String fcUser;
+    private double stormwater;
     private double co2Reduced;
     private double biodiversity;
-    private double stormwater;
     private double energyConserved;
     private String fcMunicipality;
     private List<Tree> fcTrees;
@@ -21,63 +21,63 @@ public class ForecastDto {
     public ForecastDto() {
     }
 
-    public ForecastDto(int forecastId, Date fcDate, String fcUser, double co2Reduced,
-                       double biodiversity, double stormwater, double energyConserved,
+    public ForecastDto(int forecastId, Date fcDate, String fcUser, double stormwater,
+                       double co2Reduced, double biodiversity, double energyConserved,
                        ArrayList<Tree> fcTrees) {
-        this(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, "", fcTrees);
+        this(forecastId, fcDate, fcUser, stormwater, co2Reduced, biodiversity, energyConserved, "", fcTrees);
     }
 
-    public ForecastDto(int forecastId, Date fcDate, String fcUser, double co2Reduced,
-                       double biodiversity, double stormwater, double energyConserved,
+    public ForecastDto(int forecastId, Date fcDate, String fcUser, double stormwater,
+                       double co2Reduced, double biodiversity, double energyConserved,
                        String fcMunicipality, ArrayList<Tree> fcTrees) {
         this.forecastId = forecastId;
         this.fcDate = fcDate;
         this.fcUser = fcUser;
+        this.stormwater = stormwater;
         this.co2Reduced = co2Reduced;
         this.biodiversity = biodiversity;
-        this.stormwater = stormwater;
         this.energyConserved = energyConserved;
         this.fcMunicipality = fcMunicipality;
         this.fcTrees = fcTrees;
     }
 
-	public int getForecastId() {
-		return forecastId;
-	}
+    public int getForecastId() {
+        return forecastId;
+    }
 
-	public Date getFcDate() {
-		return fcDate;
-	}
+    public Date getFcDate() {
+        return fcDate;
+    }
 
-	public String getFcUser() {
-		return fcUser;
-	}
+    public String getFcUser() {
+        return fcUser;
+    }
 
-	public double getCo2Reduced() {
-		return co2Reduced;
-	}
+    public double getStormwater() {
+        return stormwater;
+    }
 
-	public double getBiodiversity() {
-		return biodiversity;
-	}
+    public double getCo2Reduced() {
+        return co2Reduced;
+    }
 
-	public double getStormwater() {
-		return stormwater;
-	}
+    public double getBiodiversity() {
+        return biodiversity;
+    }
 
-	public double getEnergyConserved() {
-		return energyConserved;
-	}
+    public double getEnergyConserved() {
+        return energyConserved;
+    }
 
-	public String getFcMunicipality() {
-		return fcMunicipality;
-	}
+    public String getFcMunicipality() {
+        return fcMunicipality;
+    }
 
-	public List<Tree> getFcTrees() {
-		return fcTrees;
-	}
+    public List<Tree> getFcTrees() {
+        return fcTrees;
+    }
 
-	public void setFcTrees(List<Tree> fcTrees) {
-		this.fcTrees = fcTrees;
-	}
+    public void setFcTrees(List<Tree> fcTrees) {
+        this.fcTrees = fcTrees;
+    }
 }

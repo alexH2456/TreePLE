@@ -87,6 +87,18 @@ public class SQLiteJDBC {
                                     + " reportDate    VARCHAR(50) NOT NULL,"
                                     + " reportingUser VARCHAR(50) NOT NULL)";
 
+            // Forecasts DB Table
+            String sqlForecasts = "CREATE TABLE IF NOT EXISTS FORECASTS "
+                                + "(forecastId INT PRIMARY KEY  NOT NULL,"
+                                + " fcDate          VARCHAR(50) NOT NULL,"
+                                + " fcUser          VARCHAR(50) NOT NULL,"
+                                + " co2Reduced      DOUBLE NOT NULL,"
+                                + " biodiversity    DOUBLE NOT NULL,"
+                                + " stormwater      DOUBLE NOT NULL,"
+                                + " energyConserved DOUBLE NOT NULL,"
+                                + " fcMunicipality  VARCHAR(50),"
+                                + " fcTrees         TEXT NOT NULL)";
+
             Statement stmt = c.createStatement();
             stmt.executeUpdate(sqlTrees);
             stmt.executeUpdate(sqlUsers);
@@ -94,6 +106,7 @@ public class SQLiteJDBC {
             stmt.executeUpdate(sqlLocations);
             stmt.executeUpdate(sqlMunicipalities);
             stmt.executeUpdate(sqlSurveyReports);
+            stmt.executeUpdate(sqlForecasts);
             stmt.close();
             return true;
         } catch (Exception e) {
@@ -142,8 +155,8 @@ public class SQLiteJDBC {
 
     // Add a new Tree
     public boolean insertTree(int treeId, int height, int diameter, String address,
-                           String datePlanted, String land, String status, String ownership,
-                           String species, int location, String municipality, String reports) {
+                              String datePlanted, String land, String status, String ownership,
+                              String species, int location, String municipality, String reports) {
         String insertTree = String.format(
             "INSERT INTO TREES (treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports) " +
             "VALUES (%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s');",
@@ -159,7 +172,7 @@ public class SQLiteJDBC {
 
     // Update a Tree
     public boolean updateTree(int treeId, int height, int diameter, String land, String status,
-                           String ownership, String species, String municipality, String reports) {
+                              String ownership, String species, String municipality, String reports) {
         String updateTree = String.format(
             "UPDATE TREES " +
             "SET height = %d, diameter = %d, land = '%s', status = '%s', ownership = '%s', species = '%s', municipality = '%s', reports = '%s' " +
@@ -174,18 +187,6 @@ public class SQLiteJDBC {
         return false;
     }
 
-    // Update a Tree's Survey Reports
-    public boolean updateTreeSurveyReport(int treeId, String reports) {
-        String updateTreeReport = String.format("UPDATE TREES SET reports = '%s' WHERE treeId = %d;", reports, treeId);
-
-        try {
-            return c.createStatement().executeUpdate(updateTreeReport) <= 0 ? false : true;
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-        return false;
-    }
-
     // Get all Trees
     public ArrayList<Tree> getAllTrees() {
         ArrayList<Tree> treeList = new ArrayList<Tree>();
@@ -194,27 +195,7 @@ public class SQLiteJDBC {
             ResultSet rs = c.createStatement().executeQuery("SELECT * FROM TREES;");
 
             while (rs.next()) {
-                int treeId = rs.getInt("treeId");
-                int height = rs.getInt("height");
-                int diameter = rs.getInt("diameter");
-                String address = rs.getString("address");
-                Date datePlanted = Date.valueOf(rs.getString("datePlanted"));
-                Land land = Land.valueOf(rs.getString("land"));
-                Status status = Status.valueOf(rs.getString("status"));
-                Ownership ownership = Ownership.valueOf(rs.getString("ownership"));
-                Species species = getSpecies(rs.getString("species"));
-                Location location = getLocation(rs.getInt("location"));
-                Municipality municipality = getMunicipality(rs.getString("municipality"));
-                ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
-
-                for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
-                    if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
-                        reports.add(getSurveyReport(Integer.parseInt(reportId)));
-                    }
-                }
-
-                treeList.add(new Tree(height, diameter, address, datePlanted, land, status,
-                                      ownership, species, location, municipality, treeId, reports));
+                treeList.add(createTree(rs));
             }
 
             rs.close();
@@ -233,26 +214,7 @@ public class SQLiteJDBC {
             ResultSet rs = c.createStatement().executeQuery(getTree);
 
             if (rs.next()) {
-                int height = rs.getInt("height");
-                int diameter = rs.getInt("diameter");
-                String address = rs.getString("address");
-                Date datePlanted = Date.valueOf(rs.getString("datePlanted"));
-                Land land = Land.valueOf(rs.getString("land"));
-                Status status = Status.valueOf(rs.getString("status"));
-                Ownership ownership = Ownership.valueOf(rs.getString("ownership"));
-                Species species = getSpecies(rs.getString("species"));
-                Location location = getLocation(rs.getInt("location"));
-                Municipality municipality = getMunicipality(rs.getString("municipality"));
-                ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
-
-                for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
-                    if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
-                        reports.add(getSurveyReport(Integer.parseInt(reportId)));
-                    }
-                }
-
-                tree = new Tree(height, diameter, address, datePlanted, land, status,
-                                ownership, species, location, municipality, treeId, reports);
+                tree = createTree(rs);
             }
 
             rs.close();
@@ -326,8 +288,9 @@ public class SQLiteJDBC {
         ArrayList<SurveyReport> reports = new ArrayList<SurveyReport>();
 
         for (String reportId : rs.getString("reports").replaceAll("\\s", "").split(",")) {
-            if (reportId.matches("^\\d+$") && getSurveyReport(Integer.parseInt(reportId)) != null) {
-                reports.add(getSurveyReport(Integer.parseInt(reportId)));
+            SurveyReport report;
+            if (reportId.matches("^\\d+$") && (report = getSurveyReport(Integer.parseInt(reportId))) != null) {
+                reports.add(report);
             }
         }
 
@@ -576,7 +539,7 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Location
-    public boolean insertLocation(int locationId, Double latitude, Double longitude) {
+    public boolean insertLocation(int locationId, double latitude, double longitude) {
         String insertLocation = String.format(
             "INSERT INTO LOCATIONS (locationId, latitude, longitude) " +
             "VALUES (%d, %.8f, %.8f);",
@@ -591,7 +554,7 @@ public class SQLiteJDBC {
     }
 
     // Update a Location
-    public boolean updateLocation(int locationId, Double latitude, Double longitude) {
+    public boolean updateLocation(int locationId, double latitude, double longitude) {
         String updateLocation = String.format(
             "UPDATE LOCATIONS " +
             "SET latitude = %.8f, longitude = %.8f " +
@@ -725,8 +688,9 @@ public class SQLiteJDBC {
                     Municipality municipality = new Municipality(name, rs.getInt("totalTrees"));
 
                     for (String locationId : rs.getString("borders").replaceAll("\\s", "").split(",")) {
-                        if (locationId.matches("^\\d+$") && getLocation(Integer.parseInt(locationId)) != null) {
-                            municipality.addBorder(getLocation(Integer.parseInt(locationId)));
+                        Location location;
+                        if (locationId.matches("^\\d+$") && (location = getLocation(Integer.parseInt(locationId))) != null) {
+                            municipality.addBorder(location);
                         }
                     }
 
@@ -756,8 +720,9 @@ public class SQLiteJDBC {
                     municipality = new Municipality(name, rs.getInt("totalTrees"));
 
                     for (String locationId : rs.getString("borders").replaceAll("\\s", "").split(",")) {
-                        if (locationId.matches("^\\d+$") && getLocation(Integer.parseInt(locationId)) != null) {
-                            municipality.addBorder(getLocation(Integer.parseInt(locationId)));
+                        Location location;
+                        if (locationId.matches("^\\d+$") && (location = getLocation(Integer.parseInt(locationId))) != null) {
+                            municipality.addBorder(location);
                         }
                     }
                 }
@@ -872,34 +837,131 @@ public class SQLiteJDBC {
 
 
     // ==============================
-    // MAIN FUNCTION
+    // FORECASTS TABLE API
     // ==============================
 
-    /*
-    public void main(String[] args) {
-        c = null;
-        stmt = null;
+    // Add a new Forecast
+    public boolean insertForecast(int forecastId, String fcDate, String fcUser, double co2Reduced,
+                                  double biodiversity, double stormwater, double energyConserved,
+                                  String fcMunicipality, String fcTrees) {
+        String insertForecast = String.format(
+            "INSERT INTO FORECASTS (forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees) " +
+            "VALUES (%d, '%s', '%s', %.2f, %.2f, %.2f, %.2f, '%s', '%s');",
+            forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees);
 
-        connect();
-        insertUser(2, "Abbas", "1q2w3e", 21, 100, "{\"AXIOS1EV2\": 3, \"ELEK56VUA\": 9, \"IDEK1053R\": 10}");
-        insertLocation("AXAX", "Pizza Pizza", "1846", "Saint-Catherine Street", 600,
-        "{" + "\"Martin\": {\"checkIn\": \"17:30:00\", \"checkOut\": \"17:45:00\"},"
-                    + "\"Jennifer\": {\"checkIn\": \"09:11:11\", \"checkOut\": \"09:12:34\"},"
-                    + "\"Motassaem\": {\"checkIn\": \"09:59:00\", \"checkOut\": \"19:00:00\"}"
-                    + "}");
-
-        showUsers();
-        showLocations();
-
-        deleteUser(2);
-        deleteLocation("AXAX");
-
-        showUsers();
-        showLocations();
-
-        updateUserPassword(1, "fgtboi");
-
-        closeConnection();
+        try {
+            return c.createStatement().executeUpdate(insertForecast) <= 0 ? false : true;
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return false;
     }
-    */
+
+    // Get all Forecasts
+    public ArrayList<Forecast> getAllForecasts() {
+        ArrayList<Forecast> forecastList = new ArrayList<Forecast>();
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery("SELECT * FROM FORECASTS;");
+
+            while (rs.next()) {
+                forecastList.add(createForecast(rs));
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return forecastList;
+    }
+
+    // Get a Forecast
+    public Forecast getForecast(int forecastId) {
+        Forecast forecast = null;
+        String getForecast = String.format("SELECT * FROM FORECASTS WHERE forecastId = %d;", forecastId);
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery(getForecast);
+
+            if (rs.next()) {
+                forecast = createForecast(rs);
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return forecast;
+    }
+
+    // Get all Forecasts of a User
+    public ArrayList<Forecast> getAllForecastsOfUser(String fcUser) {
+        ArrayList<Forecast> forecastList = new ArrayList<Forecast>();
+        String getForecastsOfUser = String.format("SELECT * FROM FORECASTS WHERE fcUser = '%s';", fcUser);
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery(getForecastsOfUser);
+
+            while (rs.next()) {
+                forecastList.add(createForecast(rs));
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return forecastList;
+    }
+
+    // Get the highest forecastId
+    public int getMaxForecastId() {
+        int getMaxForecastId = -1;
+        try {
+            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(forecastId) AS getMaxForecastId FROM FORECASTS;");
+
+            if (rs.next()) {
+                getMaxForecastId = rs.getInt("getMaxForecastId");
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return getMaxForecastId;
+    }
+
+    // Delete a Forecast
+    public boolean deleteForecast(int forecastId) {
+        String deleteForecast = String.format("DELETE FROM FORECASTS WHERE forecastId = %d;", forecastId);
+
+        try {
+            return c.createStatement().executeUpdate(deleteForecast) <= 0 ? false : true;
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Create a Forecast object
+    private Forecast createForecast(ResultSet rs) throws Exception {
+        int forecastId = rs.getInt("forecastId");
+        Date fcDate = Date.valueOf(rs.getString("fcDate"));
+        String fcUser = rs.getString("fcUser");
+        double stormwater = rs.getDouble("stormwater");
+        double co2Reduced = rs.getDouble("co2Reduced");
+        double biodiversity = rs.getDouble("biodiversity");
+        double energyConserved = rs.getDouble("energyConserved");
+        String fcMunicipality = rs.getString("fcMunicipality");
+        ArrayList<Tree> fcTrees = new ArrayList<Tree>();
+
+        for (String treeId : rs.getString("fcTrees").replaceAll("\\s", "").split(",")) {
+            Tree tree;
+            if (treeId.matches("^\\d+$") && (tree = getTree(Integer.parseInt(treeId))) != null) {
+                fcTrees.add(tree);
+            }
+        }
+
+        return new Forecast(fcDate, fcUser, stormwater, co2Reduced, biodiversity,
+                            energyConserved, fcMunicipality, forecastId, fcTrees);
+    }
 }

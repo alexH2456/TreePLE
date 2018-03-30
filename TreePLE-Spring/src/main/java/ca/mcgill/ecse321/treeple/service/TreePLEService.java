@@ -28,13 +28,15 @@ public class TreePLEService {
     public boolean setMaxId() {
         return Tree.setNextTreeId(sql.getMaxTreeId() + 1) &&
                Location.setNextLocationId(sql.getMaxLocationId() + 1) &&
-               SurveyReport.setNextReportId(sql.getMaxReportId() + 1);
+               SurveyReport.setNextReportId(sql.getMaxReportId() + 1) &&
+               Forecast.setNextForecastId(sql.getMaxForecastId() + 1);
     }
 
     public boolean reduceMaxId() {
         return Tree.setNextTreeId(Tree.getNextTreeId() - 1) &&
                Location.setNextLocationId(Location.getNextLocationId() - 1) &&
-               SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+               SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1) &&
+               Forecast.setNextForecastId(Forecast.getNextForecastId() - 1);
     }
 
     // ==============================
@@ -55,8 +57,8 @@ public class TreePLEService {
         String status = treeParams.getString("status");
         String ownership = treeParams.getString("ownership");
         String species = treeParams.getString("species");
-        Double latitude = treeParams.getDouble("latitude");
-        Double longitude = treeParams.getDouble("longitude");
+        double latitude = treeParams.getDouble("latitude");
+        double longitude = treeParams.getDouble("longitude");
         String municipality = treeParams.getString("municipality");
 
 
@@ -208,7 +210,6 @@ public class TreePLEService {
         return speciesObj;
     }
 
-
     // Create a new Municipality
     public Municipality createMunicipality(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name").trim();
@@ -282,6 +283,11 @@ public class TreePLEService {
     // Get a list of all Survey Reports
     public List<SurveyReport> getAllSurveyReports() {
         return Collections.unmodifiableList(sql.getAllSurveyReports());
+    }
+
+    // Get a list of all Forecasts
+    public List<Forecast> getAllForecasts() {
+        return Collections.unmodifiableList(sql.getAllForecasts());
     }
 
 
@@ -371,6 +377,18 @@ public class TreePLEService {
             throw new InvalidInputException("No Survey Report with that ID exists!");
 
         return report;
+    }
+
+    // Get a specific Forecast
+    public Forecast getForecastById(int forecastId) throws Exception {
+        if (forecastId <= 0)
+            throw new InvalidInputException("Forecast's ID cannot be negative!");
+
+        Forecast forecast;
+        if ((forecast = sql.getForecast(forecastId)) == null)
+            throw new InvalidInputException("No Forecast with that ID exists!");
+
+        return forecast;
     }
 
 
@@ -488,7 +506,7 @@ public class TreePLEService {
         ArrayList<Integer> locationIdList = new ArrayList<>();
         borders.forEach(border -> {
             JSONArray locationJSON = (JSONArray) border;
-            Location location = new Location(locationJSON.getDouble(0), locationJSON.getDouble(1));
+            Location location = new Location(locationJSON.getdouble(0), locationJSON.getdouble(1));
             municipalityObj.addBorder(location);
             locationIdList.add(location.getLocationId());
             if(iteration == prevLength) {
@@ -623,6 +641,34 @@ public class TreePLEService {
             throw new SQLException("SQL Municipality delete query failed!");
 
         return municipality;
+    }
+
+    // Delete a Forecast
+    public Forecast deleteForecast(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("user");
+        int forecastId = jsonParams.getInt("forecastId");
+
+        if (forecastId <= 0)
+            throw new InvalidInputException("Forecast's ID cannot be negative or zero!");
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("User is not logged in/Username is missing!");
+
+        Forecast forecast = sql.getForecast(forecastId);
+        User user = sql.getUser(username);
+
+        if (forecast == null)
+            throw new InvalidInputException("No Forecast with that ID exists!");
+        if (user == null)
+            throw new InvalidInputException("That username doesn't exist!");
+        if (!forecast.getFcUser().equals(user.getUsername()))
+            throw new InvalidInputException("This Forecast wasn't created by you!");
+
+        if (!sql.deleteForecast(forecastId))
+            throw new SQLException("SQL Forecast delete query failed!");
+
+        Forecast.setNextForecastId(Forecast.getNextForecastId() - 1);
+
+        return forecast;
     }
 
 

@@ -111,8 +111,8 @@ class Species
 class Location
 {
   autounique locationId;
-  Double latitude;
-  Double longitude;
+  double latitude;
+  double longitude;
 
   public Location(double aLatitude, double aLongitude, int aLocationId) {
     latitude = aLatitude;
@@ -181,21 +181,21 @@ class Forecast
   autounique forecastId;
   Date fcDate;
   String fcUser;
+  double stormwater;
   double co2Reduced;
   double biodiversity;
-  double stormwater;
   double energyConserved;
   String fcMunicipality;
   * -> * Tree fcTrees;
 
-  public Forecast(Date aFcDate, String aFcUser, double aCo2Reduced, double aBiodiversity,
-                  double aStormwater, double aEnergyConserved, String aFcMunicipality,
+  public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced,
+                  double aBiodiversity, double aEnergyConserved, String aFcMunicipality,
                   int aForecastId, ArrayList<Tree> aFcTrees) {
     fcDate = aFcDate;
     fcUser = aFcUser;
+    stormwater = aStormwater;
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
-    stormwater = aStormwater;
     energyConserved = aEnergyConserved;
     fcMunicipality = aFcMunicipality;
     forecastId = aForecastId;

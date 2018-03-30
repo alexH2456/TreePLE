@@ -22,9 +22,9 @@ public class Forecast
   //Forecast Attributes
   private Date fcDate;
   private String fcUser;
+  private double stormwater;
   private double co2Reduced;
   private double biodiversity;
-  private double stormwater;
   private double energyConserved;
   private String fcMunicipality;
 
@@ -38,13 +38,13 @@ public class Forecast
   // CONSTRUCTOR
   //------------------------
 
-  public Forecast(Date aFcDate, String aFcUser, double aCo2Reduced, double aBiodiversity, double aStormwater, double aEnergyConserved, String aFcMunicipality)
+  public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved, String aFcMunicipality)
   {
     fcDate = aFcDate;
     fcUser = aFcUser;
+    stormwater = aStormwater;
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
-    stormwater = aStormwater;
     energyConserved = aEnergyConserved;
     fcMunicipality = aFcMunicipality;
     forecastId = nextForecastId++;
@@ -71,6 +71,14 @@ public class Forecast
     return wasSet;
   }
 
+  public boolean setStormwater(double aStormwater)
+  {
+    boolean wasSet = false;
+    stormwater = aStormwater;
+    wasSet = true;
+    return wasSet;
+  }
+
   public boolean setCo2Reduced(double aCo2Reduced)
   {
     boolean wasSet = false;
@@ -83,14 +91,6 @@ public class Forecast
   {
     boolean wasSet = false;
     biodiversity = aBiodiversity;
-    wasSet = true;
-    return wasSet;
-  }
-
-  public boolean setStormwater(double aStormwater)
-  {
-    boolean wasSet = false;
-    stormwater = aStormwater;
     wasSet = true;
     return wasSet;
   }
@@ -121,6 +121,11 @@ public class Forecast
     return fcUser;
   }
 
+  public double getStormwater()
+  {
+    return stormwater;
+  }
+
   public double getCo2Reduced()
   {
     return co2Reduced;
@@ -129,11 +134,6 @@ public class Forecast
   public double getBiodiversity()
   {
     return biodiversity;
-  }
-
-  public double getStormwater()
-  {
-    return stormwater;
   }
 
   public double getEnergyConserved()
@@ -244,12 +244,12 @@ public class Forecast
   }
 
   // line 194 "../../../../../TreePLE.ump"
-   public  Forecast(Date aFcDate, String aFcUser, double aCo2Reduced, double aBiodiversity, double aStormwater, double aEnergyConserved, String aFcMunicipality, int aForecastId, ArrayList<Tree> aFcTrees){
+   public  Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved, String aFcMunicipality, int aForecastId, ArrayList<Tree> aFcTrees){
     fcDate = aFcDate;
     fcUser = aFcUser;
+    stormwater = aStormwater;
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
-    stormwater = aStormwater;
     energyConserved = aEnergyConserved;
     fcMunicipality = aFcMunicipality;
     forecastId = aForecastId;
@@ -275,9 +275,9 @@ public class Forecast
     return super.toString() + "["+
             "forecastId" + ":" + getForecastId()+ "," +
             "fcUser" + ":" + getFcUser()+ "," +
+            "stormwater" + ":" + getStormwater()+ "," +
             "co2Reduced" + ":" + getCo2Reduced()+ "," +
             "biodiversity" + ":" + getBiodiversity()+ "," +
-            "stormwater" + ":" + getStormwater()+ "," +
             "energyConserved" + ":" + getEnergyConserved()+ "," +
             "fcMunicipality" + ":" + getFcMunicipality()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "fcDate" + "=" + (getFcDate() != null ? !getFcDate().equals(this)  ? getFcDate().toString().replaceAll("  ","    ") : "this" : "null");

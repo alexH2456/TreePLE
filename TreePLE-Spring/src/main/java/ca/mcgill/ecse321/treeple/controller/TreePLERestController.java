@@ -58,6 +58,10 @@ public class TreePLERestController {
         return modelMapper.map(report, SurveyReportDto.class);
     }
 
+    private ForecastDto convertToDto(Forecast forecast) {
+        return modelMapper.map(forecast, ForecastDto.class);
+    }
+
     private ArrayList<SurveyReportDto> createSurveyReportDtos(List<SurveyReport> reports) {
         ArrayList<SurveyReportDto> reportDtos = new ArrayList<SurveyReportDto>();
         for (SurveyReport report : reports) {
@@ -117,6 +121,14 @@ public class TreePLERestController {
         for (Municipality municipality : service.getAllMunicipalities())
             municipalities.add(convertToDto(municipality));
         return municipalities;
+    }
+
+    @GetMapping(value = {"/forecasts/"})
+    public List<ForecastDto> getAllForecasts() {
+        List<ForecastDto> forecasts = new ArrayList<ForecastDto>();
+        for (Forecast forecast : service.getAllForecasts())
+            forecasts.add(convertToDto(forecast));
+        return forecasts;
     }
 
 
