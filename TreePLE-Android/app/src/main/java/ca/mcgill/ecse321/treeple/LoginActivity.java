@@ -160,7 +160,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onResponse(JSONArray response) {
                 try {
-                    final String apkFileName = response.getJSONObject(0).getJSONObject("apkInfo").getString("outputFile");
+                    String apkFile = response.getJSONObject(0).getJSONObject("apkInfo").getString("outputFile");
+                    final String apkFileName = apkFile.replaceAll("-release.apk", "-release-signed.apk");
                     String dlUrl = baseUrl + apkFileName;
 
                     InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, dlUrl, new Response.Listener<byte[]>() {
