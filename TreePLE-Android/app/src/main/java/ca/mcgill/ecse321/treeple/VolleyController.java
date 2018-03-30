@@ -18,12 +18,13 @@ class VolleyController {
 
     private static VolleyController mInstance;
     private RequestQueue mRequestQueue;
-    private static Context mContext;
+    private Context mContext;
 
+    //Backend URL
     static final String DEFAULT_BASE_URL = "http://ecse321-11.ece.mcgill.ca:8080/";
 
     private VolleyController(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mRequestQueue = getRequestQueue();
     }
 
@@ -50,9 +51,8 @@ class InputStreamVolleyRequest extends Request<byte[]> {
 
     private final Response.Listener<byte[]> mListener;
     private Map<String, String> mParams;
-    public Map<String, String> responseHeaders;
 
-    public InputStreamVolleyRequest(int method, String mUrl, Response.Listener<byte[]> listener, Response.ErrorListener errorListener, HashMap<String, String> params) {
+    InputStreamVolleyRequest(int method, String mUrl, Response.Listener<byte[]> listener, Response.ErrorListener errorListener, HashMap<String, String> params) {
         super(method, mUrl, errorListener);
         setShouldCache(false);
         mListener = listener;
@@ -71,7 +71,7 @@ class InputStreamVolleyRequest extends Request<byte[]> {
 
     @Override
     protected Response<byte[]> parseNetworkResponse(NetworkResponse response) {
-        responseHeaders = response.headers;
+        Map<String, String> responseHeaders = response.headers;
         return Response.success(response.data, HttpHeaderParser.parseCacheHeaders(response));
     }
 

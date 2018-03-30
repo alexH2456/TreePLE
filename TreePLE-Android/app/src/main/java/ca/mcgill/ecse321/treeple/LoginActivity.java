@@ -5,36 +5,29 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -54,19 +47,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static android.Manifest.permission.READ_CONTACTS;
+public class LoginActivity extends AppCompatActivity {
 
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    private static final int REQUEST_READ_CONTACTS = 0;
-
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private EditText mUserView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -80,8 +71,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
         // Set up the login form.
-        mEmailView = findViewById(R.id.email);
-        populateAutoComplete();
+        mUserView = findViewById(R.id.user);
 
         mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -95,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button signInButton = findViewById(R.id.email_sign_in_button);
+        Button signInButton = findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button signUpButton = findViewById(R.id.action_sign_up);
+        Button signUpButton = findViewById(R.id.sign_up_button);
         signUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,7 +101,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        //TODO: For debugging, remove when backend deployed properly (remove from layout as well)
+        //Debug method
         Button gotoMapButton = findViewById(R.id.action_goto_map);
         gotoMapButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -153,77 +143,56 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     //Queries server for latest release apk and downloads it to the users device
     private void updateApp() {
 
-        final String baseUrl = "http://ecse321-11.ece.mcgill.ca:8080/TreePLE-Android/release/";
-        String jsonUrl = baseUrl + "output.json";
+        String dlUrl = VolleyController.DEFAULT_BASE_URL + "TreePLE-Android/release/TreePLE.apk";
 
-        JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, jsonUrl, null, new Response.Listener<JSONArray>() {
+        InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, dlUrl, new Response.Listener<byte[]>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(byte[] response) {
                 try {
-                    String apkFile = response.getJSONObject(0).getJSONObject("apkInfo").getString("outputFile");
-                    final String apkFileName = apkFile.replaceAll("-release.apk", "-release-signed.apk");
-                    String dlUrl = baseUrl + apkFileName;
+                    if (response != null) {
+                        if (isExternalStorageWritable() && isStoragePermissionGranted()) {
 
-                    InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, dlUrl, new Response.Listener<byte[]>() {
-                        @Override
-                        public void onResponse(byte[] response) {
-                            try {
-                                if (response != null) {
-                                    if (isExternalStorageWritable() && isStoragePermissionGranted()) {
+                            InputStream input = new ByteArrayInputStream(response);
 
-                                        InputStream input = new ByteArrayInputStream(response);
+                            File path = new File(Environment.getExternalStorageDirectory() + "/TreePLE/");
+                            path.mkdirs();
+                            File file = new File(path, "TreePLE.apk");
 
-                                        File path = new File(Environment.getExternalStorageDirectory() + "/TreePLE/");
-                                        path.mkdirs();
-                                        File file = new File(path, apkFileName);
+                            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(file));
 
-                                        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(file));
+                            byte data[] = new byte[1024];
+                            int count;
+                            long total = 0;
 
-                                        byte data[] = new byte[1024];
-                                        int count;
-                                        long total = 0;
-
-                                        while ((count = input.read(data)) != -1) {
-                                            total += count;
-                                            output.write(data, 0, count);
-                                        }
-
-                                        output.flush();
-                                        output.close();
-                                        input.close();
-
-                                        Toast.makeText(getApplicationContext(), "Download complete, Apk saved at: " + path.getPath(), Toast.LENGTH_LONG).show();
-
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "No storage access", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                output.write(data, 0, count);
                             }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            error.printStackTrace();
-                        }
-                    }, null);
 
-                    RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
-                    mRequestQueue.add(request);
+                            output.flush();
+                            output.close();
+                            input.close();
 
-                } catch (JSONException e) {
+                            Toast.makeText(getApplicationContext(), "Download complete, Apk saved at: " + path.getPath(), Toast.LENGTH_LONG).show();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No storage access", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "Download error", Toast.LENGTH_LONG).show();
                 error.printStackTrace();
             }
-        });
+        }, null);
 
-        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+        mRequestQueue.add(request);
     }
 
     public boolean isExternalStorageWritable() {
@@ -240,45 +209,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
+        if (requestCode == 1) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
+                updateApp();
             }
         }
     }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
+     * If there are form errors (invalid user, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
@@ -287,11 +230,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         // Reset errors.
-        mEmailView.setError(null);
+        mUserView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        String user = mUserView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -308,14 +251,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
+        // Check for a valid user address.
+        if (TextUtils.isEmpty(user)) {
+            mUserView.setError(getString(R.string.error_field_required));
+            focusView = mUserView;
             cancel = true;
-        } else if (!isUsernameValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
+        } else if (!isUsernameValid(user)) {
+            mUserView.setError(getString(R.string.error_invalid_user));
+            focusView = mUserView;
             cancel = true;
         }
 
@@ -327,7 +270,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(user, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -337,7 +280,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 5;
     }
 
     /**
@@ -376,58 +319,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -438,7 +329,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mUsername;
         private final String mPassword;
         private JSONObject user;
-        private boolean noAccount = false;
+        private boolean noAccount = true;
         private boolean loggedIn = false;
 
         UserLoginTask(String username, String password) {
@@ -454,20 +345,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
             try {
-                user = loginReq.get();
+                user = loginReq.get(5, TimeUnit.SECONDS);
                 if (user != null) {
                     if (user.getString("password").equals(mPassword)) {
                         loggedInUser = user;
                         loggedIn = true;
+                        noAccount = false;
                     }
-                } else {
-                    noAccount = true;
                 }
-            } catch (Exception e) {
+            } catch (InterruptedException | ExecutionException e) {
+                if (e.getCause() instanceof VolleyError) {
+                    VolleyError volleyError = (VolleyError) e.getCause();
+                    NetworkResponse networkResponse = volleyError.networkResponse;
+                    Log.e(TAG, "Backend error: " + networkResponse.toString());
+                }
+            } catch (TimeoutException e) {
+                Log.e(TAG, "Timeout occurred when waiting for response");
+            } catch (JSONException e) {
                 e.printStackTrace();
-                noAccount = true;
             }
-
             return loggedIn;
         }
 
@@ -480,8 +376,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success) {
                 switchToMap();
             } else if (noAccount) {
-                mEmailView.setError(getString(R.string.error_no_account));
-                mEmailView.requestFocus();
+                mUserView.setError(getString(R.string.error_no_account));
+                mUserView.requestFocus();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
