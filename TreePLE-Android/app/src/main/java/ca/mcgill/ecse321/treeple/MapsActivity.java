@@ -106,6 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeButtonEnabled(false);
         }
 
+        //This kills the app if backend isn't running
 //        refreshUser();
     }
 
@@ -343,9 +344,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void refreshUser() {
 
         String username = "";
-
         try {
-            username = LoginActivity.loggedInUser.getString("username");
+            if (LoginActivity.loggedInUser != null) {
+                username = LoginActivity.loggedInUser.getString("username");
+            } else {
+                Toast.makeText(getApplicationContext(), "No user logged in", Toast.LENGTH_LONG).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -358,8 +362,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("User Refresh failed!");
-                Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_LONG).show();
             }
         });
 

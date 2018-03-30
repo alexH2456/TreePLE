@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import {setMessage} from '../actions/message';
 import InputPreview from './InputPreview';
 import {getAllUsers} from './Requests';
+import {Button, Input, Image, Modal, Label} from 'semantic-ui-react'
 
 class App extends PureComponent {
   constructor(props) {
@@ -39,12 +40,17 @@ class App extends PureComponent {
         <Link to="/about">
           <button>Go to About</button>
         </Link>
+        <Link to="/map">
+          <button>Go to maps</button>
+        </Link>
         <button onClick={this.request}>Send request</button>
         {this.state.users ? (
           <div>
           {this.state.users.map(user => <p key={user.username}>{user.username}</p>)}
           </div>
         ) : (null)}
+
+        
       </div>
     );
   };
