@@ -19,7 +19,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -239,10 +238,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
         }
 
         if (TextUtils.isEmpty(postalCode)) {
@@ -287,12 +282,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
     private boolean isPasswordSame(String password, String reenter) {
        return password.equals(reenter);
-    }
-
-    private boolean isEmailValid(String email) {
-        String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
-        Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(email);
-        return matcher.matches();
     }
 
     /**

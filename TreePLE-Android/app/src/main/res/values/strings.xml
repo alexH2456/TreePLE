@@ -56,7 +56,8 @@
     <string name="prompt_postal_code">Postal Code</string>
     <string name="error_no_postal">Enter a postal code</string>
     <string name="error_wrong_postal">Enter a valid postal code</string>
-    <string name="action_goto_map">Goto Map</string>
+    <string name="action_goto_map">Goto Map(DEBUG)</string>
+    <string name="update_placeholder">Check for updates</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>
