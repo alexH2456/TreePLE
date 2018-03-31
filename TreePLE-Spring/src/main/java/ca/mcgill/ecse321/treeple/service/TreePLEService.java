@@ -250,6 +250,56 @@ public class TreePLEService {
         return municipality;
     }
 
+    public Forecast createForecast(JSONObject jsonParams) throws Exception {
+    	String fcDate = jsonParams.getString("fcDate");
+    	String fcUser = jsonParams.getString("fcUser");
+    	String fcMunicipality = jsonParams.getString("fcMunicipality");
+    	JSONArray fcTreeIds = jsonParams.getJSONArray("fcTrees");
+    	
+    	if (fcUser == null || fcUser.replaceAll("\\s", "").isEmpty())
+    		throw new InvalidInputException("User is not logged in/Username is missing!");
+    	if (fcMunicipality == null || fcMunicipality.replaceAll("\\s", "").isEmpty())
+    		throw new InvalidInputException("Municipality name is missing!");
+    	if (fcDate == null || !fcDate.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
+            throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
+    	if (fcTreeIds == null || fcTreeIds.length()<1)
+    		throw new InvalidInputException("There needs to be at least one tree to forecast!");
+    	if(!Municipality.hasWithName(fcMunicipality))
+    		throw new InvalidInputException("Municipality does not exist yet!");
+    	if(!User.hasWithUsername(fcUser))
+    		throw new InvalidInputException("User does no exist yet!");
+    	
+    	ArrayList<Tree> treeList = new ArrayList<Tree>();
+    	ArrayList<Integer> treeIdList = new ArrayList<Integer>();
+    	
+    	fcTreeIds.forEach(treeObj -> {
+    		Tree tree;
+    		int treeId = (int) treeObj;
+    		if((tree = sql.getTree(treeId)) != null) {
+    			treeList.add(tree);
+    			treeIdList.add(treeId);
+    		}
+            
+        });
+    	double stormwater = forecastStormwaterIntercepted(treeList);
+    	double co2Reduced = forecastCO2Sequestered(treeList);
+    	double biodiversity = biodiversityIndex(treeList);
+    	double energyConserved = forecastEnergyConserved(treeList);
+    	
+    	Forecast forecastObj = new Forecast(Date.valueOf(fcDate), fcUser, stormwater, co2Reduced, biodiversity, energyConserved, fcMunicipality);
+    	String fcTrees = treeIdList.toString().replaceAll("(\\[)|(\\])", "");
+    	
+    	for(Tree tree:treeList) {
+    		forecastObj.addFcTree(tree);
+    	}
+    	
+    	if (!sql.insertForecast(forecastObj.getForecastId(),fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees)) {
+            forecastObj.delete();
+            throw new SQLException("SQL Species insert query failed!");
+        }
+    	
+    	return forecastObj;
+    }
 
     // ==============================
     // GET ALL API
@@ -532,6 +582,11 @@ public class TreePLEService {
         return municipalityObj;
     }
     */
+    
+    //Update a Forecast
+    public Forecast updateForecast(JSONObject jsonParams) {
+    	return null;
+    }
 
 
     // ==============================
@@ -756,8 +811,12 @@ public class TreePLEService {
         return co2Sequestered/getAgeOfTree(tree);
     }
 
-    // Returns the forecasted impact of removing a list of trees
-    public double forecastCO2SequesteredReduced(List<Tree> trees) throws Exception {
+    // ==============================
+    // FORECASTING
+    // ==============================
+     
+    // Returns the amount of CO2 reduced per year from a list of trees
+    public double forecastCO2Sequestered(List<Tree> trees) throws Exception {
         double impactOfCutdown = 0;
 
         for (Tree tree: trees) {
@@ -773,6 +832,14 @@ public class TreePLEService {
         int totalSpecies = getUniqueSpecies(trees).size();
 
         return (double) totalTrees/totalSpecies;
+    }
+    
+    public double forecastStormwaterIntercepted(List<Tree> trees) {
+    	return 0;
+    }
+    
+    public double forecastEnergyConserved(List<Tree> trees) {
+    	return 0;
     }
 
     // ==============================
