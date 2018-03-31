@@ -446,7 +446,7 @@ public class TreePLEService {
     // UPDATE API
     // ==============================
 
-    // Update a Tree
+    //TODO Update a Tree
     public Tree updateTree(JSONObject jsonParams) throws Exception {
         return null;
     }
@@ -525,7 +525,7 @@ public class TreePLEService {
         return speciesObj;
     }
 
-    // Update a Municipality
+    // TODO Update a Municipality
     public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
         return null;
     }
@@ -583,7 +583,7 @@ public class TreePLEService {
     }
     */
     
-    //Update a Forecast
+    //TODO Update a Forecast
     public Forecast updateForecast(JSONObject jsonParams) {
     	return null;
     }
@@ -745,18 +745,20 @@ public class TreePLEService {
     	return myTrees;
     }
     
-    //TODO Returns every tree with a certain species
+    //Returns every tree with a certain species
     public List<Tree> filterTreeBySpecies(Species species) throws Exception{
     	if(species == null) 
     		throw new InvalidInputException("Species cannot be null!");
-    	return null;
+    	return sql.getAllTreesOfSpecies(species.getName());
     }
     
-    //TODO Returns every tree within a municipality
+    //Returns every tree within a municipality
     public List<Tree> filterTreeByMunicipality(Municipality municipality) throws Exception{
     	if(municipality == null) 
     		throw new InvalidInputException("Municipality cannot be null!");
-    	return null;
+    	ArrayList<Tree> treeByMunicipality = sql.getAllTreesFromMunicipality(municipality.getName());
+    	
+    	return treeByMunicipality;
     	
     }
 
