@@ -2,7 +2,6 @@ package ca.mcgill.ecse321.treeple;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
@@ -69,7 +67,6 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
 
     @Bean
     @EventListener(ApplicationEnvironmentPreparedEvent.class)
-    // @EventListener(ApplicationReadyEvent.class)
     public SQLiteJDBC ModelIdCountInitializer() {
         sql = new SQLiteJDBC();
         sql.connect();
