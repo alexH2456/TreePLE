@@ -20,16 +20,16 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <AutoCompleteTextView
-        android:id="@+id/email"
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:maxLines="1"
         android:singleLine="true" />
 
-    <EditText
+    <android.support.design.widget.TextInputEditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,35 +42,33 @@
         android:singleLine="true" />
 
     <Button
-        android:id="@+id/email_sign_in_button"
+        android:id="@+id/sign_in_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/button_bg_rounded_corners"
-        android:text="@string/action_sign_in"
-        android:textStyle="bold" />
+        android:text="@string/action_sign_in" />
 
     <Button
-        android:id="@+id/action_sign_up"
+        android:id="@+id/sign_up_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/button_bg_rounded_corners"
-        android:text="@string/action_sign_up"
-        android:textStyle="bold" />
+        android:text="@string/action_sign_up" />
 
     <!--Debug button-->
-    <Button
-        android:id="@+id/action_goto_map"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_bg_rounded_corners"
-        android:text="@string/action_goto_map"
-        android:textStyle="bold" />
+    <!--<Button-->
+        <!--android:id="@+id/action_goto_map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/button_bg_rounded_corners"-->
+        <!--android:text="@string/action_goto_map"-->
+        <!--android:textStyle="bold" />-->
 
 </LinearLayout>
 
