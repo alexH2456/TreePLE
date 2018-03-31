@@ -7,7 +7,7 @@ var parentDir = path.join(__dirname, '../');
 
 module.exports = {
   entry: [
-    path.join(parentDir, 'src/index.jsx'),
+    path.join(parentDir, 'src/index.jsx')
     // 'webpack-hot-middleware/client?reload=true'
   ],
   output: {
@@ -47,20 +47,16 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.css']
   },
-  devtool: 'eval-source-map',
-
-
+  devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('production'),
-      }
+      'process.env.NODE_ENV': JSON.stringify('production'),
     }),
     new ExtractTextPlugin("bundle.css", {allChunks: false}),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
       mangle: true,
       compress: {
         warnings: false,
