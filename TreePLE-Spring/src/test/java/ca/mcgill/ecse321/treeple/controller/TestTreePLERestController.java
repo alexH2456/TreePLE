@@ -9,12 +9,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
@@ -31,13 +29,9 @@ public class TestTreePLERestController {
     @InjectMocks
     TreePLERestController mockController = new TreePLERestController();
 
-    // @Autowired
-    // private WebApplicationContext wac;
-
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(mockController).build();
-        // mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
@@ -47,7 +41,7 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
-    
+
     @Test
     public void testGetAllUsersEmptyDB() throws Exception {
         mockMvc.perform(get("/users/").contentType(APPLICATION_JSON))
@@ -55,7 +49,7 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
-    
+
     @Test
     public void testGetAllSpeciesEmptyDB() throws Exception {
         mockMvc.perform(get("/species/").contentType(APPLICATION_JSON))
@@ -63,7 +57,7 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
-    
+
     @Test
     public void testGetAllLocationsEmptyDB() throws Exception {
         mockMvc.perform(get("/locations/").contentType(APPLICATION_JSON))
@@ -71,7 +65,7 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
-    
+
     @Test
     public void testGetAllMunicipalitiesEmptyDB() throws Exception {
         mockMvc.perform(get("/municipalities/").contentType(APPLICATION_JSON))

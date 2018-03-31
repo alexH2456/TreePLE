@@ -1,5 +1,6 @@
 package ca.mcgill.ecse321.treeple;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.modelmapper.ModelMapper;
@@ -8,10 +9,11 @@ import org.modelmapper.convention.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
 
 import ca.mcgill.ecse321.treeple.controller.configuration.*;
@@ -20,6 +22,10 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 @SpringBootApplication
 public class TreePLESpringApplication extends SpringBootServletInitializer {
+
+    @Autowired
+    private Environment environment;
+    public static Environment env;
 
     @Autowired
     private AndroidProperties androidProperties;
@@ -60,7 +66,7 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
     }
 
     @Bean
-    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationEnvironmentPreparedEvent.class)
     public SQLiteJDBC ModelIdCountInitializer() {
         sql = new SQLiteJDBC();
         sql.connect();
@@ -69,6 +75,11 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
         SurveyReport.setNextReportId(sql.getMaxReportId() + 1);
         Forecast.setNextForecastId(sql.getMaxForecastId() + 1);
         return sql;
+    }
+
+    @PostConstruct
+    public void initEnv() {
+        env = environment;
     }
 
     @PreDestroy
