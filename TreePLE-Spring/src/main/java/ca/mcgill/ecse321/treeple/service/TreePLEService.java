@@ -810,6 +810,54 @@ public class TreePLEService {
 
         return co2Sequestered/getAgeOfTree(tree);
     }
+    
+    //Returns the amount of energy conserved in kWh per year for a single tree
+    public double getEnergyConserved(Tree tree) throws InvalidInputException {
+    	if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+    	Land landType = tree.getLand();
+    	
+    	if(landType == Land.Institutional) {
+    		
+    	}else if(landType == Land.Municipal) {
+    		
+    	}else if(landType == Land.Park) {
+    		
+    	}else if(landType == Land.Residential) {
+    		
+    	}
+    }
+    
+    //Calculates the amount of stormwater runoff from a single tree in liters per year
+    public double getStormwaterIntercepted(Tree tree) throws InvalidInputException {
+    	if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+    	double stormwaterCaptured = 0;
+    	double curveNumber = 0;
+    	Land landType = tree.getLand();
+    	
+    	if(landType == Land.Institutional) {
+    		curveNumber = 96.3;
+    	}else if(landType == Land.Municipal) {
+    		curveNumber = 100;
+    	}else if(landType == Land.Park) {
+    		curveNumber = 83.5;
+    	}else if(landType == Land.Residential) {
+    		curveNumber = 93.2;
+    	}
+    	double S = ((1000/curveNumber) - 10); //In inches. This represents sorptivity of the tree
+    	double canopyArea = estimateCanopyArea(tree);//Estimation of the canopy area
+    	stormwaterCaptured = S*canopyArea/12;
+    	
+    	return cubicFeetToLiters(stormwaterCaptured);
+    }
+    	
+    //Calculates the approximate value of canopy area in square feet using tree diameter
+    public double estimateCanopyArea(Tree tree) {
+    	double crownDiameter = 1.945 * tree.getDiameter();
+    	double canopyArea = Math.PI * Math.pow(cmToFeet(crownDiameter)/2, 2);
+    	return canopyArea;
+    }
 
     // ==============================
     // FORECASTING
@@ -817,13 +865,13 @@ public class TreePLEService {
      
     // Returns the amount of CO2 reduced per year from a list of trees
     public double forecastCO2Sequestered(List<Tree> trees) throws Exception {
-        double impactOfCutdown = 0;
+        double totalCO2Reduced = 0;
 
         for (Tree tree: trees) {
-            impactOfCutdown += getCO2Sequestered(tree);
+        	totalCO2Reduced  += getCO2Sequestered(tree);
         }
 
-        return impactOfCutdown;
+        return totalCO2Reduced ;
     }
 
     // Calculates the biodiversity index of a list of trees
@@ -834,13 +882,33 @@ public class TreePLEService {
         return (double) totalTrees/totalSpecies;
     }
     
-    public double forecastStormwaterIntercepted(List<Tree> trees) {
-    	return 0;
+    //Calculates the total stormwater intercepted from a list of trees
+    public double forecastStormwaterIntercepted(List<Tree> trees) throws Exception {
+    	double totalStormwater = 0;
+
+        for (Tree tree: trees) {
+        	totalStormwater  += getStormwaterIntercepted(tree);
+        }
+
+        return totalStormwater ;
     }
     
-    public double forecastEnergyConserved(List<Tree> trees) {
-    	return 0;
+    //Calculates the total amount of energy conserved from a list of trees
+    public double forecastEnergyConserved(List<Tree> trees) throws Exception {
+    	double totalEnergyConserved= 0;
+
+        for (Tree tree: trees) {
+        	totalEnergyConserved  += getEnergyConserved(tree);
+        }
+
+        return totalEnergyConserved ;
     }
+    
+    // ==============================
+    // SUSTAINABILITY ATTRIBUTES WORTH
+    // ==============================
+    
+    public double 
 
     // ==============================
     // HELPER METHODS
@@ -862,15 +930,19 @@ public class TreePLEService {
     // CONVERSIONS
     // ==============================
 
-    public double cmToFeet(int centimeters) {
+    public double cmToFeet(double centimeters) {
         return 0.0328084 * centimeters;
     }
 
-    public double cmToInches(int centimeters) {
+    public double cmToInches(double centimeters) {
         return 12 * cmToFeet(centimeters);
     }
 
     public double poundsToKG(double weight) {
         return 0.453592 * weight;
+    }
+    
+    public double cubicFeetToLiters(double volume) {
+    	return 28.3168*volume;
     }
 }
