@@ -93,8 +93,8 @@
 }
 
 {
-    "username": "Gang",
-    "password": "skrt",
-    "role": "Resident",
+    "username": "Admin",
+    "password": "gucci",
+    "role": "Scientist",
     "myAddresses": "H4L3N1"
 }

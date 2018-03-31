@@ -5,20 +5,26 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
+import ca.mcgill.ecse321.treeple.TreePLESpringApplication;
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;
 import ca.mcgill.ecse321.treeple.model.User.*;
 
 public class SQLiteJDBC {
+
     private static Connection c;
     private static String dbPath;
 
     public SQLiteJDBC() {
-        dbPath = new File(System.getProperty("user.dir")) + "/db/treeple.db";
+        if (TreePLESpringApplication.env.acceptsProfiles("prod")) {
+            dbPath = System.getProperty("catalina.base") + "/webapps/ROOT/WEB-INF/classes/treeple.db";
+        } else {
+            dbPath = System.getProperty("user.dir") + "/src/main/resources/treeple.db";
+        }
     }
 
     public SQLiteJDBC(String filename) {
-        dbPath = new File(System.getProperty("user.dir")) + filename;
+        dbPath = System.getProperty("user.dir") + filename;
     }
 
     public String getDbPath() {
