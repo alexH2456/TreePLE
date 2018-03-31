@@ -16,12 +16,13 @@ public class SQLiteJDBC {
     private static String dbPath;
 
     public SQLiteJDBC() {
-        if (TreePLESpringApplication.env.acceptsProfiles("prod")) {
+        dbPath = "/opt/tomcat/webapps/treeple.db";
+        // if (TreePLESpringApplication.env.acceptsProfiles("prod")) {
             // dbPath = System.getProperty("catalina.base") + "/webapps/ROOT/WEB-INF/classes/treeple.db";
-            dbPath = "/opt/tomcat/webapps/treeple.db";
-        } else {
-            dbPath = System.getProperty("user.dir") + "/src/main/resources/treeple.db";
-        }
+            // dbPath = "/opt/tomcat/webapps/treeple.db";
+        // } else {
+        //     dbPath = System.getProperty("user.dir") + "/src/main/resources/treeple.db";
+        // }
     }
 
     public SQLiteJDBC(String filename) {
