@@ -725,6 +725,40 @@ public class TreePLEService {
 
         return forecast;
     }
+    
+    // ==============================
+    // FILTERING API
+    // ==============================
+    
+    //Returns every tree that a user has in his/her possession
+    public List<Tree> filterTreeByUser(User user) throws InvalidInputException{
+    	if(user == null) 
+    		throw new InvalidInputException("Species cannot be null!");
+    	
+    	Integer[] myTreeIds = user.getMyTrees();
+    	ArrayList<Tree> myTrees = new ArrayList<Tree>();
+    	
+    	for (int i = 0; i<myTreeIds.length; i++) {
+    		myTrees.add(sql.getTree(myTreeIds[i].intValue()));
+    	}
+    	
+    	return myTrees;
+    }
+    
+    //TODO Returns every tree with a certain species
+    public List<Tree> filterTreeBySpecies(Species species) throws Exception{
+    	if(species == null) 
+    		throw new InvalidInputException("Species cannot be null!");
+    	return null;
+    }
+    
+    //TODO Returns every tree within a municipality
+    public List<Tree> filterTreeByMunicipality(Municipality municipality) throws Exception{
+    	if(municipality == null) 
+    		throw new InvalidInputException("Municipality cannot be null!");
+    	return null;
+    	
+    }
 
 
     // ==============================
@@ -811,7 +845,7 @@ public class TreePLEService {
         return co2Sequestered/getAgeOfTree(tree);
     }
     
-    //Returns the amount of energy conserved in kWh per year for a single tree
+    //TODO Returns the amount of energy conserved in kWh per year for a single tree
     public double getEnergyConserved(Tree tree) throws InvalidInputException {
     	if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
@@ -826,6 +860,8 @@ public class TreePLEService {
     	}else if(landType == Land.Residential) {
     		
     	}
+    	
+    	return 0;
     }
     
     //Calculates the amount of stormwater runoff from a single tree in liters per year
@@ -908,8 +944,8 @@ public class TreePLEService {
     // SUSTAINABILITY ATTRIBUTES WORTH
     // ==============================
     
-    public double 
-
+    //TODO if we feel like. Basically the amount of money saved
+    
     // ==============================
     // HELPER METHODS
     // ==============================
