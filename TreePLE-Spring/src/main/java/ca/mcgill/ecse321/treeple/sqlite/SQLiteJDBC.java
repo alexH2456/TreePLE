@@ -17,7 +17,8 @@ public class SQLiteJDBC {
 
     public SQLiteJDBC() {
         if (TreePLESpringApplication.env.acceptsProfiles("prod")) {
-            dbPath = System.getProperty("catalina.base") + "/webapps/ROOT/WEB-INF/classes/treeple.db";
+            // dbPath = System.getProperty("catalina.base") + "/webapps/ROOT/WEB-INF/classes/treeple.db";
+            dbPath = "/opt/tomcat/webapps/treeple.db";
         } else {
             dbPath = System.getProperty("user.dir") + "/src/main/resources/treeple.db";
         }
