@@ -15,16 +15,9 @@ public class ForecastDto {
     private double co2Reduced;
     private double biodiversity;
     private double energyConserved;
-    private String fcMunicipality;
     private List<Tree> fcTrees;
 
     public ForecastDto() {
-    }
-
-    public ForecastDto(int forecastId, Date fcDate, String fcUser, double stormwater,
-                       double co2Reduced, double biodiversity, double energyConserved,
-                       ArrayList<Tree> fcTrees) {
-        this(forecastId, fcDate, fcUser, stormwater, co2Reduced, biodiversity, energyConserved, "", fcTrees);
     }
 
     public ForecastDto(int forecastId, Date fcDate, String fcUser, double stormwater,
@@ -37,7 +30,6 @@ public class ForecastDto {
         this.co2Reduced = co2Reduced;
         this.biodiversity = biodiversity;
         this.energyConserved = energyConserved;
-        this.fcMunicipality = fcMunicipality;
         this.fcTrees = fcTrees;
     }
 
@@ -67,10 +59,6 @@ public class ForecastDto {
 
     public double getEnergyConserved() {
         return energyConserved;
-    }
-
-    public String getFcMunicipality() {
-        return fcMunicipality;
     }
 
     public List<Tree> getFcTrees() {

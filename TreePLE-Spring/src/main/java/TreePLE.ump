@@ -185,19 +185,16 @@ class Forecast
   double co2Reduced;
   double biodiversity;
   double energyConserved;
-  String fcMunicipality;
   * -> * Tree fcTrees;
 
   public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced,
-                  double aBiodiversity, double aEnergyConserved, String aFcMunicipality,
-                  int aForecastId, ArrayList<Tree> aFcTrees) {
+                  double aBiodiversity, double aEnergyConserved, int aForecastId, ArrayList<Tree> aFcTrees) {
     fcDate = aFcDate;
     fcUser = aFcUser;
     stormwater = aStormwater;
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
     energyConserved = aEnergyConserved;
-    fcMunicipality = aFcMunicipality;
     forecastId = aForecastId;
     fcTrees = aFcTrees;
   }

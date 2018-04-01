@@ -102,7 +102,6 @@ public class SQLiteJDBC {
                                 + " biodiversity    DOUBLE NOT NULL,"
                                 + " stormwater      DOUBLE NOT NULL,"
                                 + " energyConserved DOUBLE NOT NULL,"
-                                + " fcMunicipality  VARCHAR(50),"
                                 + " fcTrees         TEXT NOT NULL)";
 
             Statement stmt = c.createStatement();
@@ -230,8 +229,26 @@ public class SQLiteJDBC {
         return tree;
     }
 
+    // Get all trees of type Species
+    public ArrayList<Tree> getAllTreesOfSpecies(String species){
+        ArrayList<Tree> trees = new ArrayList<Tree>();
+        String getTreesOfSpecies = String.format("SELECT * FROM TREES WHERE species = '%s';", species);
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery(getTreesOfSpecies);
+
+            while (rs.next()) {
+                trees.add(createTree(rs));
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+
+        return trees;
+    }
+
     // Get all Trees from a Municipality
-    public ArrayList<Tree> getAllTreesFromMunicipality(String municipality) {
+    public ArrayList<Tree> getAllTreesOfMunicipality(String municipality) {
         ArrayList<Tree> trees = new ArrayList<>();
         String getTreesFromMunicipality = String.format("SELECT * FROM TREES WHERE municipality = '%s';", municipality);
 
@@ -848,12 +865,11 @@ public class SQLiteJDBC {
 
     // Add a new Forecast
     public boolean insertForecast(int forecastId, String fcDate, String fcUser, double co2Reduced,
-                                  double biodiversity, double stormwater, double energyConserved,
-                                  String fcMunicipality, String fcTrees) {
+                                  double biodiversity, double stormwater, double energyConserved, String fcTrees) {
         String insertForecast = String.format(
             "INSERT INTO FORECASTS (forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees) " +
-            "VALUES (%d, '%s', '%s', %.2f, %.2f, %.2f, %.2f, '%s', '%s');",
-            forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees);
+            "VALUES (%d, '%s', '%s', %.2f, %.2f, %.2f, %.2f, '%s');",
+            forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
 
         try {
             return c.createStatement().executeUpdate(insertForecast) <= 0 ? false : true;
@@ -957,7 +973,6 @@ public class SQLiteJDBC {
         double co2Reduced = rs.getDouble("co2Reduced");
         double biodiversity = rs.getDouble("biodiversity");
         double energyConserved = rs.getDouble("energyConserved");
-        String fcMunicipality = rs.getString("fcMunicipality");
         ArrayList<Tree> fcTrees = new ArrayList<Tree>();
 
         for (String treeId : rs.getString("fcTrees").replaceAll("\\s", "").split(",")) {
@@ -967,7 +982,7 @@ public class SQLiteJDBC {
             }
         }
 
-        return new Forecast(fcDate, fcUser, stormwater, co2Reduced, biodiversity,
-                            energyConserved, fcMunicipality, forecastId, fcTrees);
+        return new Forecast(fcDate, fcUser, stormwater, co2Reduced,
+                            biodiversity, energyConserved, forecastId, fcTrees);
     }
 }

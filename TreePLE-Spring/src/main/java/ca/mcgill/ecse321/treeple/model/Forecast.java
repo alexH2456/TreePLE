@@ -26,7 +26,6 @@ public class Forecast
   private double co2Reduced;
   private double biodiversity;
   private double energyConserved;
-  private String fcMunicipality;
 
   //Autounique Attributes
   private int forecastId;
@@ -38,7 +37,7 @@ public class Forecast
   // CONSTRUCTOR
   //------------------------
 
-  public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved, String aFcMunicipality)
+  public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved)
   {
     fcDate = aFcDate;
     fcUser = aFcUser;
@@ -46,7 +45,6 @@ public class Forecast
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
     energyConserved = aEnergyConserved;
-    fcMunicipality = aFcMunicipality;
     forecastId = nextForecastId++;
     fcTrees = new ArrayList<Tree>();
   }
@@ -103,14 +101,6 @@ public class Forecast
     return wasSet;
   }
 
-  public boolean setFcMunicipality(String aFcMunicipality)
-  {
-    boolean wasSet = false;
-    fcMunicipality = aFcMunicipality;
-    wasSet = true;
-    return wasSet;
-  }
-
   public Date getFcDate()
   {
     return fcDate;
@@ -139,11 +129,6 @@ public class Forecast
   public double getEnergyConserved()
   {
     return energyConserved;
-  }
-
-  public String getFcMunicipality()
-  {
-    return fcMunicipality;
   }
 
   public int getForecastId()
@@ -243,20 +228,19 @@ public class Forecast
     fcTrees.clear();
   }
 
-  // line 194 "../../../../../TreePLE.ump"
-   public  Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved, String aFcMunicipality, int aForecastId, ArrayList<Tree> aFcTrees){
+  // line 192 "../../../../../TreePLE.ump"
+   public  Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced, double aBiodiversity, double aEnergyConserved, int aForecastId, ArrayList<Tree> aFcTrees){
     fcDate = aFcDate;
     fcUser = aFcUser;
     stormwater = aStormwater;
     co2Reduced = aCo2Reduced;
     biodiversity = aBiodiversity;
     energyConserved = aEnergyConserved;
-    fcMunicipality = aFcMunicipality;
     forecastId = aForecastId;
     fcTrees = aFcTrees;
   }
 
-  // line 206 "../../../../../TreePLE.ump"
+  // line 203 "../../../../../TreePLE.ump"
    public static  boolean setNextForecastId(int minForecastId){
     boolean wasSet = false;
     nextForecastId = minForecastId;
@@ -264,7 +248,7 @@ public class Forecast
     return wasSet;
   }
 
-  // line 213 "../../../../../TreePLE.ump"
+  // line 210 "../../../../../TreePLE.ump"
    public static  int getNextForecastId(){
     return nextForecastId;
   }
@@ -278,8 +262,7 @@ public class Forecast
             "stormwater" + ":" + getStormwater()+ "," +
             "co2Reduced" + ":" + getCo2Reduced()+ "," +
             "biodiversity" + ":" + getBiodiversity()+ "," +
-            "energyConserved" + ":" + getEnergyConserved()+ "," +
-            "fcMunicipality" + ":" + getFcMunicipality()+ "]" + System.getProperties().getProperty("line.separator") +
+            "energyConserved" + ":" + getEnergyConserved()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "fcDate" + "=" + (getFcDate() != null ? !getFcDate().equals(this)  ? getFcDate().toString().replaceAll("  ","    ") : "this" : "null");
   }
 }
