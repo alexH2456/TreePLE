@@ -250,6 +250,56 @@ public class TreePLEService {
         return municipality;
     }
 
+    public Forecast createForecast(JSONObject jsonParams) throws Exception {
+    	String fcDate = jsonParams.getString("fcDate");
+    	String fcUser = jsonParams.getString("fcUser");
+    	String fcMunicipality = jsonParams.getString("fcMunicipality");
+    	JSONArray fcTreeIds = jsonParams.getJSONArray("fcTrees");
+    	
+    	if (fcUser == null || fcUser.replaceAll("\\s", "").isEmpty())
+    		throw new InvalidInputException("User is not logged in/Username is missing!");
+    	if (fcMunicipality == null || fcMunicipality.replaceAll("\\s", "").isEmpty())
+    		throw new InvalidInputException("Municipality name is missing!");
+    	if (fcDate == null || !fcDate.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
+            throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
+    	if (fcTreeIds == null || fcTreeIds.length()<1)
+    		throw new InvalidInputException("There needs to be at least one tree to forecast!");
+    	if(!Municipality.hasWithName(fcMunicipality))
+    		throw new InvalidInputException("Municipality does not exist yet!");
+    	if(!User.hasWithUsername(fcUser))
+    		throw new InvalidInputException("User does no exist yet!");
+    	
+    	ArrayList<Tree> treeList = new ArrayList<Tree>();
+    	ArrayList<Integer> treeIdList = new ArrayList<Integer>();
+    	
+    	fcTreeIds.forEach(treeObj -> {
+    		Tree tree;
+    		int treeId = (int) treeObj;
+    		if((tree = sql.getTree(treeId)) != null) {
+    			treeList.add(tree);
+    			treeIdList.add(treeId);
+    		}
+            
+        });
+    	double stormwater = forecastStormwaterIntercepted(treeList);
+    	double co2Reduced = forecastCO2Sequestered(treeList);
+    	double biodiversity = biodiversityIndex(treeList);
+    	double energyConserved = forecastEnergyConserved(treeList);
+    	
+    	Forecast forecastObj = new Forecast(Date.valueOf(fcDate), fcUser, stormwater, co2Reduced, biodiversity, energyConserved, fcMunicipality);
+    	String fcTrees = treeIdList.toString().replaceAll("(\\[)|(\\])", "");
+    	
+    	for(Tree tree:treeList) {
+    		forecastObj.addFcTree(tree);
+    	}
+    	
+    	if (!sql.insertForecast(forecastObj.getForecastId(),fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees)) {
+            forecastObj.delete();
+            throw new SQLException("SQL Species insert query failed!");
+        }
+    	
+    	return forecastObj;
+    }
 
     // ==============================
     // GET ALL API
@@ -396,7 +446,7 @@ public class TreePLEService {
     // UPDATE API
     // ==============================
 
-    // Update a Tree
+    //TODO Update a Tree
     public Tree updateTree(JSONObject jsonParams) throws Exception {
         return null;
     }
@@ -475,7 +525,7 @@ public class TreePLEService {
         return speciesObj;
     }
 
-    // Update a Municipality
+    // TODO Update a Municipality
     public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
         return null;
     }
@@ -532,6 +582,11 @@ public class TreePLEService {
         return municipalityObj;
     }
     */
+    
+    //TODO Update a Forecast
+    public Forecast updateForecast(JSONObject jsonParams) {
+    	return null;
+    }
 
 
     // ==============================
@@ -670,6 +725,42 @@ public class TreePLEService {
 
         return forecast;
     }
+    
+    // ==============================
+    // FILTERING API
+    // ==============================
+    
+    //Returns every tree that a user has in his/her possession
+    public List<Tree> filterTreeByUser(User user) throws InvalidInputException{
+    	if(user == null) 
+    		throw new InvalidInputException("User cannot be null!");
+    	
+    	Integer[] myTreeIds = user.getMyTrees();
+    	ArrayList<Tree> myTrees = new ArrayList<Tree>();
+    	
+    	for (int i = 0; i<myTreeIds.length; i++) {
+    		myTrees.add(sql.getTree(myTreeIds[i].intValue()));
+    	}
+    	
+    	return myTrees;
+    }
+    
+    //Returns every tree with a certain species
+    public List<Tree> filterTreeBySpecies(Species species) throws Exception{
+    	if(species == null) 
+    		throw new InvalidInputException("Species cannot be null!");
+    	return sql.getAllTreesOfSpecies(species.getName());
+    }
+    
+    //Returns every tree within a municipality
+    public List<Tree> filterTreeByMunicipality(Municipality municipality) throws Exception{
+    	if(municipality == null) 
+    		throw new InvalidInputException("Municipality cannot be null!");
+    	ArrayList<Tree> treeByMunicipality = sql.getAllTreesFromMunicipality(municipality.getName());
+    	
+    	return treeByMunicipality;
+    	
+    }
 
 
     // ==============================
@@ -755,16 +846,70 @@ public class TreePLEService {
 
         return co2Sequestered/getAgeOfTree(tree);
     }
+    
+    //TODO Returns the amount of energy conserved in kWh per year for a single tree
+    public double getEnergyConserved(Tree tree) throws InvalidInputException {
+    	if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+    	Land landType = tree.getLand();
+    	
+    	if(landType == Land.Institutional) {
+    		
+    	}else if(landType == Land.Municipal) {
+    		
+    	}else if(landType == Land.Park) {
+    		
+    	}else if(landType == Land.Residential) {
+    		
+    	}
+    	
+    	return 0;
+    }
+    
+    //Calculates the amount of stormwater runoff from a single tree in liters per year
+    public double getStormwaterIntercepted(Tree tree) throws InvalidInputException {
+    	if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+    	double stormwaterCaptured = 0;
+    	double curveNumber = 0;
+    	Land landType = tree.getLand();
+    	
+    	if(landType == Land.Institutional) {
+    		curveNumber = 96.3;
+    	}else if(landType == Land.Municipal) {
+    		curveNumber = 100;
+    	}else if(landType == Land.Park) {
+    		curveNumber = 83.5;
+    	}else if(landType == Land.Residential) {
+    		curveNumber = 93.2;
+    	}
+    	double S = ((1000/curveNumber) - 10); //In inches. This represents sorptivity of the tree
+    	double canopyArea = estimateCanopyArea(tree);//Estimation of the canopy area
+    	stormwaterCaptured = S*canopyArea/12;
+    	
+    	return cubicFeetToLiters(stormwaterCaptured);
+    }
+    	
+    //Calculates the approximate value of canopy area in square feet using tree diameter
+    public double estimateCanopyArea(Tree tree) {
+    	double crownDiameter = 1.945 * tree.getDiameter();
+    	double canopyArea = Math.PI * Math.pow(cmToFeet(crownDiameter)/2, 2);
+    	return canopyArea;
+    }
 
-    // Returns the forecasted impact of removing a list of trees
-    public double forecastCO2SequesteredReduced(List<Tree> trees) throws Exception {
-        double impactOfCutdown = 0;
+    // ==============================
+    // FORECASTING
+    // ==============================
+     
+    // Returns the amount of CO2 reduced per year from a list of trees
+    public double forecastCO2Sequestered(List<Tree> trees) throws Exception {
+        double totalCO2Reduced = 0;
 
         for (Tree tree: trees) {
-            impactOfCutdown += getCO2Sequestered(tree);
+        	totalCO2Reduced  += getCO2Sequestered(tree);
         }
 
-        return impactOfCutdown;
+        return totalCO2Reduced ;
     }
 
     // Calculates the biodiversity index of a list of trees
@@ -774,7 +919,35 @@ public class TreePLEService {
 
         return (double) totalTrees/totalSpecies;
     }
+    
+    //Calculates the total stormwater intercepted from a list of trees
+    public double forecastStormwaterIntercepted(List<Tree> trees) throws Exception {
+    	double totalStormwater = 0;
 
+        for (Tree tree: trees) {
+        	totalStormwater  += getStormwaterIntercepted(tree);
+        }
+
+        return totalStormwater ;
+    }
+    
+    //Calculates the total amount of energy conserved from a list of trees
+    public double forecastEnergyConserved(List<Tree> trees) throws Exception {
+    	double totalEnergyConserved= 0;
+
+        for (Tree tree: trees) {
+        	totalEnergyConserved  += getEnergyConserved(tree);
+        }
+
+        return totalEnergyConserved ;
+    }
+    
+    // ==============================
+    // SUSTAINABILITY ATTRIBUTES WORTH
+    // ==============================
+    
+    //TODO if we feel like. Basically the amount of money saved
+    
     // ==============================
     // HELPER METHODS
     // ==============================
@@ -795,15 +968,19 @@ public class TreePLEService {
     // CONVERSIONS
     // ==============================
 
-    public double cmToFeet(int centimeters) {
+    public double cmToFeet(double centimeters) {
         return 0.0328084 * centimeters;
     }
 
-    public double cmToInches(int centimeters) {
+    public double cmToInches(double centimeters) {
         return 12 * cmToFeet(centimeters);
     }
 
     public double poundsToKG(double weight) {
         return 0.453592 * weight;
+    }
+    
+    public double cubicFeetToLiters(double volume) {
+    	return 28.3168*volume;
     }
 }

@@ -249,7 +249,24 @@ public class SQLiteJDBC {
 
         return trees;
     }
+    
+    // Get all trees of type Species
+    public ArrayList<Tree> getAllTreesOfSpecies(String species){
+    	ArrayList<Tree> trees = new ArrayList<Tree>();
+    	String getTreesOfSpecies = String.format("SELECT * FROM TREES WHERE species = '%s';", species);
+    	
+    	try {
+            ResultSet rs = c.createStatement().executeQuery(getTreesOfSpecies);
 
+            while (rs.next()) {
+                trees.add(createTree(rs));
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+
+        return trees;
+    }
     // Get the highest treeId
     public int getMaxTreeId() {
         int getMaxTreeId = -1;
