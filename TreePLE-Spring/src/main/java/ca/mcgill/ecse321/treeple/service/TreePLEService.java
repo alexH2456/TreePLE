@@ -733,7 +733,7 @@ public class TreePLEService {
     //Returns every tree that a user has in his/her possession
     public List<Tree> filterTreeByUser(User user) throws InvalidInputException{
     	if(user == null) 
-    		throw new InvalidInputException("Species cannot be null!");
+    		throw new InvalidInputException("User cannot be null!");
     	
     	Integer[] myTreeIds = user.getMyTrees();
     	ArrayList<Tree> myTrees = new ArrayList<Tree>();
