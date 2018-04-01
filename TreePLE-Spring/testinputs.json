@@ -1,4 +1,6 @@
-// Tree
+// ==============================
+// TREE
+// ==============================
 {
     "user": "Abbas",
     "tree": {
@@ -31,16 +33,42 @@
     }
 }
 
-
-// Species
 {
-    "name": "Human",
-    "species": "HomoFgt",
-    "genus": "TheBigGay"
+    "user": "Admin",
+    "tree": {
+        "height": 420,
+        "diameter": 400,
+        "datePlanted": "2018-03-16",
+        "land": "Residential",
+        "status": "Planted",
+        "ownership": "Private",
+        "species": "Weeping Willow",
+        "latitude": 45.515883,
+        "longitude": -73.685552,
+        "municipality": "Saint-Laurent"
+    }
 }
 
 
-// Municipality
+// ==============================
+// SPECIES
+// ==============================
+{
+    "name": "Human",
+    "species": "Homo Sapien",
+    "genus": "Homo"
+}
+
+{
+
+    "name": "Weeping Willow",
+    "species": "Salix Babylonica",
+    "genus": "Salix"
+}
+
+// ==============================
+// MUNICIPALITY
+// ==============================
 {
     "name": "Saint-Lazare",
     "totalTrees": 0,
@@ -57,39 +85,56 @@
     "totalTrees": 0,
     "borders": [
         [45.5036, -73.6],
-        [45.504, -73.58],
         [45.502, -73.592],
-        [45.5025, -73.56]
+        [45.5025, -73.56],
+        [45.504, -73.58]
     ]
 }
 
-// User
+{
+    "name": "Saint-Laurent",
+    "totalTrees": 0,
+    "borders": [
+        [45.497470, -73.772830],
+        [45.481864, -73.773715],
+        [45.460268, -73.750029],
+        [45.481208, -73.723422],
+        [45.459034, -73.683652],
+        [45.526536, -73.651208],
+        [45.522407, -73.730198]
+    ]
+}
+
+
+// ==============================
+// USER
+// ==============================
 {
     "username": "Abbas",
     "password": "alacuck",
     "role": "Resident",
-    "myAddresses": "decarie"
+    "myAddresses": "H4L3N1"
 }
 
 {
     "username": "Fetish",
-    "password": "gayboi",
+    "password": "cuck",
     "role": "Resident",
-    "myAddresses": "St-Lazare"
+    "myAddresses": "J7T"
 }
 
 {
     "username": "Gareth",
-    "password": "fgtboi",
+    "password": "gingerboi",
     "role": "Scientist",
     "myAddresses": ""
 }
 
 {
     "username": "Filipino",
-    "password": "gayboi",
+    "password": "filip",
     "role": "Scientist",
-    "myAddresses": "gayyyyyy"
+    "myAddresses": ""
 }
 
 {

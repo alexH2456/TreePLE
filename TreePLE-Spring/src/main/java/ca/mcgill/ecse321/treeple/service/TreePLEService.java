@@ -775,6 +775,7 @@ public class TreePLEService {
         return (double) totalTrees/totalSpecies;
     }
 
+
     // ==============================
     // HELPER METHODS
     // ==============================
