@@ -527,14 +527,12 @@ public class TestSQLiteJDBC {
         success = sql.insertLocation(4, 76.4, 64.1);
         assertEquals(true, success);
 
-        int newTotal = 40;
         String newBorders = "3, 4";
-        success = sql.updateMunicipality(defaultMun.getString("name"), newTotal, newBorders);
+        success = sql.updateMunicipalityBorders(defaultMun.getString("name"), newBorders);
         assertEquals(true, success);
 
         Municipality mun = sql.getMunicipality(defaultMun.getString("name"));
         assertEquals(defaultMun.getString("name"), mun.getName());
-        assertEquals(newTotal, mun.getTotalTrees());
 
         int i = 0;
         int[] locIds = {3, 4};

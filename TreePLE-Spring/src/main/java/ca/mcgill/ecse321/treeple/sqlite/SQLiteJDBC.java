@@ -230,7 +230,7 @@ public class SQLiteJDBC {
     }
 
     // Get all trees of type Species
-    public ArrayList<Tree> getAllTreesOfSpecies(String species){
+    public ArrayList<Tree> getAllTreesOfSpecies(String species) {
         ArrayList<Tree> trees = new ArrayList<Tree>();
         String getTreesOfSpecies = String.format("SELECT * FROM TREES WHERE species = '%s';", species);
 
@@ -263,6 +263,26 @@ public class SQLiteJDBC {
         }
 
         return trees;
+    }
+
+    // Get Tree count of a Municipality
+    public int getTreeCountOfMunicipality(String municipality) {
+        int treeCount = -1;
+        String getTreeCountOfMunicipality = String.format("SELECT COUNT(treeId) AS treeCount FROM TREES WHERE municipality = '%s';", municipality);
+
+        try {
+            ResultSet rs = c.createStatement().executeQuery(getTreeCountOfMunicipality);
+
+            if (rs.next()) {
+                treeCount = rs.getInt("treeCount");
+                updateMunicipalityTotalTrees(municipality, treeCount);
+            }
+
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return treeCount;
     }
 
     // Get the highest treeId
@@ -632,6 +652,7 @@ public class SQLiteJDBC {
     // Get the highest locationId
     public int getMaxLocationId() {
         int getMaxLocationId = -1;
+
         try {
             ResultSet rs = c.createStatement().executeQuery("SELECT MAX(locationId) AS maxLocationId FROM LOCATIONS;");
 
@@ -680,12 +701,44 @@ public class SQLiteJDBC {
     }
 
     // Update a Municipality
-    public boolean updateMunicipality(String name, int totalTrees, String borders) {
+    public boolean updateMunicipalityBorders(String name, String borders) {
         String updateMunicipality = String.format(
             "UPDATE MUNICIPALITIES " +
-            "SET totalTrees = %d, borders = '%s' " +
+            "SET borders = '%s' " +
             "WHERE name = '%s';",
-            totalTrees, borders, name);
+            borders, name);
+
+        try {
+            return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Update a Municipality's total trees
+    public boolean updateMunicipalityTotalTrees(String name, int totalTrees) {
+        String updateMunicipality = String.format(
+            "UPDATE MUNICIPALITIES " +
+            "SET totalTrees = %d " +
+            "WHERE name = '%s';",
+            totalTrees, name);
+
+        try {
+            return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Update a Municipality's total trees by incrementing/decrementing
+    public boolean updateMunicipalityIncDecTotalTrees(String name, int incDec) {
+        String updateMunicipality = String.format(
+            "UPDATE MUNICIPALITIES " +
+            "SET totalTrees = totalTrees + %d " +
+            "WHERE name = '%s';",
+            incDec, name);
 
         try {
             return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
@@ -831,11 +884,12 @@ public class SQLiteJDBC {
     // Get the highest reportId
     public int getMaxReportId() {
         int getMaxReportId = -1;
+
         try {
-            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(reportId) AS getMaxReportId FROM SURVEYREPORTS;");
+            ResultSet rs = c.createStatement().executeQuery("SELECT MAX(reportId) AS maxReportId FROM SURVEYREPORTS;");
 
             if (rs.next()) {
-                getMaxReportId = rs.getInt("getMaxReportId");
+                getMaxReportId = rs.getInt("maxReportId");
             }
 
             rs.close();
