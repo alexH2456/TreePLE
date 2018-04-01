@@ -4,8 +4,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.mcgill.ecse321.treeple.model.Tree;
-
 public class ForecastDto {
 
     private int forecastId;
@@ -15,14 +13,14 @@ public class ForecastDto {
     private double co2Reduced;
     private double biodiversity;
     private double energyConserved;
-    private List<Tree> fcTrees;
+    private List<TreeDto> fcTrees;
 
     public ForecastDto() {
     }
 
     public ForecastDto(int forecastId, Date fcDate, String fcUser, double stormwater,
                        double co2Reduced, double biodiversity, double energyConserved,
-                       String fcMunicipality, ArrayList<Tree> fcTrees) {
+                       ArrayList<TreeDto> fcTrees) {
         this.forecastId = forecastId;
         this.fcDate = fcDate;
         this.fcUser = fcUser;
@@ -61,11 +59,11 @@ public class ForecastDto {
         return energyConserved;
     }
 
-    public List<Tree> getFcTrees() {
+    public List<TreeDto> getFcTrees() {
         return fcTrees;
     }
 
-    public void setFcTrees(List<Tree> fcTrees) {
+    public void setFcTrees(List<TreeDto> fcTrees) {
         this.fcTrees = fcTrees;
     }
 }
