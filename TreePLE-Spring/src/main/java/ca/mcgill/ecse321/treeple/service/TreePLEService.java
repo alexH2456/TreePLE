@@ -2,6 +2,7 @@ package ca.mcgill.ecse321.treeple.service;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.lang3.*;
@@ -42,6 +43,7 @@ public class TreePLEService {
     // CREATE API
     // ==============================
 
+    // TODO: Increment totalTrees in municipality
     // Create a new Tree
     public Tree createTree(JSONObject jsonParams) throws Exception {
         // User data
@@ -143,6 +145,7 @@ public class TreePLEService {
         return treeObj;
     }
 
+    // TODO: Change myAddresses to JSONArray
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
@@ -482,9 +485,85 @@ public class TreePLEService {
 
     // Update a Tree
     public Tree updateTree(JSONObject jsonParams) throws Exception {
-        return null;
+        // User data
+        String username = jsonParams.getString("user");
+
+        // Tree data
+        JSONObject treeParams = jsonParams.getJSONObject("tree");
+        int treeId = treeParams.getInt("treeId");
+        int height = treeParams.getInt("height");
+        int diameter = treeParams.getInt("diameter");
+        String land = treeParams.getString("land");
+        String status = treeParams.getString("status");
+        String ownership = treeParams.getString("ownership");
+        String species = treeParams.getString("species");
+        String municipality = treeParams.getString("municipality");
+
+        if (treeId <= 0)
+            throw new InvalidInputException("Tree's ID cannot be negative!");
+        if (height < 0)
+            throw new InvalidInputException("Height cannot be negative!");
+        if (diameter < 0)
+            throw new InvalidInputException("Diameter cannot be negative!");
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("User is not logged in/Username is missing!");
+        if (!EnumUtils.isValidEnum(Land.class, land))
+            throw new InvalidInputException("That land type doesn't exist!");
+        if (!EnumUtils.isValidEnum(Status.class, status))
+            throw new InvalidInputException("That status doesn't exist!");
+        if (!EnumUtils.isValidEnum(Ownership.class, ownership))
+            throw new InvalidInputException("That ownership doesn't exist!");
+
+        Tree treeObj;
+        User userObj;
+        Species speciesObj;
+        Municipality municipalityObj;
+        if ((treeObj = sql.getTree(treeId)) == null)
+            throw new InvalidInputException("No Tree with that ID exists!");
+        if ((userObj = sql.getUser(username)) == null)
+            throw new InvalidInputException("User does not exist!");
+        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyTrees(), treeId))
+            throw new InvalidInputException("You cannot update someone else's tree!");
+        if ((speciesObj = sql.getSpecies(species)) == null)
+            throw new InvalidInputException("Species does not exist!");
+        if ((municipalityObj = sql.getMunicipality(municipality)) == null)
+            throw new InvalidInputException("Municipality does not exist!");
+
+        SurveyReport surveyReportObj = new SurveyReport(new Date(Calendar.getInstance().getTimeInMillis()), username);
+
+        treeObj.setHeight(height);
+        treeObj.setDiameter(diameter);
+        treeObj.setLand(Land.valueOf(land));
+        treeObj.setStatus(Status.valueOf(status));
+        treeObj.setOwnership(Ownership.valueOf(ownership));
+        treeObj.setSpecies(speciesObj);
+        treeObj.setMunicipality(municipalityObj);
+        treeObj.addReport(surveyReportObj);
+
+        ArrayList<Integer> reportIdList = new ArrayList<Integer>();
+        for (SurveyReport report : treeObj.getReports()) {
+            if (sql.getSurveyReport(report.getReportId()) != null) {
+                reportIdList.add(report.getReportId());
+            }
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (!sql.insertSurveyReport(surveyReportObj.getReportId(), dateFormat.format(surveyReportObj.getReportDate()), username)) {
+            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            throw new SQLException("SQL Survey Report insert query failed!");
+        }
+
+        if (!sql.updateTree(treeObj.getTreeId(), height, diameter, land, status, ownership, species,
+                            municipality, reportIdList.toString().replaceAll("(\\[)|(\\])", ""))) {
+            SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
+            sql.deleteSurveyReport(surveyReportObj.getReportId());
+            throw new SQLException("SQL Tree update query failed!");
+        }
+
+        return treeObj;
     }
 
+    // TODO: Change myAddresses to JSONArray
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");

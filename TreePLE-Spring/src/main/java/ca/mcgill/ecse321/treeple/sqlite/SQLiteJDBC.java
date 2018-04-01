@@ -56,9 +56,9 @@ public class SQLiteJDBC {
                             + " land         VARCHAR(50)  NOT NULL,"
                             + " status       VARCHAR(50)  NOT NULL,"
                             + " ownership    VARCHAR(50)  NOT NULL,"
-                            + " species      INT,"
+                            + " species      INT          NOT NULL,"
                             + " location     INT          NOT NULL,"
-                            + " municipality VARCHAR(50),"
+                            + " municipality VARCHAR(50)  NOT NULL,"
                             + " reports      TEXT         NOT NULL)";
 
             // Users DB Table
@@ -98,11 +98,11 @@ public class SQLiteJDBC {
                                 + "(forecastId INT PRIMARY KEY  NOT NULL,"
                                 + " fcDate          VARCHAR(50) NOT NULL,"
                                 + " fcUser          VARCHAR(50) NOT NULL,"
-                                + " co2Reduced      DOUBLE NOT NULL,"
-                                + " biodiversity    DOUBLE NOT NULL,"
-                                + " stormwater      DOUBLE NOT NULL,"
-                                + " energyConserved DOUBLE NOT NULL,"
-                                + " fcTrees         TEXT NOT NULL)";
+                                + " co2Reduced      DOUBLE      NOT NULL,"
+                                + " biodiversity    DOUBLE      NOT NULL,"
+                                + " stormwater      DOUBLE      NOT NULL,"
+                                + " energyConserved DOUBLE      NOT NULL,"
+                                + " fcTrees         TEXT        NOT NULL)";
 
             Statement stmt = c.createStatement();
             stmt.executeUpdate(sqlTrees);
