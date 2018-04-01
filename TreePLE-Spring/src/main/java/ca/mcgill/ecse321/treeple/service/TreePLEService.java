@@ -150,10 +150,12 @@ public class TreePLEService {
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
+        String scientistAccess = jsonParams.getString("scientistPassword");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
         String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
+        String scientistPassword = "1234";
 
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
@@ -169,6 +171,9 @@ public class TreePLEService {
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
+        if(role.equals("Scientist") && !(scientistAccess.equals(scientistPassword))) {
+        	throw new SQLException("SQL User insert query failed!");
+        }
 
         User user = new User(username, password, UserRole.valueOf(role));
 
