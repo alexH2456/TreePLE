@@ -912,7 +912,6 @@ public class TreePLEService {
         return totalEnergyConserved;
     }
 
-
     // ==============================
     // SUSTAINABILITY ATTRIBUTES
     // ==============================
@@ -937,25 +936,27 @@ public class TreePLEService {
         return co2Sequestered/getAgeOfTree(tree);
     }
 
-    // TODO
     // Returns the amount of energy conserved by the tree (in kWh/yr)
     public double getEnergyConserved(Tree tree) throws Exception {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
+        
+        final double averageEnergyConsumed = 22332.2; //In kWh/year
 
+        double energyCoefficient = 0;
         Land landType = tree.getLand();
 
-        if (landType == Land.Park) {
-
-        } else if (landType == Land.Residential) {
-
-        } else if (landType == Land.Institutional) {
-
-        } else if (landType == Land.Municipal) {
-
-        }
-
-        return 0;
+        if (landType == Land.Park) 
+        	energyCoefficient = 0.7145;
+        else if (landType == Land.Residential) 
+        	energyCoefficient = 0.8874;
+        else if (landType == Land.Institutional) 
+        	energyCoefficient = 0.9010;
+        else if (landType == Land.Municipal) 
+        	energyCoefficient = 0.8896;
+        
+        double diameterCoefficient = tree.getDiameter()/50; //Average diameter of a tree is about 50
+        return averageEnergyConsumed*(1-energyCoefficient) * diameterCoefficient;
     }
 
     // Returns the amount of stormwater runoff by the tree (in L/yr)
@@ -989,8 +990,21 @@ public class TreePLEService {
     // SUSTAINABILITY MONETARY WORTH
     // ==============================
 
-    // TODO: The amount of money saved
-
+    //All the following methods are in CAD
+    //Monetary worth of energy
+    public double energyConservedWorth(double energyConserved) {
+    	return energyConserved * 0.162861;
+    }
+    
+    //Monetary worth of CO2
+    public double co2reducedWorth(double co2Reduced) {
+    	return co2Reduced * 0.009498572;
+    }
+    
+    //Monetary worth of stormwater
+    public double stormwaterWorth(double stormwater) {
+    	return stormwater * 0.0033732774;
+    }
 
     // ==============================
     // TREE HELPER METHODS
