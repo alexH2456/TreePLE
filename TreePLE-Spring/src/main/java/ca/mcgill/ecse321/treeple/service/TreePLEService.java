@@ -19,8 +19,14 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 @Service
 public class TreePLEService {
+	
+	// ==============================
+    // GLOBABL VARIABLES
+    // ==============================
+	
     private SQLiteJDBC sql;
     private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
+    private final String scientistPassword = "1234";
 
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
@@ -155,7 +161,7 @@ public class TreePLEService {
         String role = jsonParams.getString("role");
         String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
-        String scientistPassword = "1234";
+        
 
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
