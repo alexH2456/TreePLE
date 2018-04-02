@@ -140,6 +140,7 @@ public class TreePLEService {
         }
 
         userObj.addMyTree(treeObj.getTreeId());
+        municipalityObj.setTotalTrees(municipalityObj.getTotalTrees() + 1);
         sql.updateUserTrees(username, Arrays.toString(userObj.getMyTrees()).replaceAll("(\\[)|(\\])", ""));
         sql.updateMunicipalityIncDecTotalTrees(municipality, 1);
 
@@ -725,8 +726,10 @@ public class TreePLEService {
         if (!sql.deleteTree(treeId))
             throw new SQLException("SQL Tree delete query failed!");
 
+        Municipality municipality = tree.getMunicipality();
         Tree.setNextTreeId(Tree.getNextTreeId() - 1);
-        sql.updateMunicipalityIncDecTotalTrees(tree.getMunicipality().getName(), -1);
+        municipality.setTotalTrees(municipality.getTotalTrees() - 1);
+        sql.updateMunicipalityIncDecTotalTrees(municipality.getName(), -1);
 
         return tree;
     }
