@@ -141,6 +141,7 @@ public class TreePLEService {
 
         userObj.addMyTree(treeObj.getTreeId());
         sql.updateUserTrees(username, Arrays.toString(userObj.getMyTrees()).replaceAll("(\\[)|(\\])", ""));
+        municipalityObj.setTotalTrees(municipalityObj.getTotalTrees()+1);
         sql.updateMunicipalityIncDecTotalTrees(municipality, 1);
 
         return treeObj;
