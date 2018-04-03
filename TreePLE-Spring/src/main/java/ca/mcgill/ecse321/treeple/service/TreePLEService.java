@@ -912,6 +912,7 @@ public class TreePLEService {
         return totalEnergyConserved;
     }
 
+
     // ==============================
     // SUSTAINABILITY ATTRIBUTES
     // ==============================
@@ -941,22 +942,23 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
         
-        final double averageEnergyConsumed = 22332.2; //In kWh/year
+        double averageEnergyConsumed = 22332.2; // In kWh/yr
 
         double energyCoefficient = 0;
         Land landType = tree.getLand();
 
-        if (landType == Land.Park) 
+        if (landType == Land.Park) {
         	energyCoefficient = 0.7145;
-        else if (landType == Land.Residential) 
+        } else if (landType == Land.Residential) {
         	energyCoefficient = 0.8874;
-        else if (landType == Land.Institutional) 
+        } else if (landType == Land.Institutional) {
         	energyCoefficient = 0.9010;
-        else if (landType == Land.Municipal) 
+        } else if (landType == Land.Municipal) {
         	energyCoefficient = 0.8896;
+        }
         
-        double diameterCoefficient = tree.getDiameter()/50; //Average diameter of a tree is about 50
-        return averageEnergyConsumed*(1-energyCoefficient) * diameterCoefficient;
+        double diameterCoefficient = tree.getDiameter()/50; // Average diameter of a tree is 50
+        return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
 
     // Returns the amount of stormwater runoff by the tree (in L/yr)
@@ -990,20 +992,19 @@ public class TreePLEService {
     // SUSTAINABILITY MONETARY WORTH
     // ==============================
 
-    //All the following methods are in CAD
-    //Monetary worth of energy
+    // Monetary worth of energy conserved (in CAD)
     public double energyConservedWorth(double energyConserved) {
-    	return energyConserved * 0.162861;
+    	return 0.162861 * energyConserved;
     }
     
-    //Monetary worth of CO2
-    public double co2reducedWorth(double co2Reduced) {
-    	return co2Reduced * 0.009498572;
+    // Monetary worth of CO2 reduced (in CAD)
+    public double co2ReducedWorth(double co2Reduced) {
+    	return 0.009498572 * co2Reduced;
     }
     
-    //Monetary worth of stormwater
+    // Monetary worth of stormwater intercepted (in CAD)
     public double stormwaterWorth(double stormwater) {
-    	return stormwater * 0.0033732774;
+    	return 0.0033732774 * stormwater;
     }
 
     // ==============================
