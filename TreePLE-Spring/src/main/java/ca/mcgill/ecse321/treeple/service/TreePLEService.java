@@ -282,7 +282,11 @@ public class TreePLEService {
         fcTrees.forEach(treeId -> {
             Tree tree;
             if ((tree = sql.getTree((int) treeId)) != null) {
-                treeList.add(tree);
+				try {
+					treeList.add(getFutureTree(tree, Date.valueOf(fcDate)));
+				} catch (Exception e) {
+					throw new Exception(e.getMessage());
+				}
                 treeIdList.add((int) treeId);
             }
         });
@@ -1021,6 +1025,25 @@ public class TreePLEService {
         // Average growth rate of a tree is about 6 yrs/inch
         return (int) Math.round(6*diameter);
     }
+    
+    // Returns the tree with updated height and diameter for the given date
+    public Tree getFutureTree(Tree tree, Date futureDate) throws Exception {
+    	long currentTime = Calendar.getInstance().getTimeInMillis();
+    	long futureTime = futureDate.getTime();
+
+    	if (currentTime > futureTime) 
+    		throw new InvalidInputException("Future date cannot be before the current date!");
+    	double timeDiff = (futureTime - currentTime)/(1000*60*60*24*365.25);
+    	
+    	tree.setDiameter((int) (tree.getDiameter() + inchesToCm(timeDiff/6)));
+	int futureHeight = (int) Math.exp(2.447 + 0.7 * Math.log(Math.log(getAgeOfTree(tree) + 1)));
+    	// int futureHeight = (int) (100 * Math.sqrt(Math.pow(2.4569, Math.log(getAgeOfTree(tree)+1))));
+    	if (futureHeight > tree.getHeight()) {
+        	tree.setHeight(futureHeight);
+    	}
+
+    	return tree;
+    }
 
     // Returns the approximate weight of the tree (in kg)
     public double getWeightOfTree(Tree tree) throws Exception {
@@ -1066,12 +1089,20 @@ public class TreePLEService {
     // CONVERSIONS
     // ==============================
 
+    public double cmToInches(double centimeters) {
+        return 12 * cmToFeet(centimeters);
+    }
+
     public double cmToFeet(double centimeters) {
         return 0.0328084 * centimeters;
     }
 
-    public double cmToInches(double centimeters) {
-        return 12 * cmToFeet(centimeters);
+    public double inchesToCm(double inches) {
+    	return 2.54 * inches;
+    }
+
+    public double feetToMeter(double feet) {
+        return 0.3048 * feet;
     }
 
     public double poundsToKG(double weight) {
