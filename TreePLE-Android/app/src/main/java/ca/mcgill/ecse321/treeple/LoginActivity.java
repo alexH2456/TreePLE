@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
     //Queries server for latest release apk and downloads it to the users device
     private void updateApp() {
 
-        String dlUrl = VolleyController.DEFAULT_BASE_URL + "TreePLE-Android/release/TreePLE.apk";
+        String dlUrl = VolleyController.DEFAULT_BASE_URL + "TreePLE-Android/TreePLE.apk";
 
         InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, dlUrl, new Response.Listener<byte[]>() {
             @Override
