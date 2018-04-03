@@ -937,25 +937,28 @@ public class TreePLEService {
         return co2Sequestered/getAgeOfTree(tree);
     }
 
-    // TODO
     // Returns the amount of energy conserved by the tree (in kWh/yr)
     public double getEnergyConserved(Tree tree) throws Exception {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
+        
+        double averageEnergyConsumed = 22332.2; // In kWh/yr
 
+        double energyCoefficient = 0;
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-
+        	energyCoefficient = 0.7145;
         } else if (landType == Land.Residential) {
-
+        	energyCoefficient = 0.8874;
         } else if (landType == Land.Institutional) {
-
+        	energyCoefficient = 0.9010;
         } else if (landType == Land.Municipal) {
-
+        	energyCoefficient = 0.8896;
         }
-
-        return 0;
+        
+        double diameterCoefficient = tree.getDiameter()/50; // Average diameter of a tree is 50
+        return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
 
     // Returns the amount of stormwater runoff by the tree (in L/yr)
@@ -989,8 +992,20 @@ public class TreePLEService {
     // SUSTAINABILITY MONETARY WORTH
     // ==============================
 
-    // TODO: The amount of money saved
-
+    // Monetary worth of energy conserved (in CAD)
+    public double energyConservedWorth(double energyConserved) {
+    	return 0.162861 * energyConserved;
+    }
+    
+    // Monetary worth of CO2 reduced (in CAD)
+    public double co2ReducedWorth(double co2Reduced) {
+    	return 0.009498572 * co2Reduced;
+    }
+    
+    // Monetary worth of stormwater intercepted (in CAD)
+    public double stormwaterWorth(double stormwater) {
+    	return 0.0033732774 * stormwater;
+    }
 
     // ==============================
     // TREE HELPER METHODS
