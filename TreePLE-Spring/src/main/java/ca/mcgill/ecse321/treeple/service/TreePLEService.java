@@ -43,7 +43,6 @@ public class TreePLEService {
     // CREATE API
     // ==============================
 
-    // TODO: Increment totalTrees in municipality
     // Create a new Tree
     public Tree createTree(JSONObject jsonParams) throws Exception {
         // User data
@@ -276,20 +275,17 @@ public class TreePLEService {
         if (sql.getUser(fcUser) == null)
             throw new InvalidInputException("User does not exist!");
 
-        // TODO: Increase height/diameter according to future date
         ArrayList<Tree> treeList = new ArrayList<Tree>();
         ArrayList<Integer> treeIdList = new ArrayList<Integer>();
-        fcTrees.forEach(treeId -> {
+        Iterator<Object> fcTreesIterator = fcTrees.iterator();
+
+        while (fcTreesIterator.hasNext()) {
             Tree tree;
-            if ((tree = sql.getTree((int) treeId)) != null) {
-				try {
-					treeList.add(getFutureTree(tree, Date.valueOf(fcDate)));
-				} catch (Exception e) {
-					throw new Exception(e.getMessage());
-				}
-                treeIdList.add((int) treeId);
+            if ((tree = sql.getTree((int) fcTreesIterator.next())) != null) {
+                treeList.add(getFutureTree(tree, Date.valueOf(fcDate)));
+                treeIdList.add((int) fcTreesIterator.next());
             }
-        });
+        }
 
         double stormwater = forecastStormwaterIntercepted(treeList);
         double co2Reduced = forecastCO2Sequestered(treeList);
@@ -945,22 +941,22 @@ public class TreePLEService {
     public double getEnergyConserved(Tree tree) throws Exception {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
-        
+
         double averageEnergyConsumed = 22332.2; // In kWh/yr
 
         double energyCoefficient = 0;
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-        	energyCoefficient = 0.7145;
+            energyCoefficient = 0.7145;
         } else if (landType == Land.Residential) {
-        	energyCoefficient = 0.8874;
+            energyCoefficient = 0.8874;
         } else if (landType == Land.Institutional) {
-        	energyCoefficient = 0.9010;
+            energyCoefficient = 0.9010;
         } else if (landType == Land.Municipal) {
-        	energyCoefficient = 0.8896;
+            energyCoefficient = 0.8896;
         }
-        
+
         double diameterCoefficient = tree.getDiameter()/50; // Average diameter of a tree is 50
         return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
@@ -998,17 +994,17 @@ public class TreePLEService {
 
     // Monetary worth of energy conserved (in CAD)
     public double energyConservedWorth(double energyConserved) {
-    	return 0.162861 * energyConserved;
+        return 0.162861 * energyConserved;
     }
-    
+
     // Monetary worth of CO2 reduced (in CAD)
     public double co2ReducedWorth(double co2Reduced) {
-    	return 0.009498572 * co2Reduced;
+        return 0.009498572 * co2Reduced;
     }
-    
+
     // Monetary worth of stormwater intercepted (in CAD)
     public double stormwaterWorth(double stormwater) {
-    	return 0.0033732774 * stormwater;
+        return 0.0033732774 * stormwater;
     }
 
     // ==============================
@@ -1023,26 +1019,28 @@ public class TreePLEService {
         double diameter = cmToInches(tree.getDiameter());
 
         // Average growth rate of a tree is about 6 yrs/inch
-        return (int) Math.round(6*diameter);
+        return (int) Math.round(6 * diameter);
     }
-    
+
     // Returns the tree with updated height and diameter for the given date
     public Tree getFutureTree(Tree tree, Date futureDate) throws Exception {
-    	long currentTime = Calendar.getInstance().getTimeInMillis();
-    	long futureTime = futureDate.getTime();
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        long futureTime = futureDate.getTime();
 
-    	if (currentTime > futureTime) 
-    		throw new InvalidInputException("Future date cannot be before the current date!");
-    	double timeDiff = (futureTime - currentTime)/(1000*60*60*24*365.25);
-    	
-    	tree.setDiameter((int) (tree.getDiameter() + inchesToCm(timeDiff/6)));
-	int futureHeight = (int) Math.exp(2.447 + 0.7 * Math.log(Math.log(getAgeOfTree(tree) + 1)));
-    	// int futureHeight = (int) (100 * Math.sqrt(Math.pow(2.4569, Math.log(getAgeOfTree(tree)+1))));
-    	if (futureHeight > tree.getHeight()) {
-        	tree.setHeight(futureHeight);
-    	}
+        if (currentTime > futureTime)
+            throw new InvalidInputException("Future date cannot be before the current date!");
 
-    	return tree;
+        double yearsDiff = (futureTime - currentTime) / (1000*60*60*24*365.25);
+
+        tree.setDiameter((int) (tree.getDiameter() + inchesToCm(yearsDiff/6)));
+        int futureHeight = (int) Math.exp(2.447 + 0.7 * Math.log(Math.log(getAgeOfTree(tree) + 1)));
+        // int futureHeight = (int) (100 * Math.sqrt(Math.pow(2.4569, Math.log(getAgeOfTree(tree)+1))));
+
+        if (futureHeight > tree.getHeight()) {
+            tree.setHeight(futureHeight);
+        }
+
+        return tree;
     }
 
     // Returns the approximate weight of the tree (in kg)
@@ -1098,7 +1096,7 @@ public class TreePLEService {
     }
 
     public double inchesToCm(double inches) {
-    	return 2.54 * inches;
+        return 2.54 * inches;
     }
 
     public double feetToMeter(double feet) {

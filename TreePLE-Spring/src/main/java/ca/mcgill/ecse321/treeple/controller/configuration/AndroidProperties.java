@@ -9,7 +9,8 @@ public class AndroidProperties {
 
     // The IP address of the Android client
     // private String ip = "192.168.56.102";
-    private String ip = "132.206.4.80";
+    // private String ip = "132.206.4.80";
+    private String ip = "ecse321-11.ece.mcgill.ca";
 
     // The port on which the Android client listens
     private int port = 8086;
