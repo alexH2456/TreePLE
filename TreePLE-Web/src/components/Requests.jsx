@@ -1,14 +1,13 @@
 import React, {PureComponent} from 'react';
-import {Link} from 'react-router-dom';
 import axios from 'axios';
 
-const backendUrl = 'http://localhost:8088/';
-const frontendUrl = 'http://localhost:8087/';
+// const backendUrl = 'http://localhost:8088/';
+// const frontendUrl = 'http://localhost:8087/';
 // const backendUrl = '';
 // const frontendUrl = '';
 
 const AXIOS = axios.create({
-  baseURL: backendUrl,
+  // baseURL: backendUrl,
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE',
@@ -36,6 +35,11 @@ function getAllUsers() {
   return getRequest(url);
 };
 
+function getUser(params) {
+  const url = '/users/';
+  return getRequestWithParams(url, params);
+};
+
 function getAllSpecies() {
   const url = '/species/';
   return getRequest(url);
@@ -53,15 +57,38 @@ function getAllMunicipalities() {
 
 
 // ==============================
+// POST API
+// ==============================
+
+function createTree(jsonParams) {
+  const url = '/newtree/';
+  return postRequest(url);
+}
+
+function createUser(jsonParams) {
+  const url = '/newuser/';
+  return postRequest(url);
+}
+
+
+// ==============================
 // REQUEST API
 // ==============================
 
 function getRequest(url) {
-  return AXIOS.get(url);
+  return AXIOS.get('/api' + url);
 };
 
-export {getAllTrees, getAllTreeLocations,
-        getAllUsers,
+function getRequestWithParams(url, params) {
+  return AXIOS.get('/api' + url, params);
+};
+
+function postRequest(url) {
+  return AXIOS.post('/api' + url);
+};
+
+export {getAllTrees, getAllTreeLocations, createTree,
+        getAllUsers, getUser, createUser,
         getAllSpecies,
         getAllLocations,
         getAllMunicipalities};
