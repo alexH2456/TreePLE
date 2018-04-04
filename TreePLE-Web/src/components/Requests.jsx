@@ -17,7 +17,7 @@ const AXIOS = axios.create({
 });
 
 // ==============================
-// GET API
+// GET ALL API
 // ==============================
 
 function getAllTrees() {
@@ -35,11 +35,6 @@ function getAllUsers() {
   return getRequest(url);
 };
 
-function getUser(params) {
-  const url = '/users/';
-  return getRequestWithParams(url, params);
-};
-
 function getAllSpecies() {
   const url = '/species/';
   return getRequest(url);
@@ -54,6 +49,21 @@ function getAllMunicipalities() {
   const url = '/municipalities/';
   return getRequest(url);
 }
+
+
+// ==============================
+// GET API
+// ==============================
+
+function getTree(treeId) {
+  const url = `/trees/${treeId}/`;
+  return getRequest(url);
+};
+
+function getUser(username) {
+  const url = `/users/${username}/`;
+  return getRequest(url);
+};
 
 
 // ==============================
@@ -86,6 +96,25 @@ function getRequestWithParams(url, params) {
 function postRequest(url) {
   return AXIOS.post('/api' + url);
 };
+
+function registerUser() {
+      const url = '/newuser/';
+      let username=this.state.username;
+      let password=this.state.password;
+      let role=this.state.role;
+      let myAddresses=this.state.myAddresses;
+
+      AXIOS.post(backendUrl+ url, { username, password, role, myAddresses })
+            .then((response) => {
+                console.log("got it");
+                console.log(response);
+
+           })
+    }
+
+
+
+
 
 export {getAllTrees, getAllTreeLocations, createTree,
         getAllUsers, getUser, createUser,
