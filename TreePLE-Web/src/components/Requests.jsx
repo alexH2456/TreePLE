@@ -59,9 +59,47 @@ function getAllMunicipalities() {
 function getRequest(url) {
   return AXIOS.get(url);
 };
+function loginUser() {
+    const url = '/login/';
+    let username=this.state.username;
+    let password=this.state.password;
+      AXIOS.post(backendUrl+ url, { username, password })
+            .then((response) => {
+
+                console.log(response);
+                if (response.status == 200) {
+                      localStorage.setItem("username", JSON.stringify(response.data.username));
+                      localStorage.setItem("userRole", JSON.stringify(response.data.role));
+                      localStorage.setItem("adresses", JSON.stringify(response.data.myAddresses[0]));
+
+                 }
+      })
+
+    }
+
+
+function registerUser() {
+      const url = '/newuser/';
+      let username=this.state.username;
+      let password=this.state.password;
+      let role=this.state.role;
+      let myAddresses=this.state.myAddresses;
+
+      AXIOS.post(backendUrl+ url, { username, password, role, myAddresses })
+            .then((response) => {
+                console.log("got it");
+                console.log(response);
+
+           })
+    }
+
+
+
+
 
 export {getAllTrees, getAllTreeLocations,
         getAllUsers,
         getAllSpecies,
         getAllLocations,
-        getAllMunicipalities};
+        getAllMunicipalities,
+        loginUser};

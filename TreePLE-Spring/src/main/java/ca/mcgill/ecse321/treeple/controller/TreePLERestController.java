@@ -222,6 +222,12 @@ public class TreePLERestController {
         Forecast forecast = service.createForecast(new JSONObject(jsonBody));
         return convertToDto(forecast);
     }
+    
+    @PostMapping(value = {"/login/"})
+    public UserDto login(@RequestBody String jsonBody) throws Exception {
+        User user = service.login(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
 
 
     // ==============================
