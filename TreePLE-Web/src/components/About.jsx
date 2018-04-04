@@ -8,6 +8,27 @@ const options = [
 ]
 
 class About extends PureComponent {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+    };
+
+  this.login =service.loginUser.bind(this);
+  }
+
+  handleChangeU(event) {
+      this.setState({username: event.target.value});
+      console.log("hey");
+    }
+
+  handleChangeP(event) {
+      this.setState({password: event.target.value});
+      console.log("heyP");
+   }
+
   render () {
     return (
       <div>
@@ -20,17 +41,13 @@ class About extends PureComponent {
         <div>
 
         <Modal trigger={<Button>Login</Button>} basic size='small'>
-        
-         
             <Modal.Content image>
             
             <div>
-              <Image src='images/favicon.ico' size='medium' spaced = 'true|right' />
+              <Image src='images/favicon.ico' size='medium' spaced = 'right' />
               </div>
               <Modal.Description>
-                
               <Form>
-
               
               <Form.Input fluid label='Username' placeholder='Username' />
               
@@ -52,7 +69,7 @@ class About extends PureComponent {
           
             <Modal.Content image>
             <div>
-             <Image src='images/favicon.ico' size='medium' spaced = 'true|right' />  
+             <Image src='images/favicon.ico' size='medium' spaced = 'right' />  
              </div>
               <Modal.Description>
               <Form>
