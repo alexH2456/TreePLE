@@ -77,6 +77,7 @@ public class TestTreePLEService {
         user.put("username", (String) null);
         user.put("password", "123yunus");
         user.put("role", "Scientist");
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", "St-Lazare");
 
         service.createUser(user);
@@ -88,6 +89,7 @@ public class TestTreePLEService {
         user.put("username", "Yunus");
         user.put("password", (String) null);
         user.put("role", "Scientist");
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", "St-Lazare");
 
         service.createUser(user);
@@ -99,6 +101,7 @@ public class TestTreePLEService {
         user.put("username", "Yunus");
         user.put("password", "123yunus");
         user.put("role", (String) null);
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", "St-Lazare");
 
         service.createUser(user);
@@ -110,6 +113,7 @@ public class TestTreePLEService {
         user.put("username", "Yunus");
         user.put("password", "123yunus");
         user.put("role", "Scientist");
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", (String) null);
 
         service.createUser(user);
@@ -121,6 +125,7 @@ public class TestTreePLEService {
         user.put("username", "Yunus");
         user.put("password", "123yunus");
         user.put("role", "NotARealRole");
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", "St-Lazare");
 
         try {
@@ -136,6 +141,7 @@ public class TestTreePLEService {
         user.put("username", "Yunus");
         user.put("password", "123yunus");
         user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
         user.put("myAddresses", "   ");
 
         try {
@@ -989,6 +995,7 @@ public class TestTreePLEService {
         testUser.put("username", "Abbas");
         testUser.put("password", "ecse321pw");
         testUser.put("role", "Resident");
+        testUser.put("scientistKey", "");
         testUser.put("myAddresses", "H4L3N1");
 
         return testUser;
