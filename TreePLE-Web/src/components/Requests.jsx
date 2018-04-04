@@ -67,6 +67,8 @@ function loginUser() {
     let pass=this.state.password;
       AXIOS.post(backendUrl+ url, { usr, pass })
             .then((response) => {
+                console.log("got it");
+                localSession.setItem("role", "test");
                 //if (response.data.result_status == "success") {
                   //  localSession.setItem("role", JSON.stringify(response.data.userRole))
                         //dispatch({ type: AUTHENTICATE_USER });
