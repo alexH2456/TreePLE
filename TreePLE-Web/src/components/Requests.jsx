@@ -61,21 +61,21 @@ function getRequest(url) {
 };
 function loginUser() {
     const url = '/newuser/';
-
-        AXIOS.post(backendURL+ url, { this.state.username, this.state.password })
+    console.log(this.state.username);
+    console.log(this.state.password);
+    let usr=this.state.username;
+    let pass=this.state.password;
+      AXIOS.post(backendUrl+ url, { usr, pass })
             .then((response) => {
-                if (response.data.result_status == "success") {
-                    localSession.setItem("role", JSON.stringify(response.data.userRole))
+                //if (response.data.result_status == "success") {
+                  //  localSession.setItem("role", JSON.stringify(response.data.userRole))
                         //dispatch({ type: AUTHENTICATE_USER });
                         //browserHistory.push("/home");
                     })
-                }
-            })
-            .catch(() => {
-                ..dispatch(authError('Incorrect Login Info'));
-            });
+
     }
-}
+
+
 
 export {getAllTrees, getAllTreeLocations,
         getAllUsers,
