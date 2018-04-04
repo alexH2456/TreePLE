@@ -60,20 +60,22 @@ function getRequest(url) {
   return AXIOS.get(url);
 };
 function loginUser() {
-    const url = '/newuser/';
+    const url = '/login/';
     console.log(this.state.username);
     console.log(this.state.password);
-    let usr=this.state.username;
-    let pass=this.state.password;
-      AXIOS.post(backendUrl+ url, { usr, pass })
+    let username=this.state.username;
+    let password=this.state.password;
+      AXIOS.post(backendUrl+ url, { username, password })
             .then((response) => {
                 console.log("got it");
-                localSession.setItem("role", "test");
-                //if (response.data.result_status == "success") {
-                  //  localSession.setItem("role", JSON.stringify(response.data.userRole))
-                        //dispatch({ type: AUTHENTICATE_USER });
-                        //browserHistory.push("/home");
-                    })
+                console.log(response);
+                if (response.status == 200) {
+                      localStorage.setItem("username", JSON.stringify(response.data.username));
+                      localStorage.setItem("userRole", JSON.stringify(response.data.userRole));
+                      localStorage.setItem("adresses", JSON.stringify(response.data.myAdresses));
+
+                 }
+      })
 
     }
 
