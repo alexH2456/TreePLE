@@ -172,9 +172,8 @@ public class TreePLEService {
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
-        if (role.equals("Scientist") && !sRoleKey.equals(scientistPassword)) {
+        if (role.equals("Scientist") && !sRoleKey.equals(scientistPassword))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
-        }
 
         User user = new User(username, password, UserRole.valueOf(role));
 
