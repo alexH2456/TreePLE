@@ -19,14 +19,10 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 
 @Service
 public class TreePLEService {
-	
-	// ==============================
-    // GLOBABL VARIABLES
-    // ==============================
-	
+
     private SQLiteJDBC sql;
     private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
-    private final String scientistPassword = "1234";
+    private final String sRoleKey = "i<3tr33s";
 
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
@@ -156,12 +152,11 @@ public class TreePLEService {
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
-        String scientistAccess = jsonParams.getString("scientistPassword");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
-        String myAddresses = jsonParams.getString("myAddresses");
+        String scientistKey = jsonParams.getString("scientistKey");
+	String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
-        
 
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
@@ -177,8 +172,8 @@ public class TreePLEService {
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
-        if(role.equals("Scientist") && !(scientistAccess.equals(scientistPassword))) {
-        	throw new SQLException("SQL User insert query failed!");
+        if (role.equals("Scientist") && !sRoleKey.equals(scientistPassword)) {
+            throw new InvalidInputException("Authorization key for Scientist role is invalid!");
         }
 
         User user = new User(username, password, UserRole.valueOf(role));
