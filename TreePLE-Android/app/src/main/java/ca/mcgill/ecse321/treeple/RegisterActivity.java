@@ -112,7 +112,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void switchToMap() {
-        Intent mapsIntent = new Intent(this, MapsActivity.class);
+        Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(mapsIntent);
         finish();
     }

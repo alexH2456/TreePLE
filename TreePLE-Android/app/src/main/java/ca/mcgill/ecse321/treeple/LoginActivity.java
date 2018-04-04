@@ -115,13 +115,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void switchToRegister() {
-        Intent registerIntent = new Intent(this, RegisterActivity.class);
+        Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
         startActivity(registerIntent);
         finish();
     }
 
     public void switchToMap() {
-        Intent mapsIntent = new Intent(this, MapsActivity.class);
+        Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(mapsIntent);
         finish();
     }
