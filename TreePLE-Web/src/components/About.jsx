@@ -53,9 +53,9 @@ class About extends PureComponent {
               </div>
               <Modal.Description>
                 <Form>
-                  <Form.Input fluid label='Username' placeholder='Username' onChange={this.handleChangeU}/>
-                  <Form.Input fluid type='password' label='Password' placeholder='Password' onChange={this.handleChangeP}/>
-                  <Form.Button color='olive' size='massive' onClick={this.handleSignIn}>Sign In</Form.Button>
+                  <Form.Input fluid placeholder='Username' onChange={this.handleChangeU}/>
+                  <Form.Input fluid type='password' placeholder='Password' onChange={this.handleChangeP}/>
+                  <Form.Button inverted color='green' size='small' onClick={this.handleSignIn}>Sign In</Form.Button>
                 </Form>
               </Modal.Description>
             </Modal.Content>
@@ -70,13 +70,13 @@ class About extends PureComponent {
               </div>
               <Modal.Description>
                 <Form>
-                  <Form.Input fluid label='Username' placeholder='Username'/>
-                  <Form.Input fluid type='password' label='Password' placeholder='Password'/>
-                  <Form.Input fluid type='password' label='Password2' placeholder='Confirm Password'/>
-                  <Form.Select fluid label='Role' options={options} placeholder='Role'/>
-                  <Form.Input fluid type='password' label='ScientistAccess' placeholder='Scientist Access'/>
-                  <Form.Input fluid label='PostalCode' placeholder='PostalCode'/>
-                  <Form.Button color='olive' size='massive'>Register</Form.Button>
+                  <Form.Input fluid placeholder='Username'/>
+                  <Form.Input fluid type='password' placeholder='Password'/>
+                  <Form.Input fluid type='password' placeholder='Confirm Password'/>
+                  <Form.Select fluid options={options} placeholder='Role'/>
+                  <Form.Input fluid type='password' placeholder='Scientist Access Key'/>
+                  <Form.Input fluid placeholder='PostalCode'/>
+                  <Form.Button inverted color='green' size='small'>Register</Form.Button>
                 </Form>
               </Modal.Description>
             </Modal.Content>
