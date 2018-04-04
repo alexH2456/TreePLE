@@ -1,6 +1,11 @@
 import React, {PureComponent} from 'react';
 import {Link} from 'react-router-dom';
-import {Button, Input, Image, Modal, Label} from 'semantic-ui-react'
+import {Button, Input, Image, Modal, Label, Form} from 'semantic-ui-react'
+
+const options = [
+  { key: 'R', text: 'Resident', value: 'resident' },
+  { key: '', text: 'Scientist', value: 'scientist' },
+]
 
 class About extends PureComponent {
   render () {
@@ -13,23 +18,62 @@ class About extends PureComponent {
           </Link>
         </div>
         <div>
-          <br/>
+
         <Modal trigger={<Button>Login</Button>} basic size='small'>
         
+         
             <Modal.Content image>
+            
+            <div>
               <Image src='images/favicon.ico' size='medium' spaced = 'true|right' />
+              </div>
               <Modal.Description>
-                <div style={{display: "inline-block"}}>
-                <Input placeholder='Enter Username' />
                 
-                <Label pointing = 'left'size = 'large' >Please enter your username</Label>
-                </div>
-                <div style={{display: "inline-block"}}>
-                <Input placeholder='Enter Password' />
+              <Form>
+
+              
+              <Form.Input fluid label='Username' placeholder='Username' />
+              
+              <Form.Input type = 'password' fluid label='Password' placeholder='Password' />
+
+              <Form.Button color = 'olive' size = 'massive' >Sign In</Form.Button>
+              
+              </Form>
                 
-                <Label pointing = 'left' size = 'large' >Please enter your password</Label>
-                </div>
-                <Button color = 'olive' size = 'massive' > Login</Button>
+              </Modal.Description>
+            </Modal.Content>
+          </Modal>
+          
+        </div>
+      
+
+        <div>
+          <Modal trigger= {<Button> Register</Button>} basic size = "small">
+          
+            <Modal.Content image>
+            <div>
+             <Image src='images/favicon.ico' size='medium' spaced = 'true|right' />  
+             </div>
+              <Modal.Description>
+              <Form>
+
+              
+              
+              <Form.Input fluid label='Username' placeholder='Username' />
+              
+              <Form.Input type = 'password' fluid label='Password' placeholder='Password' />
+
+              <Form.Input type = 'password' fluid label='Password2' placeholder='Confirm Password' />
+
+              <Form.Select fluid label='Role' options={options} placeholder='Role' />
+
+              <Form.Input type = 'password' fluid label='ScientistAccess' placeholder='Scientist Access' />
+
+              <Form.Input fluid label='PostalCode' placeholder='PostalCode' />
+
+              <Form.Button color = 'olive' size = 'massive' >Register</Form.Button>
+
+              </Form>
               </Modal.Description>
             </Modal.Content>
           </Modal>
