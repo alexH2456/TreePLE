@@ -1,10 +1,13 @@
 import React, {PureComponent} from 'react';
-import {Button, Input, Image, Modal, Label} from 'semantic-ui-react';
+import {Button, Input, Image, Modal, Label, Form} from 'semantic-ui-react';
 import SignInModal from './SignInModal';
 import {getUser} from './Requests.jsx'
 
+const options = [
+  {key: 'R', text: 'Resident', value: 'resident'},
+  {key: '', text: 'Scientist', value: 'scientist'},
+]
 class About extends PureComponent {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -42,34 +45,45 @@ class About extends PureComponent {
     return (
       <div>
         <div>
-          About
+          <Modal basic trigger={<Button>Login</Button>} size='small'>
+            <Modal.Content image>
+
+            <div>
+              <Image src='images/favicon.ico' size='medium' spaced='right'/>
+              </div>
+              <Modal.Description>
+                <Form>
+                  <Form.Input fluid label='Username' placeholder='Username' onChange={this.handleChangeU}/>
+                  <Form.Input fluid type='password' label='Password' placeholder='Password' onChange={this.handleChangeP}/>
+                  <Form.Button color='olive' size='massive' onClick={this.handleSignIn}>Sign In</Form.Button>
+                </Form>
+              </Modal.Description>
+            </Modal.Content>
+          </Modal>
         </div>
 
         <div>
-          <br/>
-          <Modal basic trigger={<Button>Login</Button>} size='small'>
+          <Modal trigger={<Button>Register</Button>} basic size="small">
             <Modal.Content image>
-              <Image src='images/favicon.ico' size='medium' spaced='right' />
+              <div>
+              <Image src='images/favicon.ico' size='medium' spaced='right'/>
+              </div>
               <Modal.Description>
-                <div style={{display: "inline-block"}}>
-                <Input
-                  placeholder='Enter Username'
-                  onChange={this.handleChangeU}
-                />
-
-                <Label pointing='left'size='large'>Please enter your username</Label>
-                </div>
-                <div style={{display: "inline-block"}}>
-                  <Input placeholder='Enter Password' onChange={this.handleChangeP} />
-                  <Label pointing='left' size='large'>Please enter your password</Label>
-                </div>
-                <Button color='olive' size='massive' onClick={this.handleSignIn}>Login</Button>
+                <Form>
+                  <Form.Input fluid label='Username' placeholder='Username'/>
+                  <Form.Input fluid type='password' label='Password' placeholder='Password'/>
+                  <Form.Input fluid type='password' label='Password2' placeholder='Confirm Password'/>
+                  <Form.Select fluid label='Role' options={options} placeholder='Role'/>
+                  <Form.Input fluid type='password' label='ScientistAccess' placeholder='Scientist Access'/>
+                  <Form.Input fluid label='PostalCode' placeholder='PostalCode'/>
+                  <Form.Button color='olive' size='massive'>Register</Form.Button>
+                </Form>
               </Modal.Description>
             </Modal.Content>
           </Modal>
         </div>
         <div>
-          <SignInModal/>
+        <SignInModal/>
         </div>
       </div>
     );

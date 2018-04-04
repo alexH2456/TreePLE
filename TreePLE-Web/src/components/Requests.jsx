@@ -98,22 +98,17 @@ function postRequest(url) {
 };
 
 function registerUser() {
-      const url = '/newuser/';
-      let username=this.state.username;
-      let password=this.state.password;
-      let role=this.state.role;
-      let myAddresses=this.state.myAddresses;
+  const url = '/newuser/';
+  let username=this.state.username;
+  let password=this.state.password;
+  let role=this.state.role;
+  let myAddresses=this.state.myAddresses;
 
-      AXIOS.post(backendUrl+ url, { username, password, role, myAddresses })
-            .then((response) => {
-                console.log("got it");
-                console.log(response);
-
-           })
-    }
-
-
-
+  AXIOS.post(backendUrl+ url, { username, password, role, myAddresses })
+    .then((response) => {
+        console.log(response);
+    })
+}
 
 
 export {getAllTrees, getAllTreeLocations, createTree,
