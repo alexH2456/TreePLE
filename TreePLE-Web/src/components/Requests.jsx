@@ -59,9 +59,27 @@ function getAllMunicipalities() {
 function getRequest(url) {
   return AXIOS.get(url);
 };
+function loginUser() {
+    const url = '/newuser/';
+
+        AXIOS.post(backendURL+ url, { this.state.username, this.state.password })
+            .then((response) => {
+                if (response.data.result_status == "success") {
+                    localSession.setItem("role", JSON.stringify(response.data.userRole))
+                        //dispatch({ type: AUTHENTICATE_USER });
+                        //browserHistory.push("/home");
+                    })
+                }
+            })
+            .catch(() => {
+                ..dispatch(authError('Incorrect Login Info'));
+            });
+    }
+}
 
 export {getAllTrees, getAllTreeLocations,
         getAllUsers,
         getAllSpecies,
         getAllLocations,
-        getAllMunicipalities};
+        getAllMunicipalities,
+        loginUser};
