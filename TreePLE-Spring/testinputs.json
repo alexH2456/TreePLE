@@ -18,7 +18,7 @@
 }
 
 {
-    "user": "Gang",
+    "user": "Fetish",
     "tree": {
         "height": 420,
         "diameter": 40,
@@ -60,7 +60,6 @@
 }
 
 {
-
     "name": "Weeping Willow",
     "species": "Salix Babylonica",
     "genus": "Salix"
@@ -109,6 +108,7 @@
 // ==============================
 // USER
 // ==============================
+
 {
     "username": "Abbas",
     "password": "alacuck",
@@ -118,7 +118,7 @@
 
 {
     "username": "Fetish",
-    "password": "cuck",
+    "password": "meme123",
     "role": "Resident",
     "myAddresses": "J7T"
 }
