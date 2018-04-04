@@ -611,6 +611,20 @@ public class TreePLEService {
 
         return user;
     }
+    
+    public User login(JSONObject jsonParams) throws Exception {
+    	 String username = jsonParams.getString("username");
+         String password = jsonParams.getString("password");
+    	 User user=sql.getUser(username);
+    	 if(user.getPassword().equals(password))
+    	 {
+    		return user; 
+    	 }
+         
+         
+         
+         return null;
+    }
 
     // Update a Species
     public Species updateSpecies(JSONObject jsonParams) throws Exception {
