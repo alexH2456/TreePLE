@@ -61,23 +61,39 @@ function getRequest(url) {
 };
 function loginUser() {
     const url = '/login/';
-    console.log(this.state.username);
-    console.log(this.state.password);
     let username=this.state.username;
     let password=this.state.password;
       AXIOS.post(backendUrl+ url, { username, password })
             .then((response) => {
-                console.log("got it");
+
                 console.log(response);
                 if (response.status == 200) {
                       localStorage.setItem("username", JSON.stringify(response.data.username));
-                      localStorage.setItem("userRole", JSON.stringify(response.data.userRole));
-                      localStorage.setItem("adresses", JSON.stringify(response.data.myAdresses));
+                      localStorage.setItem("userRole", JSON.stringify(response.data.role));
+                      localStorage.setItem("adresses", JSON.stringify(response.data.myAddresses[0]));
 
                  }
       })
 
     }
+
+
+function registerUser() {
+      const url = '/newuser/';
+      let username=this.state.username;
+      let password=this.state.password;
+      let role=this.state.role;
+      let myAddresses=this.state.myAddresses;
+
+      AXIOS.post(backendUrl+ url, { username, password, role, myAddresses })
+            .then((response) => {
+                console.log("got it");
+                console.log(response);
+
+           })
+    }
+
+
 
 
 
