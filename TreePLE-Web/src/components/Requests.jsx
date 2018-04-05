@@ -50,6 +50,16 @@ function getAllMunicipalities() {
   return getRequest(url);
 }
 
+function getAllForecasts() {
+  const url = `/forecasts/`;
+  return getRequest(url);
+}
+
+function getTreePLESustainability() {
+  const url = `/treeple/sustainability/`;
+  return getRequest(url);
+}
+
 
 // ==============================
 // GET API
@@ -107,5 +117,7 @@ export {
   getAllSpecies,
   getAllLocations,
   getAllMunicipalities,
+  getAllForecasts,
+  getTreePLESustainability,
   login
 };

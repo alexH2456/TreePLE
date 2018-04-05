@@ -141,6 +141,11 @@ public class TreePLERestController {
         return forecasts;
     }
 
+    @GetMapping(value = {"/treeple/sustainability/"})
+    public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
+        return service.getTreePLESustainability();
+    }
+
 
     // ==============================
     // GET ONE MAPPING API

@@ -378,6 +378,36 @@ public class TreePLEService {
         return Collections.unmodifiableList(sql.getAllForecasts());
     }
 
+    // Get sustainability factos for entire TreePLE system
+    public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
+        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
+        // JSONObject sustainabilityFactors = new JSONObject();
+        Map<String, Double> stormwater = new HashMap<String, Double>();
+        Map<String, Double> co2Reduced = new HashMap<String, Double>();
+        Map<String, Double> biodiversity = new HashMap<String, Double>();
+        Map<String, Double> energyConserved = new HashMap<String, Double>();
+        List<Tree> allTrees = getAllTrees();
+
+        double factor = 0;
+        stormwater.put("factor", (factor = forecastStormwaterIntercepted(allTrees)));
+        stormwater.put("worth", stormwaterWorth(factor));
+
+        co2Reduced.put("factor", (factor = forecastCO2Sequestered(allTrees)));
+        co2Reduced.put("worth", co2ReducedWorth(factor));
+
+        biodiversity.put("factor", forecastBiodiversityIndex(allTrees));
+
+        energyConserved.put("factor", (factor = forecastEnergyConserved(allTrees)));
+        energyConserved.put("worth", energyConservedWorth(factor));
+
+        sustainabilityFactors.put("stormwater", stormwater);
+        sustainabilityFactors.put("co2Reduced", co2Reduced);
+        sustainabilityFactors.put("biodiversity", biodiversity);
+        sustainabilityFactors.put("energyConserved", energyConserved);
+
+        return sustainabilityFactors;
+    }
+
 
     // ==============================
     // GET API
@@ -945,6 +975,32 @@ public class TreePLEService {
     // SUSTAINABILITY ATTRIBUTES
     // ==============================
 
+    // Returns the amount of stormwater runoff by the tree (in L/yr)
+    public double getStormwaterIntercepted(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double curveNumber = 0;
+        double stormwaterCaptured = 0;
+        Land landType = tree.getLand();
+
+        if (landType == Land.Park) {
+            curveNumber = 83.5;
+        } else if (landType == Land.Residential) {
+            curveNumber = 93.2;
+        } else if (landType == Land.Institutional) {
+            curveNumber = 96.3;
+        } else if (landType == Land.Municipal) {
+            curveNumber = 100;
+        }
+
+        double sorptivity = (1000/curveNumber) - 10; // Sorptivity of the tree (in inches)
+        double canopyArea = getCanopyArea(tree); // Estimation of the canopy area
+        stormwaterCaptured = sorptivity * canopyArea/12;
+
+        return cubicFeetToLiters(stormwaterCaptured);
+    }
+
     // Returns the amount of CO2 sequestered by the tree (in kg/yr)
     public double getCO2Sequestered(Tree tree) throws Exception {
         if (tree == null)
@@ -989,40 +1045,14 @@ public class TreePLEService {
         return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
 
-    // Returns the amount of stormwater runoff by the tree (in L/yr)
-    public double getStormwaterIntercepted(Tree tree) throws Exception {
-        if (tree == null)
-            throw new InvalidInputException("Tree cannot be null!");
-
-        double curveNumber = 0;
-        double stormwaterCaptured = 0;
-        Land landType = tree.getLand();
-
-        if (landType == Land.Park) {
-            curveNumber = 83.5;
-        } else if (landType == Land.Residential) {
-            curveNumber = 93.2;
-        } else if (landType == Land.Institutional) {
-            curveNumber = 96.3;
-        } else if (landType == Land.Municipal) {
-            curveNumber = 100;
-        }
-
-        double sorptivity = (1000/curveNumber) - 10; // Sorptivity of the tree (in inches)
-        double canopyArea = getCanopyArea(tree); // Estimation of the canopy area
-        stormwaterCaptured = sorptivity * canopyArea/12;
-
-        return cubicFeetToLiters(stormwaterCaptured);
-    }
-
 
     // ==============================
     // SUSTAINABILITY MONETARY WORTH
     // ==============================
 
-    // Monetary worth of energy conserved (in CAD)
-    public double energyConservedWorth(double energyConserved) {
-        return 0.162861 * energyConserved;
+    // Monetary worth of stormwater intercepted (in CAD)
+    public double stormwaterWorth(double stormwater) {
+        return 0.0033732774 * stormwater;
     }
 
     // Monetary worth of CO2 reduced (in CAD)
@@ -1030,10 +1060,11 @@ public class TreePLEService {
         return 0.009498572 * co2Reduced;
     }
 
-    // Monetary worth of stormwater intercepted (in CAD)
-    public double stormwaterWorth(double stormwater) {
-        return 0.0033732774 * stormwater;
+    // Monetary worth of energy conserved (in CAD)
+    public double energyConservedWorth(double energyConserved) {
+        return 0.162861 * energyConserved;
     }
+
 
     // ==============================
     // TREE HELPER METHODS

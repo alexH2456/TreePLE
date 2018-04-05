@@ -22,6 +22,7 @@ class IconMenu extends PureComponent {
   }
 
   toggleVisibility = () => this.setState({visible: !this.state.visible});
+
   handleSignIn = () => this.setState({showSignIn: !this.state.showSignIn});
   handleSignUp = () => this.setState({showSignUp: !this.state.showSignUp});
   handleLogOut = () => localStorage.clear();
