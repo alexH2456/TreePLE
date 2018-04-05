@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -61,9 +62,6 @@ import java.util.TimeZone;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    // TODO: Add update function for tree properties
-    // TODO: Replace tree icon with default marker, color based on ownership
 
     private GoogleMap mMap;
 
@@ -180,7 +178,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng markerPos = marker.getPosition();
                 Double latitude = markerPos.latitude;
                 Double longitude = markerPos.longitude;
-                String latlng = latitude + " " + longitude;
+                String latlng = "Lat: " + latitude + " Lng: " + longitude;
 
                 coords.setText(latlng);
 
@@ -189,12 +187,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.support_simple_spinner_dropdown_item);
                 landSpinner.setAdapter(landAdapter);
+                landSpinner.setSelection(0);
 
                 ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.support_simple_spinner_dropdown_item);
                 statusSpinner.setAdapter(statusAdapter);
+                statusSpinner.setSelection(0);
 
                 ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.support_simple_spinner_dropdown_item);
                 ownershipSpinner.setAdapter(ownershipAdapter);
+                ownershipSpinner.setSelection(0);
 
                 //Remove created marker if tree not added to database
                 popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -216,6 +217,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } catch (InvalidInputException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -265,7 +269,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 TextView treeCoords = popupView.findViewById(R.id.tree_coords);
-                treeCoords.setText(marker.getPosition().toString());
+                double latitude = marker.getPosition().latitude;
+                double longitude = marker.getPosition().longitude;
+                String coords = "Lat: " + latitude + " Long: " + longitude;
+                treeCoords.setText(coords);
 
                 popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
@@ -302,7 +309,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Remove current markers
         clearTrees();
 
-        //TODO: Don't display trees if they have status cutDown
         //Query database for list of all trees and add each to the map + trees list
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "trees/", null, new Response.Listener<JSONArray>() {
             @Override
@@ -310,16 +316,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject tree = response.getJSONObject(i);
+                        String status = tree.getString("status");
 
-                        JSONObject location = tree.getJSONObject("location");
-                        double latitude = (double) location.get("latitude");
-                        double longitude = (double) location.get("longitude");
+                        //Don't add trees to map if they have status "Cutdown"
+                        if (!status.equals("Cutdown")) {
+                            JSONObject location = tree.getJSONObject("location");
+                            double latitude = (double) location.get("latitude");
+                            double longitude = (double) location.get("longitude");
+                            LatLng latLng = new LatLng(latitude, longitude);
 
-                        LatLng latLng = new LatLng(latitude, longitude);
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                            float markerColor = getMarkerColor(status);
 
-                        trees.put(marker, tree);
-
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
+                            trees.put(marker, tree);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -337,6 +347,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
+    }
+
+    private float getMarkerColor(String status) {
+        if (status.equals("Planted")) {
+            return BitmapDescriptorFactory.HUE_GREEN;
+        } else if (status.equals("Diseased")) {
+            return BitmapDescriptorFactory.HUE_YELLOW;
+        } else if (status.equals("MarkedForCutdown")) {
+            return BitmapDescriptorFactory.HUE_ROSE;
+        } else {
+            return BitmapDescriptorFactory.HUE_RED;
+        }
     }
 
     //Get updated user info from database
@@ -535,7 +557,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Parses entered info from fields and converts it into a JSON object, then issues a POST to the database
-    public void plantTree(View view) throws JSONException {
+    public void plantTree(View view) throws JSONException, InvalidInputException {
 
         TextView currentView = popupView.findViewById(R.id.tree_height);
         int height = Integer.parseInt(currentView.getText().toString());
@@ -565,6 +587,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String[] latlng = currentView.getText().toString().split(" ");
         Double latitude = Double.parseDouble(latlng[0]);
         Double longitude = Double.parseDouble(latlng[1]);
+
+        if (land.equals("Select Land Type") || status.equals("Select Status") || ownership.equals("Select Ownership")) {
+            throw new InvalidInputException("No selection");
+        }
+        if (status.equals("Cutdown")) {
+            throw new InvalidInputException("Can't plant a tree with Cutdown status");
+        }
 
         String username = LoginActivity.loggedInUser.getString("username");
 
@@ -602,18 +631,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    //TODO: Change to updateTree and update status to cutDown instead of deleting
-    //Gets tree json from map and issues POST request to database
+    //Gets tree json from map and issues PATCH request to database to update status to "Cutdown"
     public void cutDownTree(Marker marker) throws JSONException {
 
-        int treeID = (int) trees.get(marker).get("treeId");
-        System.out.println("TREEID: " + treeID);
+        JSONObject treeCutDown = new JSONObject();
+        treeCutDown.put("user", LoginActivity.loggedInUser.getString("username"));
 
-        JSONObject treeDelete = new JSONObject();
-        treeDelete.put("treeId", treeID);
-        treeDelete.put("user", LoginActivity.loggedInUser.getString("username"));
+        JSONObject newTree = trees.get(marker);
+        newTree.put("status", "Cutdown");
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "deletetree/", treeDelete, new Response.Listener<JSONObject>() {
+        treeCutDown.put("tree", newTree);
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "trees/update/", treeCutDown, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("CutResponse: " + response.toString());
@@ -628,6 +657,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+    }
+
+    // TODO: Add update function + layout/view for changing tree properties
+    // Residents can update their own trees, Scientists can update any tree
+    public void updateTree() {
+        
     }
 
 }
