@@ -43,7 +43,7 @@ class NavigationBar extends PureComponent {
     console.log(sustainability);
     console.log(!!sustainability);
 
-    const stormwater = !!sustainability.stormwater ? sustainability.co2Reduced : {factor: '--', worth: '--'};
+    const stormwater = !!sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
     const co2Reduced = !!sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};
     const biodiversity = !!sustainability.biodiversity ? sustainability.biodiversity : {factor: '--'};
     const energyConserved = !!sustainability.energyConserved ? sustainability.energyConserved : {factor: '--', worth: '--'};
@@ -58,14 +58,13 @@ class NavigationBar extends PureComponent {
           <Menu.Item
             name='stormwater'
             fitted='vertically'
-            // active={activeItem === 'stormwater'}
           >
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Stormwater Intercepted</Segment>
               <Segment>
-                <Statistic horizontal size='mini' label='L/year' value={parseFloat(stormwater.factor).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='L/year' value={stormwater.factor.toFixed(2)}/>
                 <Divider fitted/>
-                <Statistic horizontal size='mini' label='$' value={parseFloat(stormwater.worth).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='$' value={stormwater.worth.toFixed(2)}/>
               </Segment>
             </Segment.Group>
           </Menu.Item>
@@ -73,14 +72,13 @@ class NavigationBar extends PureComponent {
           <Menu.Item
             name='co2Reduced'
             fitted='vertically'
-            // active={activeItem === 'co2Reduced'}
           >
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>CO2 Reduced</Segment>
               <Segment>
-                <Statistic horizontal size='mini' label='kg/year' value={parseFloat(co2Reduced.factor).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='kg/year' value={co2Reduced.factor.toFixed(2)}/>
                 <Divider fitted/>
-                <Statistic horizontal size='mini' label='$' value={parseFloat(co2Reduced.worth).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='$' value={co2Reduced.worth.toFixed(2)}/>
               </Segment>
             </Segment.Group>
           </Menu.Item>
@@ -88,12 +86,11 @@ class NavigationBar extends PureComponent {
           <Menu.Item
             name='biodiversity'
             fitted='vertically'
-            // active={activeItem === 'biodiversity'}
           >
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
               <Segment>
-                <Statistic horizontal size='mini' label='' value={parseFloat(biodiversity.factor).toFixed(5)}/>
+                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
               </Segment>
             </Segment.Group>
           </Menu.Item>
@@ -101,14 +98,13 @@ class NavigationBar extends PureComponent {
           <Menu.Item
             name='energyConserved'
             fitted='vertically'
-            // active={activeItem === 'energyConserved'}
           >
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Energy Conserved</Segment>
               <Segment>
-                <Statistic horizontal size='mini' label='kWh/year' value={parseFloat(energyConserved.factor).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='kWh/year' value={energyConserved.factor.toFixed(2)}/>
                 <Divider fitted/>
-                <Statistic horizontal size='mini' label='$' value={parseFloat(energyConserved.worth).toFixed(2)}/>
+                <Statistic horizontal size='mini' label='$' value={energyConserved.worth.toFixed(2)}/>
               </Segment>
             </Segment.Group>
           </Menu.Item>
