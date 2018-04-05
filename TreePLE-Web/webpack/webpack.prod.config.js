@@ -79,7 +79,7 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    port: 8080,
+    port: 8087,
     host: 'ecse321-11.novalocal',
     public: 'ecse321-11.ece.mcgill.ca',
     contentBase: parentDir,
