@@ -691,7 +691,7 @@ public class TestTreePLEService {
     // ==============================
     
     @Test
-    public void getSpeciesByNameTest() throws Exception {
+    public void testGetSpeciesByName() throws Exception {
     	service.createSpecies(testSpecies);
     	
     	try {
@@ -705,7 +705,7 @@ public class TestTreePLEService {
     }
     
     @Test
-    public void getSpeciesByNameNullName() throws Exception {
+    public void testGetSpeciesByNameNullName() throws Exception {
     	String error = "";
     	service.createSpecies(testSpecies);
     	
@@ -719,7 +719,7 @@ public class TestTreePLEService {
     }
     
     @Test
-    public void getSpeciesByNameSpacesName() throws Exception {
+    public void testGetSpeciesByNameSpacesName() throws Exception {
     	String error = "";
     	service.createSpecies(testSpecies);
     	
@@ -733,7 +733,7 @@ public class TestTreePLEService {
     }
     
     @Test
-    public void getSpeciesByNameSpeciesDNE() {
+    public void testGetSpeciesByNameSpeciesDNE() {
     	String error = "";
     	
     	try {
@@ -750,7 +750,7 @@ public class TestTreePLEService {
     // ==============================
     
     @Test
-    public void getLocationByIdTest() throws Exception {
+    public void testGetLocationByIdTest() throws Exception {
     	service.createUser(testUser);
     	service.createMunicipality(testMunicipality);
     	service.createSpecies(testSpecies);
@@ -767,7 +767,7 @@ public class TestTreePLEService {
     }
     
     @Test
-    public void getLocationByIdNegativeId() throws Exception {
+    public void testGetLocationByIdNegativeId() throws Exception {
     	String error = "";
     	try {
     		service.getLocationById(-1);
@@ -778,7 +778,7 @@ public class TestTreePLEService {
     }
     
     @Test
-    public void getLocationByIdLocationDNE() {
+    public void testGetLocationByIdLocationDNE() {
     	String error = "";
 	    	try {
 	    		service.getLocationById(1);
@@ -801,6 +801,10 @@ public class TestTreePLEService {
     // UPDATE TREE TEST
     // ==============================
 
+    @Test
+    public void testUpdateTree() {
+    	
+    }
     // ==============================
     // UPDATE USER TEST
     // ==============================
