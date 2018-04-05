@@ -58,6 +58,8 @@
     <string name="update_placeholder">Check for updates</string>
     <string name="error_invalid_user">Invalid user</string>
     <string name="user_refresh">Get User</string>
+    <string name="prompt_role_pass">Role Password</string>
+    <string name="update_tree_button">Update Tree</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>

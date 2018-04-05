@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
     private View mLoginFormView;
     private EditText mReenterView;
     private EditText mPostalView;
+    private EditText mRolePassView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +64,27 @@ public class RegisterActivity extends AppCompatActivity {
         // Set up the login form.
         mUserView = findViewById(R.id.user);
         mRoleView = findViewById(R.id.role_spinner);
+        mRolePassView = findViewById(R.id.role_password);
 
         //Populate spinner with enum
-        ArrayAdapter<CharSequence> roleAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.role_enum, R.layout.support_simple_spinner_dropdown_item);
+        final ArrayAdapter<CharSequence> roleAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.role_enum, R.layout.support_simple_spinner_dropdown_item);
         mRoleView.setAdapter(roleAdapter);
+        mRoleView.setSelection(0);
+
+        mRoleView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int scientist = roleAdapter.getPosition("Scientist");
+                if (position == scientist) {
+                    mRolePassView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mPostalView = findViewById(R.id.postal_code);
 
@@ -146,6 +165,7 @@ public class RegisterActivity extends AppCompatActivity {
         mPasswordView.setError(null);
         mReenterView.setError(null);
         mPostalView.setError(null);
+        mRolePassView.setError(null);
 
         // Store values at the time of the login attempt.
         String user = mUserView.getText().toString();
@@ -153,6 +173,7 @@ public class RegisterActivity extends AppCompatActivity {
         String reenter = mReenterView.getText().toString();
         String role = mRoleView.getSelectedItem().toString();
         String postalCode = mPostalView.getText().toString();
+        String rolePass = "";
 
         boolean cancel = false;
         View focusView = null;
@@ -204,6 +225,15 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         }
 
+        if (mRolePassView.getVisibility() == View.VISIBLE) {
+            rolePass = mRolePassView.getText().toString();
+            if (TextUtils.isEmpty(rolePass)) {
+                focusView = mRolePassView;
+                Toast.makeText(getApplicationContext(), "This field is required", Toast.LENGTH_SHORT).show();
+                cancel = true;
+            }
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -212,7 +242,7 @@ public class RegisterActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(user, password, role, postalCode);
+            mAuthTask = new UserLoginTask(user, password, role, postalCode, rolePass);
             mAuthTask.execute((Void) null);
         }
     }
@@ -283,15 +313,17 @@ public class RegisterActivity extends AppCompatActivity {
         private final String mPassword;
         private final String mRole;
         private final String mPostalCode;
+        private final String mRolePass;
 
         private JSONObject user;
         private boolean accountExists = false;
 
-        UserLoginTask(String username, String password, String role, String postalCode) {
+        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) {
             mUsername = username;
             mPassword = password;
             mRole = role;
             mPostalCode = postalCode;
+            mRolePass = rolePass;
         }
 
         @Override
@@ -324,6 +356,7 @@ public class RegisterActivity extends AppCompatActivity {
                 user.put("password", mPassword);
                 user.put("role", mRole);
                 user.put("myAddresses", mPostalCode);
+                user.put("scientistKey", mRolePass);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -339,7 +372,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
                     NetworkResponse networkResponse = volleyError.networkResponse;
-                    Log.e(TAG, "Backend error: " + networkResponse.toString());
+                    Log.e(TAG, "Backend error: " + networkResponse.allHeaders.toString());
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG,"Timeout occurred when waiting for response");
