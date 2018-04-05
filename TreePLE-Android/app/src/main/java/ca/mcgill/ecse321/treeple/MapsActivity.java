@@ -159,7 +159,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapLongClick(LatLng latLng) {
 
-                final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(getMarkerColor("Planted"))));
                 CameraUpdate centerCam = CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM);
                 mMap.animateCamera(centerCam, 400, null);
 
@@ -349,7 +349,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, error.networkResponse.toString());
+                Log.e(TAG, error.toString());
             }
         });
 
@@ -390,18 +390,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         JSONObject tree = response.getJSONObject(i);
                         String status = tree.getString("status");
 
+                        System.out.println(status);
+
                         //Don't add trees to map if they have status "Cutdown"
-                        if (!status.equals("Cutdown")) {
-                            JSONObject location = tree.getJSONObject("location");
-                            double latitude = (double) location.get("latitude");
-                            double longitude = (double) location.get("longitude");
-                            LatLng latLng = new LatLng(latitude, longitude);
+                        JSONObject location = tree.getJSONObject("location");
+                        double latitude = (double) location.get("latitude");
+                        double longitude = (double) location.get("longitude");
+                        LatLng latLng = new LatLng(latitude, longitude);
 
-                            float markerColor = getMarkerColor(status);
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(getMarkerColor(tree.getString("status")))));
+                        trees.put(marker, tree);
 
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
-                            trees.put(marker, tree);
-                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -412,7 +411,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PopulateError: " + error.networkResponse.toString());
+                Log.e(TAG, "PopulateError: " + error.toString());
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -424,11 +423,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private float getMarkerColor(String status) {
         if (status.equals("Planted")) {
             return BitmapDescriptorFactory.HUE_GREEN;
-        } else if (status.equals("Diseased")) {
+        }
+        if (status.equals("Diseased")) {
             return BitmapDescriptorFactory.HUE_YELLOW;
-        } else if (status.equals("MarkedForCutdown")) {
+        }
+        if (status.equals("MarkedForCutdown")) {
             return BitmapDescriptorFactory.HUE_ROSE;
-        } else {
+        }
+        else {
             return BitmapDescriptorFactory.HUE_RED;
         }
     }
@@ -455,7 +457,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "UserRefreshError: " + error.networkResponse.toString());
+                Log.e(TAG, "UserRefreshError: " + error.toString());
                 Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_LONG).show();
             }
         });
@@ -690,7 +692,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PlantError: " + error.networkResponse);
+                Log.e(TAG, "PlantError: " + error.toString());
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -701,13 +703,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Gets tree json from map and issues PATCH request to database to update status to "Cutdown"
     public void cutDownTree(Marker marker) throws JSONException {
 
+        JSONObject oldTree = trees.get(marker);
+
         JSONObject treeCutDown = new JSONObject();
         treeCutDown.put("user", LoginActivity.loggedInUser.getString("username"));
 
-        JSONObject newTree = trees.get(marker);
+        JSONObject newTree = new JSONObject();
+        newTree.put("treeId", oldTree.getInt("treeId"));
+        newTree.put("height", oldTree.getInt("height"));
+        newTree.put("diameter", oldTree.getInt("diameter"));
+        newTree.put("land", oldTree.getString("land"));
+        newTree.put("ownership", oldTree.getString("ownership"));
+        newTree.put("species", oldTree.getJSONObject("species").getString("name"));
+        newTree.put("municipality", oldTree.getJSONObject("municipality").getString("name"));
         newTree.put("status", "Cutdown");
 
         treeCutDown.put("tree", newTree);
+
+        System.out.println(treeCutDown.toString());
 
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "trees/update/", treeCutDown, new Response.Listener<JSONObject>() {
             @Override
@@ -718,7 +731,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "CutError: " + error.networkResponse);
+                Log.e(TAG, "CutError: " + error.toString());
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -800,7 +813,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "UpdateError: " + error.networkResponse);
+                            Log.e(TAG, "UpdateError: " + error.toString());
                             Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
                         }
                     });
