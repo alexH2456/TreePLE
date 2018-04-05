@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {Button, Image, Modal, Form} from 'semantic-ui-react';
 import {landSelectable, statusSelectable, ownershipSelectable} from '../constants';
-import {getAllSpecies} from './Requests';
+import {getAllSpecies, getAllMunicipalities} from './Requests';
 
 class UpdateTreeModal extends PureComponent {
   constructor(props) {
@@ -9,32 +9,51 @@ class UpdateTreeModal extends PureComponent {
     this.state = {
       modalOpen: false,
       treeSpecies: [],
+      municipalities: [],
       species:'',
       ownership:'',
       land:'',
       status:'',
       height:'',
-      diameter:''
+      diameter:'',
+      municipality:'',
+      treeId:''
     }
   }
 
   componentDidMount() {
     getAllSpecies()
-     .then(response => {
-       console.log(response.data);
-       let speciesSelectable = []
-       response.data.forEach((species, idx) => {
-          speciesSelectable.push({
-            key: idx,
-            text: species.name,
-            value: species.name
-          });
-       });
-       this.setState({treeSpecies: speciesSelectable});
-       console.log(speciesSelectable);
-       //response.data.map
+       .then(response => {
+        // console.log(response.data);
+         let speciesSelectable = []
+         response.data.forEach((species, idx) => {
+            speciesSelectable.push({
+              key: idx,
+              text: species.name,
+              value: species.name
+            });
+         });
+         this.setState({treeSpecies: speciesSelectable});
+         //console.log(speciesSelectable);
 
-     })
+       })
+    getAllMunicipalities()
+      .then(response => {
+          //console.log(response);
+          let municipalitySelectable = []
+          response.data.forEach((municipality, idx) => {
+             municipalitySelectable.push({
+               key: idx,
+               text: municipality.name,
+               value: municipality.name
+             });
+          });
+          //console.log(municipalitySelectable)
+          this.setState({municipalities: municipalitySelectable});
+
+
+      })
+
 
   }
 
@@ -48,6 +67,7 @@ class UpdateTreeModal extends PureComponent {
   handleStatus = (event, data) => this.setState({status: data.value});
   handleHeight = (event, data) => this.setState({height: data.value});
   handleDiameter = (event, data) => this.setState({diameter: data.value});
+  handleMunicipality = (event, data) => this.setState({municipality: data.value});
 
   render() {
     console.log(this.state);
@@ -71,6 +91,7 @@ class UpdateTreeModal extends PureComponent {
               <Form.Select fluid options={statusSelectable} placeholder='Status' onChange={this.handleStatus}/>
               <Form.Select fluid options={ownershipSelectable} placeholder='Ownership' onChange={this.handleOwnership}/>
               <Form.Select fluid options={this.state.treeSpecies} placeholder='Species' onChange={this.handleSpecies}/>
+              <Form.Select fluid options={this.state.municipalities} placeholder='Municipalities' onChange={this.handleMunicipality}/>
               <Form.Button inverted color='green' size='small' onClick={this.handleSignUp}>Update</Form.Button>
               <Form.Button inverted color='red' size='small' onClick={this.handleClose}>Close</Form.Button>
             </Form>
