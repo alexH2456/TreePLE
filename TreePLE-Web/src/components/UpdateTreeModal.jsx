@@ -69,7 +69,7 @@ class UpdateTreeModal extends PureComponent {
   handleMunicipality = (event, data) => this.setState({municipality: data.value});
 
   render() {
-    console.log(this.state);
+    //console.log(this.state);
     return(
       <Modal
         basic
