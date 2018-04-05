@@ -48,12 +48,7 @@ class SignInModal extends PureComponent {
 
   render() {
     return (
-      <Modal
-        basic
-        size='small'
-        open={this.state.modalOpen}
-        onClose={this.handleClose}
-        trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
+      <Modal basic size='small' open={this.state.modalOpen} onClose={this.handleClose} trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
       >
         <Modal.Content image>
           <div>

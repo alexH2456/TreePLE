@@ -35,18 +35,13 @@ class SignUpModal extends PureComponent {
   }
 
   render() {
-    const options = [
+    const optionsRole = [
       {key: 'R', text: 'Resident', value: 'resident'},
       {key: '', text: 'Scientist', value: 'scientist'},
     ];
 
     return (
-      <Modal
-        basic
-        size="small"
-        open={this.state.modalOpen}
-        onClose={this.handleClose}
-        trigger={<Button onClick={this.handleOpen}>Sign Up</Button>}
+      <Modal basic size="small" open={this.state.modalOpen} onClose={this.handleClose} trigger={<Button onClick={this.handleOpen}>Sign Up</Button>}
       >
         <Modal.Content image>
           <div>
@@ -57,7 +52,7 @@ class SignUpModal extends PureComponent {
               <Form.Input fluid placeholder='Username'/>
               <Form.Input fluid type='password' placeholder='Password'/>
               <Form.Input fluid type='password' placeholder='Confirm Password'/>
-              <Form.Select fluid options={options} placeholder='Role'/>
+              <Form.Select fluid options={optionsRole} placeholder='Role'/>
               <Form.Input fluid type='password' placeholder='Scientist Access Key'/>
               <Form.Input fluid placeholder='PostalCode'/>
               <Form.Button inverted color='green' size='small' onClick={this.handleSignUp}>Sign Up</Form.Button>
