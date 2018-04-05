@@ -6,10 +6,9 @@ var parentDir = path.join(__dirname, '../');
 module.exports = {
   entry: [
     path.join(parentDir, 'src/index.jsx')
-    // 'webpack-dev-server/client?http://127.0.0.1:8087/'
   ],
   output: {
-    path: parentDir + '/dist',
+    path: path.join(parentDir + '/dist'),
     filename: 'bundle.js'
   },
   module: {
@@ -43,14 +42,12 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.css']
   },
   devtool: 'eval-source-map',
   devServer: {
     port: 8087,
     host: '127.0.0.1',
-    //host: 'ecse321-11.novalocal',
-    //public: 'ecse321-11.ece.mcgill.ca',
     contentBase: parentDir,
     historyApiFallback: true,
     disableHostCheck: true,

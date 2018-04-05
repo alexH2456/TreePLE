@@ -356,6 +356,33 @@ public class TreePLEService {
     // GET API
     // ==============================
 
+    // Login
+    public User login(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+        String password = jsonParams.getString("password");
+
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (password == null || password.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Password cannot be empty!");
+
+        User user = null;
+        if ((user = User.getWithUsername(username)) != null) {
+            if (user.getPassword().equals(password)) {
+                return user;
+            }
+        } else {
+            if ((user = sql.getUser(username)) == null)
+                throw new InvalidInputException("That username doesn't exist!");
+
+            if (user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+
+        return user;
+    }
+
     // Get a specific Tree
     public Tree getTreeById(int treeId) throws Exception {
         if (treeId <= 0)
