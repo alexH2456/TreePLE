@@ -21,32 +21,32 @@ const AXIOS = axios.create({
 // ==============================
 
 function getAllTrees() {
-  const url = '/trees/';
+  const url = `/trees/`;
   return getRequest(url);
 };
 
 function getAllTreeLocations() {
-  const url = '/trees/?query=locations';
+  const url = `/trees/?query=locations`;
   return getRequest(url);
 }
 
 function getAllUsers() {
-  const url = '/users/';
+  const url = `/users/`;
   return getRequest(url);
 };
 
 function getAllSpecies() {
-  const url = '/species/';
+  const url = `/species/`;
   return getRequest(url);
 }
 
 function getAllLocations() {
-  const url = '/locations/';
+  const url = `/locations/`;
   return getRequest(url);
 }
 
 function getAllMunicipalities() {
-  const url = '/municipalities/';
+  const url = `/municipalities/`;
   return getRequest(url);
 }
 
@@ -66,7 +66,7 @@ function getUser(username) {
 };
 
 function login(jsonParams) {
-  const url = '/login/';
+  const url = `/login/`;
   return postRequestWithParams(url, jsonParams);
 };
 
@@ -75,12 +75,12 @@ function login(jsonParams) {
 // ==============================
 
 function createTree(jsonParams) {
-  const url = '/newtree/';
+  const url = `/newtree/`;
   return postRequest(url);
 }
 
 function createUser(jsonParams) {
-  const url = '/newuser/';
+  const url = `/newuser/`;
   return postRequestWithParams(url, jsonParams);
 }
 
@@ -90,19 +90,15 @@ function createUser(jsonParams) {
 // ==============================
 
 function getRequest(url) {
-  return AXIOS.get('/api' + url);
-};
-
-function getRequestWithParams(url, params) {
-  return AXIOS.get('/api' + url, params);
+  return AXIOS.get(`/api` + url);
 };
 
 function postRequest(url) {
-  return AXIOS.post('/api' + url);
+  return AXIOS.post(`/api` + url);
 };
 
 function postRequestWithParams(url, params) {
-  return AXIOS.post('/api' + url, params);
+  return AXIOS.post(`/api` + url, params);
 };
 
 export {

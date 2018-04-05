@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import GoogleMapReact, {Map, InfoWindow, Marker, Polygon, GoogleApiWrapper} from 'google-maps-react';
+import {Map, InfoWindow, Marker, Polygon, GoogleApiWrapper} from 'google-maps-react';
 import {getAllTrees, getAllMunicipalities} from './Requests';
 
 export class TreeMapContainer extends PureComponent {
@@ -94,11 +94,9 @@ export class TreeMapContainer extends PureComponent {
 
   render() {
     const style = {
-      width: '100vw',
-      height: '100vh'
+      width: '99vw',
+      height: '80vh'
     };
-
-    var smt = this.state.trees;
 
     return (this.props.loaded && Object.keys(this.state.center).length !== 0) ? (
       <div style={style}>
@@ -115,7 +113,7 @@ export class TreeMapContainer extends PureComponent {
                             strokeOpacity={0.8}
                             strokeWeight={2}
                             fillColor="#0000FF"
-                            fillOpacity={0.35}/>;
+                            fillOpacity={0.3}/>;
           })}
           {this.state.trees.map(tree => {
             return <Marker key={tree.treeId} name={tree.treeId}
@@ -133,3 +131,5 @@ export default GoogleApiWrapper({
   apiKey: 'AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo',
   version: '3.31'
 })(TreeMapContainer);
+
+// export default TreeMapContainer;

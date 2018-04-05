@@ -803,13 +803,13 @@ public class TestTreePLEService {
 
     @Test
     public void testUpdateTree() throws Exception {
-    	service.createUser(testUser);
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 20);
@@ -826,7 +826,6 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
             Tree tree = service.updateTree(updateTreeObj);
 
             assertEquals(testTreeObj.getInt("treeId") +1, Tree.getNextTreeId());
@@ -846,17 +845,17 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     @Test
     public void testUpdateTreeNegativeId() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", -1);
             testTreeObj.put("height", 420);
@@ -873,25 +872,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
-        assertEquals(error,"Tree's ID cannot be negative!");
+
+        assertEquals(error, "Tree's ID cannot be negative!");
     }
-    
+
     @Test
     public void testUpdateTreeNegativeHeight() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", -420);
@@ -908,25 +907,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
-        assertEquals(error,"Height cannot be negative!");
+
+        assertEquals(error, "Height cannot be negative!");
     }
-    
+
     @Test
     public void testUpdateTreeNegativeDiameter() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -943,25 +942,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error,"Diameter cannot be negative!");
     }
-    
+
     @Test
-    public void testUpdateTreeUsernameEmpty() throws Exception{
-    	String error = "";
-    	service.createUser(testUser);
+    public void testUpdateTreeUsernameEmpty() throws Exception {
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -978,23 +977,23 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "      ");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "User is not logged in/Username is missing!");
-    } 
-    
+    }
+
     @Test(expected = JSONException.class)
     public void testUpdateTreeUsernameNull() throws Exception {
-    	service.createUser(testUser);
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
-    	JSONObject testTreeObj = new JSONObject();
+        JSONObject testTreeObj = new JSONObject();
 
         testTreeObj.put("treeId", 1);
         testTreeObj.put("height", 420);
@@ -1011,21 +1010,21 @@ public class TestTreePLEService {
         JSONObject updateTreeObj = new JSONObject();
         updateTreeObj.put("user", (String) null);
         updateTreeObj.put("tree", testTreeObj);
-        
+
         service.updateTree(updateTreeObj);
-       
+
     }
-    
+
     @Test
     public void testUpdateTreeInvalidLandEnum() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1042,25 +1041,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "That land type doesn't exist!");
     }
-    
+
     @Test
     public void testUpdateTreeInvalidStatusEnum() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1077,25 +1076,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "That status doesn't exist!");
     }
-    
+
     @Test
     public void testUpdateTreeInvalidOwnershipEnum() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1112,24 +1111,24 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "That ownership doesn't exist!");
     }
-    
+
     @Test
     public void testUpdateTreeTreeDNE() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1146,25 +1145,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "No Tree with that ID exists!");
     }
-    
+
     @Test
     public void testUpdateTreeUserDNE() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1181,25 +1180,25 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Gareth");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "User does not exist!");
     }
-    
+
     @Test
     public void testUpdateTreeSpeciesDNE() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1211,30 +1210,30 @@ public class TestTreePLEService {
             testTreeObj.put("species", "Maple");
             testTreeObj.put("latitude", 45.515883);
             testTreeObj.put("longitude", -73.685552);
-            testTreeObj.put("municipality", "Saint-Laurent");
+            testTreeObj.put("municipality", "Saint-Lazare");
 
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "Species does not exist!");
     }
-    
+
     @Test
     public void testUpdateMunicipalityDNE() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         service.createTree(testTree);
 
         try {
-        	JSONObject testTreeObj = new JSONObject();
+            JSONObject testTreeObj = new JSONObject();
 
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
@@ -1251,18 +1250,19 @@ public class TestTreePLEService {
             JSONObject updateTreeObj = new JSONObject();
             updateTreeObj.put("user", "Abbas");
             updateTreeObj.put("tree", testTreeObj);
-            
+
             service.updateTree(updateTreeObj);
-        }catch(Exception e) {
-        	error = e.getMessage();
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "Municipality does not exist!");
     }
 
     // ==============================
     // UPDATE USER TEST
     // ==============================
+
 
     // ==============================
     // UPDATE SPECIES TEST
