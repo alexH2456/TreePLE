@@ -685,16 +685,110 @@ public class TestTreePLEService {
     public void testGetTreeByIdNonExistantTree() throws Exception {
         service.getTreeById(100);
     }
-    //TODO
+    
     // ==============================
     // GET SPECIES BY NAME TEST
     // ==============================
     
-    //TODO
+    @Test
+    public void getSpeciesByNameTest() throws Exception {
+    	service.createSpecies(testSpecies);
+    	
+    	try {
+    		Species species = service.getSpeciesByName("Weeping Willow");
+    		assertEquals("Weeping Willow", species.getName());
+    		assertEquals("Salix Babylonica", species.getSpecies());
+    		assertEquals("Salix", species.getGenus());
+    	}catch(Exception e) {
+    		fail();
+    	}
+    }
+    
+    @Test
+    public void getSpeciesByNameNullName() throws Exception {
+    	String error = "";
+    	service.createSpecies(testSpecies);
+    	
+    	try {
+    		service.getSpeciesByName((String) null);
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	
+    	assertEquals(error, "Name cannot be empty!");
+    }
+    
+    @Test
+    public void getSpeciesByNameSpacesName() throws Exception {
+    	String error = "";
+    	service.createSpecies(testSpecies);
+    	
+    	try {
+    		service.getSpeciesByName("           ");
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	
+    	assertEquals(error, "Name cannot be empty!");
+    }
+    
+    @Test
+    public void getSpeciesByNameSpeciesDNE() {
+    	String error = "";
+    	
+    	try {
+    		service.getSpeciesByName("Weeping Willow");
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	
+    	assertEquals(error, "No Species with that name exists!");
+    }
+    
     // ==============================
     // GET LOCATION BY ID TEST
     // ==============================
     
+    @Test
+    public void getLocationByIdTest() throws Exception {
+    	service.createUser(testUser);
+    	service.createMunicipality(testMunicipality);
+    	service.createSpecies(testSpecies);
+    	service.createTree(testTree);
+    	int locationId = service.getTreeById(1).getLocation().getLocationId();
+    	
+    	try {
+    		Location location = service.getLocationById(locationId);
+    		assertEquals(45.515883, location.getLatitude(),0);
+    		assertEquals(-73.685552 , location.getLongitude(), 0);
+    	}catch(Exception e) {
+    		fail();
+    	}
+    }
+    
+    @Test
+    public void getLocationByIdNegativeId() throws Exception {
+    	String error = "";
+    	try {
+    		service.getLocationById(-1);
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	assertEquals("Location's ID cannot be negative!", error);
+    }
+    
+    @Test
+    public void getLocationByIdLocationDNE() {
+    	String error = "";
+	    	try {
+	    		service.getLocationById(1);
+	    	}catch(Exception e) {
+	    		error = e.getMessage();
+	    	}
+	    	assertEquals("No Location with that ID exists!", error);
+    }
+    
+    //TODO
     // ==============================
     // GET SURVEY REPORT BY ID TEST
     // ==============================
