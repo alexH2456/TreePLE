@@ -223,10 +223,6 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mRoleView;
             Toast.makeText(getApplicationContext(), "This field is required", Toast.LENGTH_SHORT).show();
             cancel = true;
-        } else if(role.equals("Select Role")) {
-            focusView = mRoleView;
-            Toast.makeText(getApplicationContext(), "This field is required", Toast.LENGTH_SHORT).show();
-            cancel = true;
         }
 
         if (mRolePassView.getVisibility() == View.VISIBLE) {
@@ -376,7 +372,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
                     NetworkResponse networkResponse = volleyError.networkResponse;
-                    Log.e(TAG, "Backend error: " + networkResponse.toString());
+                    Log.e(TAG, "Backend error: " + networkResponse.allHeaders.toString());
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG,"Timeout occurred when waiting for response");

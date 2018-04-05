@@ -59,27 +59,24 @@
     <string name="error_invalid_user">Invalid user</string>
     <string name="user_refresh">Get User</string>
     <string name="prompt_role_pass">Role Password</string>
+    <string name="update_tree_button">Update Tree</string>
     <string-array name="land_enum">
-        <item>Select Land Type</item>
         <item>Park</item>
         <item>Residential</item>
         <item>Institutional</item>
         <item>Municipal</item>
     </string-array>
     <string-array name="status_enum">
-        <item>Select Status</item>
         <item>Planted</item>
         <item>Diseased</item>
         <item>MarkedForCutdown</item>
         <item>Cutdown</item>
     </string-array>
     <string-array name="ownership_enum">
-        <item>Select Ownership</item>
         <item>Private</item>
         <item>Public</item>
     </string-array>
     <string-array name="role_enum">
-        <item>Select Role</item>
         <item>Resident</item>
         <item>Scientist</item>
     </string-array>
