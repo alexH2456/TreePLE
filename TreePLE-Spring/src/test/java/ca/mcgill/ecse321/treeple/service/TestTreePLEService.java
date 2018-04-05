@@ -234,7 +234,209 @@ public class TestTreePLEService {
 
         service.createMunicipality(municipality);
     }
+    
+    // ==============================
+    // CREATE FORECAST TEST
+    // ==============================
+    
+    @Test
+    public void testCreateForecast() throws Exception {
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
 
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", "Abbas");
+        testForecast.put("fcTrees", trees);
+        
+        try {
+        	Forecast forecast = service.createForecast(testForecast);
+
+        	assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
+        	assertEquals("Abbas", forecast.getFcUser());
+        	
+        	for (int i = 0; i < trees.length(); i++) {
+        		Tree tree = service.getTreeById(i + 1);
+        		Tree treeFc = forecast.getFcTree(i);
+            	assertEquals(tree.getHeight(), treeFc.getHeight());
+            	assertEquals(tree.getDiameter(), treeFc.getDiameter());
+            	assertEquals(tree.getAddress(),treeFc.getAddress());
+            	assertEquals(tree.getDatePlanted(),treeFc.getDatePlanted());
+            	assertEquals(tree.getLand(),treeFc.getLand());
+            	assertEquals(tree.getLocation().getLatitude(),treeFc.getLocation().getLatitude(),0);
+            	assertEquals(tree.getLocation().getLongitude(),treeFc.getLocation().getLongitude(),0);
+            	assertEquals(tree.getMunicipality(),treeFc.getMunicipality());
+            	assertEquals(tree.getOwnership(), treeFc.getOwnership());
+            	assertEquals(tree.getSpecies(), treeFc.getSpecies());
+            	assertEquals(tree.getStatus(), treeFc.getStatus());
+        	}
+      
+        	assertEquals(4*service.getCO2Sequestered(service.getTreeById(trees.getInt(0))),forecast.getCo2Reduced(), 0);
+        	assertEquals(4*service.getStormwaterIntercepted(service.getTreeById(trees.getInt(0))),forecast.getStormwater(), 0);
+        	assertEquals(4*service.getEnergyConserved(service.getTreeById(trees.getInt(0))),forecast.getEnergyConserved(), 0);
+        	assertEquals(0.25,forecast.getBiodiversity(), 0);
+        }catch(Exception e) {
+        	fail();
+        }
+    }
+    
+    @Test(expected = JSONException.class)
+    public void testCreateForecastUserNull() throws Exception {
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", (String) null);
+        testForecast.put("fcTrees", trees);
+       
+        service.createForecast(testForecast);
+    }
+    
+    @Test
+    public void testCreateForecastUsernamespaces() throws Exception {
+    	String error = "";
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", "             ");
+        testForecast.put("fcTrees", trees);
+        
+        try {
+        	service.createForecast(testForecast);
+        }catch(Exception e){
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "User is not logged in/Username is missing!");
+    }
+    
+    @Test(expected = JSONException.class)
+    public void testCreateForecastDateNull() throws Exception{   			
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", (String) null);
+        testForecast.put("fcUser", "Abbas");
+        testForecast.put("fcTrees", trees);
+
+        service.createForecast(testForecast);
+    }
+    
+    @Test
+    public void testCreateForecastDateWrongFormat() throws Exception{
+    	String error = "";
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018/04/16");
+        testForecast.put("fcUser", "Abbas");
+        testForecast.put("fcTrees", trees);
+
+        try {
+        	service.createForecast(testForecast);
+        }catch(Exception e){
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "Date doesn't match YYYY-(M)M-(D)D format!");
+    }
+    
+    @Test
+    public void testCreateForecastTreeListSize() throws Exception {
+    	String error = "";
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", "Abbas");
+        testForecast.put("fcTrees", trees);
+        
+        try {
+        	service.createForecast(testForecast);
+        }catch(Exception e){
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "Forecast requires minimum 1 tree!");
+    }
+    
+    @Test
+    public void testCreateForecastUserDNE() throws Exception {
+    	String error = "";
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
+
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+        	Tree tree = service.createTree(testTree);
+        	trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", "Gareth");
+        testForecast.put("fcTrees", trees);
+        
+        try {
+        	service.createForecast(testForecast);
+        }catch(Exception e){
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "User does not exist!");
+    }
 
     // ==============================
     // CREATE TREE TEST
@@ -483,19 +685,31 @@ public class TestTreePLEService {
     public void testGetTreeByIdNonExistantTree() throws Exception {
         service.getTreeById(100);
     }
-
+    //TODO
+    // ==============================
+    // GET SPECIES BY NAME TEST
+    // ==============================
+    
+    //TODO
+    // ==============================
+    // GET LOCATION BY ID TEST
+    // ==============================
+    
+    // ==============================
+    // GET SURVEY REPORT BY ID TEST
+    // ==============================
+    
+    // ==============================
+    // GET FORECAST BY ID TEST
+    // ==============================
 
     // ==============================
     // UPDATE TREE TEST
     // ==============================
 
-
-
     // ==============================
     // UPDATE USER TEST
     // ==============================
-
-
 
     // ==============================
     // UPDATE SPECIES TEST

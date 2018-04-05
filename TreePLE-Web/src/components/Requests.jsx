@@ -81,7 +81,7 @@ function createTree(jsonParams) {
 
 function createUser(jsonParams) {
   const url = '/newuser/';
-  return postRequest(url);
+  return postRequestWithParams(url, jsonParams);
 }
 
 
