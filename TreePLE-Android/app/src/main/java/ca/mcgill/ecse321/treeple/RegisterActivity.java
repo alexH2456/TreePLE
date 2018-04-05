@@ -77,12 +77,14 @@ public class RegisterActivity extends AppCompatActivity {
                 int scientist = roleAdapter.getPosition("Scientist");
                 if (position == scientist) {
                     mRolePassView.setVisibility(View.VISIBLE);
+                } else {
+                    mRolePassView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                mRolePassView.setVisibility(View.GONE);
             }
         });
 

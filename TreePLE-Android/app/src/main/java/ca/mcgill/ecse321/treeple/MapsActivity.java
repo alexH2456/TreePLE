@@ -690,7 +690,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PlantError: " + error.networkResponse.toString());
+                Log.e(TAG, "PlantError: " + error.networkResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -718,7 +718,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "CutError: " + error.networkResponse.toString());
+                Log.e(TAG, "CutError: " + error.networkResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -800,7 +800,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "PlantError: " + error.networkResponse.toString());
+                            Log.e(TAG, "UpdateError: " + error.networkResponse);
                             Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
                         }
                     });
