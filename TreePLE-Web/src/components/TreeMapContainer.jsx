@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react';
 import GoogleMapReact, {Map, InfoWindow, Marker, Polygon, GoogleApiWrapper} from 'google-maps-react';
 import {getAllTrees, getAllMunicipalities} from './Requests';
-// import TreeMap from './TreeMap';
 
 export class TreeMapContainer extends PureComponent {
   constructor(props) {
@@ -100,7 +99,6 @@ export class TreeMapContainer extends PureComponent {
     };
 
     var smt = this.state.trees;
-    // <TreeMap google={this.props.google}/>
 
     return (this.props.loaded && Object.keys(this.state.center).length !== 0) ? (
       <div style={style}>
