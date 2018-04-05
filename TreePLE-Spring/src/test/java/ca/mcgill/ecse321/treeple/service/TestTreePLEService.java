@@ -802,9 +802,464 @@ public class TestTreePLEService {
     // ==============================
 
     @Test
-    public void testUpdateTree() {
+    public void testUpdateTree() throws Exception {
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
 
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 20);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            Tree tree = service.updateTree(updateTreeObj);
+
+            assertEquals(testTreeObj.getInt("treeId") +1, Tree.getNextTreeId());
+            assertEquals(testTreeObj.getInt("treeId") + testMunicipality.getJSONArray("borders").length() + 1, Location.getNextLocationId());
+            assertEquals(testTreeObj.getInt("treeId") +2, SurveyReport.getNextReportId());
+            assertEquals(20, tree.getHeight());
+            assertEquals(testTreeObj.getInt("diameter"), tree.getDiameter());
+            assertEquals(Date.valueOf(testTreeObj.getString("datePlanted")), tree.getDatePlanted());
+            assertEquals(Land.valueOf(testTreeObj.getString("land")), tree.getLand());
+            assertEquals(Status.valueOf(testTreeObj.getString("status")), tree.getStatus());
+            assertEquals(Ownership.valueOf(testTreeObj.getString("ownership")), tree.getOwnership());
+            assertEquals(testTreeObj.getString("species"), tree.getSpecies().getName());
+            assertEquals(testTreeObj.getDouble("latitude"), tree.getLocation().getLatitude(), 0);
+            assertEquals(testTreeObj.getDouble("longitude"), tree.getLocation().getLongitude(), 0);
+            assertEquals(testTreeObj.getString("municipality"), tree.getMunicipality().getName());
+        } catch (Exception e) {
+            fail();
+        }
     }
+    
+    @Test
+    public void testUpdateTreeNegativeId() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", -1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error,"Tree's ID cannot be negative!");
+    }
+    
+    @Test
+    public void testUpdateTreeNegativeHeight() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", -420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error,"Height cannot be negative!");
+    }
+    
+    @Test
+    public void testUpdateTreeNegativeDiameter() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", -40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error,"Diameter cannot be negative!");
+    }
+    
+    @Test
+    public void testUpdateTreeUsernameEmpty() throws Exception{
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "      ");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "User is not logged in/Username is missing!");
+    } 
+    
+    @Test(expected = JSONException.class)
+    public void testUpdateTreeUsernameNull() throws Exception {
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+    	JSONObject testTreeObj = new JSONObject();
+
+        testTreeObj.put("treeId", 1);
+        testTreeObj.put("height", 420);
+        testTreeObj.put("diameter", 40);
+        testTreeObj.put("datePlanted", "2018-03-16");
+        testTreeObj.put("land", "Residential");
+        testTreeObj.put("status", "Planted");
+        testTreeObj.put("ownership", "Private");
+        testTreeObj.put("species", "Weeping Willow");
+        testTreeObj.put("latitude", 45.515883);
+        testTreeObj.put("longitude", -73.685552);
+        testTreeObj.put("municipality", "Saint-Laurent");
+
+        JSONObject updateTreeObj = new JSONObject();
+        updateTreeObj.put("user", (String) null);
+        updateTreeObj.put("tree", testTreeObj);
+        
+        service.updateTree(updateTreeObj);
+       
+    }
+    
+    @Test
+    public void testUpdateTreeInvalidLandEnum() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "NonExistant");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "That land type doesn't exist!");
+    }
+    
+    @Test
+    public void testUpdateTreeInvalidStatusEnum() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Nonexistant");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "That status doesn't exist!");
+    }
+    
+    @Test
+    public void testUpdateTreeInvalidOwnershipEnum() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "NonExistant");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "That ownership doesn't exist!");
+    }
+    
+    @Test
+    public void testUpdateTreeTreeDNE() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "No Tree with that ID exists!");
+    }
+    
+    @Test
+    public void testUpdateTreeUserDNE() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Gareth");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "User does not exist!");
+    }
+    
+    @Test
+    public void testUpdateTreeSpeciesDNE() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Maple");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Laurent");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "Species does not exist!");
+    }
+    
+    @Test
+    public void testUpdateMunicipalityDNE() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        try {
+        	JSONObject testTreeObj = new JSONObject();
+
+            testTreeObj.put("treeId", 1);
+            testTreeObj.put("height", 420);
+            testTreeObj.put("diameter", 40);
+            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("land", "Residential");
+            testTreeObj.put("status", "Planted");
+            testTreeObj.put("ownership", "Private");
+            testTreeObj.put("species", "Weeping Willow");
+            testTreeObj.put("latitude", 45.515883);
+            testTreeObj.put("longitude", -73.685552);
+            testTreeObj.put("municipality", "Saint-Lazare");
+
+            JSONObject updateTreeObj = new JSONObject();
+            updateTreeObj.put("user", "Abbas");
+            updateTreeObj.put("tree", testTreeObj);
+            
+            service.updateTree(updateTreeObj);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+        
+        assertEquals(error, "Municipality does not exist!");
+    }
+
     // ==============================
     // UPDATE USER TEST
     // ==============================
