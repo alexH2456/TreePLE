@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 import {Button, Input, Image, Modal, Label, Form} from 'semantic-ui-react';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
+import UpdateTreeModal from './UpdateTreeModal';
 
 class About extends PureComponent {
   constructor(props) {
@@ -15,10 +16,7 @@ class About extends PureComponent {
   }
 
   render () {
-    const options = [
-      {key: 'R', text: 'Resident', value: 'resident'},
-      {key: '', text: 'Scientist', value: 'scientist'},
-    ];
+    
 
     return (
       <div>
@@ -27,6 +25,9 @@ class About extends PureComponent {
         </div>
         <div>
           <SignUpModal/>
+        </div>
+        <div>
+          <UpdateTreeModal/>
         </div>
       </div>
     );

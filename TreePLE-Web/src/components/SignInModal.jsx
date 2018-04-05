@@ -10,6 +10,7 @@ class SignInModal extends PureComponent {
       inputError: false,
       username: '',
       password: '',
+      errorMessage: ''
     };
   }
 
@@ -41,19 +42,16 @@ class SignInModal extends PureComponent {
         }
       })
       .catch(error => {
-        console.log(error);
-        this.setState({inputError: true});
+        console.log(error.message);
+        this.setState({inputError: true,
+                       errorMessage:error.message
+                     });
       });
   }
 
   render() {
     return (
-      <Modal
-        basic
-        size='small'
-        open={this.state.modalOpen}
-        onClose={this.handleClose}
-        trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
+      <Modal basic size='small' open={this.state.modalOpen} onClose={this.handleClose} trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
       >
         <Modal.Content image>
           <div>
