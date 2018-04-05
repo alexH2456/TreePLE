@@ -14,9 +14,7 @@ import {TreeMapContainer} from './components/TreeMapContainer';
 const base_url = window.location.origin;
 const url = window.location.href;
 
-console.log(base_url);
 console.log(url);
-
 
 let component;
 

@@ -234,14 +234,15 @@ public class TestTreePLEService {
 
         service.createMunicipality(municipality);
     }
-    
+
+
     // ==============================
     // CREATE FORECAST TEST
     // ==============================
-    
+
     @Test
     public void testCreateForecast() throws Exception {
-    	JSONObject testForecast = new JSONObject();
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -249,48 +250,48 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
-        
-        try {
-        	Forecast forecast = service.createForecast(testForecast);
 
-        	assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
-        	assertEquals("Abbas", forecast.getFcUser());
-        	
-        	for (int i = 0; i < trees.length(); i++) {
-        		Tree tree = service.getTreeById(i + 1);
-        		Tree treeFc = forecast.getFcTree(i);
-            	assertEquals(tree.getHeight(), treeFc.getHeight());
-            	assertEquals(tree.getDiameter(), treeFc.getDiameter());
-            	assertEquals(tree.getAddress(),treeFc.getAddress());
-            	assertEquals(tree.getDatePlanted(),treeFc.getDatePlanted());
-            	assertEquals(tree.getLand(),treeFc.getLand());
-            	assertEquals(tree.getLocation().getLatitude(),treeFc.getLocation().getLatitude(),0);
-            	assertEquals(tree.getLocation().getLongitude(),treeFc.getLocation().getLongitude(),0);
-            	assertEquals(tree.getMunicipality(),treeFc.getMunicipality());
-            	assertEquals(tree.getOwnership(), treeFc.getOwnership());
-            	assertEquals(tree.getSpecies(), treeFc.getSpecies());
-            	assertEquals(tree.getStatus(), treeFc.getStatus());
-        	}
-      
-        	assertEquals(4*service.getCO2Sequestered(service.getTreeById(trees.getInt(0))),forecast.getCo2Reduced(), 0);
-        	assertEquals(4*service.getStormwaterIntercepted(service.getTreeById(trees.getInt(0))),forecast.getStormwater(), 0);
-        	assertEquals(4*service.getEnergyConserved(service.getTreeById(trees.getInt(0))),forecast.getEnergyConserved(), 0);
-        	assertEquals(0.25,forecast.getBiodiversity(), 0);
-        }catch(Exception e) {
-        	fail();
+        try {
+            Forecast forecast = service.createForecast(testForecast);
+
+            assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
+            assertEquals("Abbas", forecast.getFcUser());
+
+            for (int i = 0; i < trees.length(); i++) {
+                Tree tree = service.getTreeById(i + 1);
+                Tree treeFc = forecast.getFcTree(i);
+                assertEquals(tree.getHeight(), treeFc.getHeight());
+                assertEquals(tree.getDiameter(), treeFc.getDiameter());
+                assertEquals(tree.getAddress(),treeFc.getAddress());
+                assertEquals(tree.getDatePlanted(),treeFc.getDatePlanted());
+                assertEquals(tree.getLand(),treeFc.getLand());
+                assertEquals(tree.getLocation().getLatitude(),treeFc.getLocation().getLatitude(),0);
+                assertEquals(tree.getLocation().getLongitude(),treeFc.getLocation().getLongitude(),0);
+                assertEquals(tree.getMunicipality(),treeFc.getMunicipality());
+                assertEquals(tree.getOwnership(), treeFc.getOwnership());
+                assertEquals(tree.getSpecies(), treeFc.getSpecies());
+                assertEquals(tree.getStatus(), treeFc.getStatus());
+            }
+
+            assertEquals(4*service.getCO2Sequestered(service.getTreeById(trees.getInt(0))),forecast.getCo2Reduced(), 0);
+            assertEquals(4*service.getStormwaterIntercepted(service.getTreeById(trees.getInt(0))),forecast.getStormwater(), 0);
+            assertEquals(4*service.getEnergyConserved(service.getTreeById(trees.getInt(0))),forecast.getEnergyConserved(), 0);
+            assertEquals(0.25,forecast.getBiodiversity(), 0);
+        } catch (Exception e) {
+            fail();
         }
     }
-    
+
     @Test(expected = JSONException.class)
     public void testCreateForecastUserNull() throws Exception {
-    	JSONObject testForecast = new JSONObject();
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -298,21 +299,21 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", (String) null);
         testForecast.put("fcTrees", trees);
-       
+
         service.createForecast(testForecast);
     }
-    
+
     @Test
     public void testCreateForecastUsernamespaces() throws Exception {
-    	String error = "";
-    	JSONObject testForecast = new JSONObject();
+        String error = "";
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -320,26 +321,26 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "             ");
         testForecast.put("fcTrees", trees);
-        
+
         try {
-        	service.createForecast(testForecast);
-        }catch(Exception e){
-        	error = e.getMessage();
+            service.createForecast(testForecast);
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "User is not logged in/Username is missing!");
     }
-    
+
     @Test(expected = JSONException.class)
-    public void testCreateForecastDateNull() throws Exception{   			
-    	JSONObject testForecast = new JSONObject();
+    public void testCreateForecastDateNull() throws Exception {
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -347,8 +348,8 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", (String) null);
@@ -357,11 +358,11 @@ public class TestTreePLEService {
 
         service.createForecast(testForecast);
     }
-    
+
     @Test
-    public void testCreateForecastDateWrongFormat() throws Exception{
-    	String error = "";
-    	JSONObject testForecast = new JSONObject();
+    public void testCreateForecastDateWrongFormat() throws Exception {
+        String error = "";
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -369,8 +370,8 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", "2018/04/16");
@@ -378,18 +379,18 @@ public class TestTreePLEService {
         testForecast.put("fcTrees", trees);
 
         try {
-        	service.createForecast(testForecast);
-        }catch(Exception e){
-        	error = e.getMessage();
+            service.createForecast(testForecast);
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "Date doesn't match YYYY-(M)M-(D)D format!");
     }
-    
+
     @Test
     public void testCreateForecastTreeListSize() throws Exception {
-    	String error = "";
-    	JSONObject testForecast = new JSONObject();
+        String error = "";
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -400,20 +401,20 @@ public class TestTreePLEService {
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
-        
+
         try {
-        	service.createForecast(testForecast);
-        }catch(Exception e){
-        	error = e.getMessage();
+            service.createForecast(testForecast);
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "Forecast requires minimum 1 tree!");
     }
-    
+
     @Test
     public void testCreateForecastUserDNE() throws Exception {
-    	String error = "";
-    	JSONObject testForecast = new JSONObject();
+        String error = "";
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -421,20 +422,20 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
         for (int i = 0; i < 4; i++) {
-        	Tree tree = service.createTree(testTree);
-        	trees.put(tree.getTreeId());
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
         }
 
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "Gareth");
         testForecast.put("fcTrees", trees);
-        
+
         try {
-        	service.createForecast(testForecast);
-        }catch(Exception e){
-        	error = e.getMessage();
+            service.createForecast(testForecast);
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-        
+
         assertEquals(error, "User does not exist!");
     }
 
@@ -625,7 +626,7 @@ public class TestTreePLEService {
     }
 
     @Test
-    public void testGetMunicipalityByNameNull() throws Exception{
+    public void testGetMunicipalityByNameNull() throws Exception {
         String name = null;
 
         try {
@@ -633,11 +634,10 @@ public class TestTreePLEService {
         } catch (InvalidInputException e) {
             assertEquals("Name cannot be empty!", e.getMessage());
         }
-
     }
 
     @Test(expected = InvalidInputException.class)
-    public void testGetMunicipalityByNameNonExistant() throws Exception{
+    public void testGetMunicipalityByNameNonExistant() throws Exception {
         service.getMunicipalityByName("Laval");
     }
 
@@ -685,114 +685,114 @@ public class TestTreePLEService {
     public void testGetTreeByIdNonExistantTree() throws Exception {
         service.getTreeById(100);
     }
-    
+
     // ==============================
     // GET SPECIES BY NAME TEST
     // ==============================
-    
+
     @Test
     public void testGetSpeciesByName() throws Exception {
-    	service.createSpecies(testSpecies);
-    	
-    	try {
-    		Species species = service.getSpeciesByName("Weeping Willow");
-    		assertEquals("Weeping Willow", species.getName());
-    		assertEquals("Salix Babylonica", species.getSpecies());
-    		assertEquals("Salix", species.getGenus());
-    	}catch(Exception e) {
-    		fail();
-    	}
+        service.createSpecies(testSpecies);
+
+        try {
+            Species species = service.getSpeciesByName("Weeping Willow");
+            assertEquals("Weeping Willow", species.getName());
+            assertEquals("Salix Babylonica", species.getSpecies());
+            assertEquals("Salix", species.getGenus());
+        } catch (Exception e) {
+            fail();
+        }
     }
-    
+
     @Test
     public void testGetSpeciesByNameNullName() throws Exception {
-    	String error = "";
-    	service.createSpecies(testSpecies);
-    	
-    	try {
-    		service.getSpeciesByName((String) null);
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	
-    	assertEquals(error, "Name cannot be empty!");
+        String error = "";
+        service.createSpecies(testSpecies);
+
+        try {
+            service.getSpeciesByName((String) null);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+
+        assertEquals(error, "Name cannot be empty!");
     }
-    
+
     @Test
     public void testGetSpeciesByNameSpacesName() throws Exception {
-    	String error = "";
-    	service.createSpecies(testSpecies);
-    	
-    	try {
-    		service.getSpeciesByName("           ");
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	
-    	assertEquals(error, "Name cannot be empty!");
+        String error = "";
+        service.createSpecies(testSpecies);
+
+        try {
+            service.getSpeciesByName("           ");
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+
+        assertEquals(error, "Name cannot be empty!");
     }
-    
+
     @Test
     public void testGetSpeciesByNameSpeciesDNE() {
-    	String error = "";
-    	
-    	try {
-    		service.getSpeciesByName("Weeping Willow");
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	
-    	assertEquals(error, "No Species with that name exists!");
+        String error = "";
+
+        try {
+            service.getSpeciesByName("Weeping Willow");
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+
+        assertEquals(error, "No Species with that name exists!");
     }
-    
+
     // ==============================
     // GET LOCATION BY ID TEST
     // ==============================
-    
+
     @Test
     public void testGetLocationByIdTest() throws Exception {
-    	service.createUser(testUser);
-    	service.createMunicipality(testMunicipality);
-    	service.createSpecies(testSpecies);
-    	service.createTree(testTree);
-    	int locationId = service.getTreeById(1).getLocation().getLocationId();
-    	
-    	try {
-    		Location location = service.getLocationById(locationId);
-    		assertEquals(45.515883, location.getLatitude(),0);
-    		assertEquals(-73.685552 , location.getLongitude(), 0);
-    	}catch(Exception e) {
-    		fail();
-    	}
+        service.createUser(testUser);
+        service.createMunicipality(testMunicipality);
+        service.createSpecies(testSpecies);
+        service.createTree(testTree);
+        int locationId = service.getTreeById(1).getLocation().getLocationId();
+
+        try {
+            Location location = service.getLocationById(locationId);
+            assertEquals(45.515883, location.getLatitude(),0);
+            assertEquals(-73.685552 , location.getLongitude(), 0);
+        } catch (Exception e) {
+            fail();
+        }
     }
-    
+
     @Test
     public void testGetLocationByIdNegativeId() throws Exception {
-    	String error = "";
-    	try {
-    		service.getLocationById(-1);
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	assertEquals("Location's ID cannot be negative!", error);
+        String error = "";
+        try {
+            service.getLocationById(-1);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        assertEquals("Location's ID cannot be negative!", error);
     }
-    
+
     @Test
     public void testGetLocationByIdLocationDNE() {
-    	String error = "";
-	    	try {
-	    		service.getLocationById(1);
-	    	}catch(Exception e) {
-	    		error = e.getMessage();
-	    	}
-	    	assertEquals("No Location with that ID exists!", error);
+        String error = "";
+            try {
+                service.getLocationById(1);
+            } catch (Exception e) {
+                error = e.getMessage();
+            }
+            assertEquals("No Location with that ID exists!", error);
     }
-    
+
     //TODO
     // ==============================
     // GET SURVEY REPORT BY ID TEST
     // ==============================
-    
+
     // ==============================
     // GET FORECAST BY ID TEST
     // ==============================
@@ -1259,6 +1259,7 @@ public class TestTreePLEService {
         
         assertEquals(error, "Municipality does not exist!");
     }
+
     // ==============================
     // UPDATE USER TEST
     // ==============================

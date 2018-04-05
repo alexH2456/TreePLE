@@ -155,7 +155,7 @@ public class TreePLEService {
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
         String scientistKey = jsonParams.getString("scientistKey");
-	String myAddresses = jsonParams.getString("myAddresses");
+    String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
 
         if (username.replaceAll("\\s", "").isEmpty())
@@ -1062,7 +1062,6 @@ public class TreePLEService {
 
         tree.setDiameter((int) (tree.getDiameter() + inchesToCm(yearsDiff/6)));
         int futureHeight = (int) Math.exp(2.447 + 0.7 * Math.log(Math.log(getAgeOfTree(tree) + 1)));
-        // int futureHeight = (int) (100 * Math.sqrt(Math.pow(2.4569, Math.log(getAgeOfTree(tree)+1))));
 
         if (futureHeight > tree.getHeight()) {
             tree.setHeight(futureHeight);

@@ -53,16 +53,106 @@
 // ==============================
 // SPECIES
 // ==============================
-{
-    "name": "Human",
-    "species": "Homo Sapien",
-    "genus": "Homo"
-}
 
 {
     "name": "Weeping Willow",
     "species": "Salix Babylonica",
     "genus": "Salix"
+}
+{
+    "name":"Pacific Silver Fir",
+    "species":"Abies amabilis",
+    "genus":"Abies"
+}
+{
+    "name":"Monkey-puzzle",
+    "species":"Araucaria araucana",
+    "genus":"Araucaria"
+}
+{
+    "name":"Atlas Cedar",
+    "species":"Cedrus atlantica",
+    "genus":"Cedrus"
+}
+{
+    "name":"Lawson's Cypress",
+    "species":"Chamaecyparis lawsoniana",
+    "genus":"Chamaecyparis"
+}
+{
+    "name":"Sugi",
+    "species":"Cryptomeria japonica",
+    "genus":"Cryptomeria"
+}
+{
+    "name":"Arizona Cypress",
+    "species":"Cupressus arizonica",
+    "genus":"Cupressus"
+}
+{
+    "name":"Chinese Juniper",
+    "species":"Juniperus chinensis",
+    "genus":"Juniperus"
+}
+{
+    "name":"European Larch",
+    "species":"Larix decidua",
+    "genus":"Larix"
+}
+{
+    "name":"Dawn Redwood",
+    "species":"Metasequoia glyptostroboides",
+    "genus":"Metasequoia"
+}
+{
+    "name":"Norway Spruce",
+    "species":"Picea abies",
+    "genus":"Picea"
+}
+{
+    "name":"Whitebark Pine",
+    "species":"Pinus albicaulis",
+    "genus":"Pinus"
+}
+{
+    "name":"Chinese Arborvitae",
+    "species":"Platycladus orientalis",
+    "genus":"Platycladus"
+}
+{
+    "name":"Coast Douglas-fir",
+    "species":"Pseudotsuga menziesii",
+    "genus":"Pseudotsuga"
+}
+{
+    "name":"Umbrella-pine",
+    "species":"Sequoia sempervirens",
+    "genus":"Sequoia"
+}
+{
+    "name":"Giant Sequoia",
+    "species":"Sequoiadendron giganteum",
+    "genus":"Sequoiadendron"
+}
+{
+    "name":"Baldcypress",
+    "species":"Taxodium distichum",
+    "genus":"Taxodium"
+}
+{
+    "name":"English Yew",
+    "species":"Taxus baccata",
+    "genus":"Taxus"
+}
+{
+    "name":"Eastern Arborvitae",
+    "species":"Thuja occidentalis",
+    "genus":"Thuja"
+}
+{
+    "name":"Eastern Hemlock",
+    "species":"Tsuga canadensis",
+    "genus":"Tsuga"
 }
 
 // ==============================
@@ -80,7 +170,7 @@
 }
 
 {
-    "name": "Mont-Royal",
+    "name": "Le Plateau Mont-Royal",
     "totalTrees": 0,
     "borders": [
         [45.5036, -73.6],
@@ -104,6 +194,96 @@
     ]
 }
 
+{
+    "name": "Anjou",
+    "totalTrees":0,
+    "borders":[
+        [45.633923, -73.568635],
+        [45.611286, -73.603240],
+        [45.590152, -73.549146],
+        [45.619365, -73.536400]
+    ]
+}
+{
+    "name": "Lachine",
+    "totalTrees":0,
+    "borders":[
+        [45.438173, -73.719923],
+        [45.430644, -73.669111],
+        [45.448410, -73.628856],
+        [45.473352, -73.707899],
+        [45.460982, -73.724679]
+    ]
+}
+{
+    "name": "Lasalle",
+    "totalTrees":0,
+    "borders":[
+        [45.432099, -73.665395],
+        [45.421166, -73.665781],
+        [45.413575, -73.604155],
+        [45.428877, -73.555060],
+        [45.439959, -73.611880],
+        [45.449594, -73.604670],
+        [45.457662, -73.613768]
+
+        
+    ]
+}
+{
+    "name": "Outremont",
+    "totalTrees":0,
+    "borders":[
+        [45.527897, -73.617541],
+        [45.516351, -73.626639],
+        [45.503720, -73.595912],
+        [45.515148, -73.590762]
+        
+    ]
+}
+
+{
+    "name": "Kirkland",
+    "totalTrees":0,
+    "borders":[
+        [45.470829, -73.854712],
+        [45.446507, -73.905524],
+        [45.435305, -73.900718],
+        [45.445784, -73.832396]
+        
+    ]
+}
+{
+    "name": "Westmount",
+    "totalTrees":0,
+    "borders":[
+        [45.485728, -73.580596],
+        [45.495531, -73.606828],
+        [45.488949, -73.618464],
+        [45.480451, -73.614177],
+        [45.473920, -73.597080]
+        
+    ]
+}
+{
+    "name": "Dorval",
+    "totalTrees":0,
+    "borders":[
+        [45.481754, -73.794631],
+        [45.467203, -73.780341],
+        [45.465140, -73.784653],
+        [45.439724, -73.774982],
+        [45.438658, -73.719694],
+        [45.460975, -73.724674],
+        [45.473275, -73.707857],
+        [45.482233, -73.723447],
+        [45.461481, -73.750080],
+        [45.481981, -73.773820],
+        [45.490576, -73.764412],
+        [45.494575, -73.767872]
+    ]
+}
+
 
 // ==============================
 // USER
@@ -111,7 +291,7 @@
 
 {
     "username": "Abbas",
-    "password": "alacuck",
+    "password": "memegod",
     "role": "Resident",
     "myAddresses": "H4L3N1"
 }
@@ -127,19 +307,19 @@
     "username": "Gareth",
     "password": "gingerboi",
     "role": "Scientist",
-    "myAddresses": ""
+    "myAddresses": "J7T"
 }
 
 {
-    "username": "Filipino",
-    "password": "filip",
+    "username": "Filip",
+    "password": "filipino",
     "role": "Scientist",
-    "myAddresses": ""
+    "myAddresses": "J5A1R4"
 }
 
 {
     "username": "Admin",
-    "password": "gucci",
+    "password": "guccigang",
     "role": "Scientist",
-    "myAddresses": "H4L3N1"
+    "myAddresses": ""
 }
