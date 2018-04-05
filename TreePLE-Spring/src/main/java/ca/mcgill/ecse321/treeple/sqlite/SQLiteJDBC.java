@@ -923,7 +923,7 @@ public class SQLiteJDBC {
     public boolean insertForecast(int forecastId, String fcDate, String fcUser, double co2Reduced,
                                   double biodiversity, double stormwater, double energyConserved, String fcTrees) {
         String insertForecast = String.format(
-            "INSERT INTO FORECASTS (forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcMunicipality, fcTrees) " +
+            "INSERT INTO FORECASTS (forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees) " +
             "VALUES (%d, '%s', '%s', %.2f, %.2f, %.2f, %.2f, '%s');",
             forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
 

@@ -68,9 +68,9 @@ public class TreePLEService {
             throw new InvalidInputException("Height cannot be negative!");
         if (diameter < 0)
             throw new InvalidInputException("Diameter cannot be negative!");
-        if (datePlanted == null || !datePlanted.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
+        if (!datePlanted.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
             throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
         if (!EnumUtils.isValidEnum(Land.class, land))
             throw new InvalidInputException("That land type doesn't exist!");
@@ -158,19 +158,19 @@ public class TreePLEService {
 	String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
 
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
         if (!username.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Username must be alphanumeric!");
         if (User.hasWithUsername(username))
             throw new InvalidInputException("Username is already taken!");
-        if (password == null || password.replaceAll("\\s", "").isEmpty())
+        if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
         if (!password.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
@@ -207,7 +207,7 @@ public class TreePLEService {
             genus = "";
         }
 
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
+        if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species name cannot be empty!");
         if (Species.hasWithName(name))
             throw new InvalidInputException("Species already exists!");
@@ -228,7 +228,7 @@ public class TreePLEService {
         int totalTrees = jsonParams.getInt("totalTrees");
         JSONArray borders = jsonParams.getJSONArray("borders");
 
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
+        if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Municipality cannot be empty!");
         if (Municipality.hasWithName(name))
             throw new InvalidInputException("Municipality already exists!");
@@ -271,9 +271,9 @@ public class TreePLEService {
         String fcUser = jsonParams.getString("fcUser");
         JSONArray fcTrees = jsonParams.getJSONArray("fcTrees");
 
-        if (fcUser == null || fcUser.replaceAll("\\s", "").isEmpty())
+        if (fcUser.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
-        if (fcDate == null || !fcDate.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
+        if (!fcDate.matches("^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$"))
             throw new InvalidInputException("Date doesn't match YYYY-(M)M-(D)D format!");
         if (fcTrees == null || fcTrees.length() < 1)
             throw new InvalidInputException("Forecast requires minimum 1 tree!");
@@ -282,13 +282,12 @@ public class TreePLEService {
 
         ArrayList<Tree> treeList = new ArrayList<Tree>();
         ArrayList<Integer> treeIdList = new ArrayList<Integer>();
-        Iterator<Object> fcTreesIterator = fcTrees.iterator();
 
-        while (fcTreesIterator.hasNext()) {
+        for (int i = 0; i < fcTrees.length(); i++) {
             Tree tree;
-            if ((tree = sql.getTree((int) fcTreesIterator.next())) != null) {
+            if ((tree = sql.getTree(fcTrees.getInt(i))) != null) {
                 treeList.add(getFutureTree(tree, Date.valueOf(fcDate)));
-                treeIdList.add((int) fcTreesIterator.next());
+                treeIdList.add(fcTrees.getInt(i));
             }
         }
 
@@ -473,16 +472,13 @@ public class TreePLEService {
     // Get trees of a certain species
     public List<Tree> getTreesOfSpecies(String name) throws Exception {
         Species species = getSpeciesByName(name);
-
         return sql.getAllTreesOfSpecies(species.getName());
     }
 
     // Get trees within a municipality
     public List<Tree> getTreesOfMunicipality(String name) throws Exception {
         Municipality municipality = getMunicipalityByName(name);
-
         return sql.getAllTreesOfMunicipality(municipality.getName());
-
     }
 
 
@@ -512,7 +508,7 @@ public class TreePLEService {
             throw new InvalidInputException("Height cannot be negative!");
         if (diameter < 0)
             throw new InvalidInputException("Diameter cannot be negative!");
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
         if (!EnumUtils.isValidEnum(Land.class, land))
             throw new InvalidInputException("That land type doesn't exist!");
@@ -579,19 +575,19 @@ public class TreePLEService {
         String myAddresses = jsonParams.getString("myAddresses");
 
         User user;
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
         if (!username.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Username must be alphanumeric!");
         if ((user = sql.getUser(username)) == null)
             throw new InvalidInputException("Username does not exist!");
-        if (password == null || password.replaceAll("\\s", "").isEmpty())
+        if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
         if (!password.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses == null || myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
 
         user.setPassword(password);
@@ -621,8 +617,6 @@ public class TreePLEService {
     		return user; 
     	 }
          
-         
-         
          return null;
     }
 
@@ -643,7 +637,7 @@ public class TreePLEService {
         }
 
         Species speciesObj;
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
+        if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species name cannot be empty!");
         if ((speciesObj = sql.getSpecies(name)) == null)
             throw new InvalidInputException("Species does not exist!");
@@ -729,7 +723,7 @@ public class TreePLEService {
 
         if (treeId <= 0)
             throw new InvalidInputException("Tree's ID cannot be negative or zero!");
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
 
         Tree tree = sql.getTree(treeId);
@@ -757,7 +751,7 @@ public class TreePLEService {
     public User deleteUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
 
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
 
         User user = sql.getUser(username);
@@ -776,7 +770,7 @@ public class TreePLEService {
     public Species deleteSpecies(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name");
 
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
+        if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species' name is missing!");
 
         Species species = sql.getSpecies(name);
@@ -815,7 +809,7 @@ public class TreePLEService {
     public Municipality deleteMunicipality(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name");
 
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
+        if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Municipality's name is missing!");
 
         Municipality municipality = sql.getMunicipality(name);
@@ -837,7 +831,7 @@ public class TreePLEService {
 
         if (forecastId <= 0)
             throw new InvalidInputException("Forecast's ID cannot be negative or zero!");
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("User is not logged in/Username is missing!");
 
         Forecast forecast = sql.getForecast(forecastId);
@@ -895,7 +889,7 @@ public class TreePLEService {
         int totalTrees = trees.size();
         int totalSpecies = getUniqueSpecies(trees).size();
 
-        return (double) totalTrees/totalSpecies;
+        return (double) totalSpecies/totalTrees;
     }
 
     // Returns the amount of CO2 reduced for a list of trees (in kg/yr)
