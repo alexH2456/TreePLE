@@ -13,7 +13,8 @@ class SignUpModal extends PureComponent {
       password2: '',
       role:'',
       accessKey:'',
-      postalCode:''
+      postalCode:'',
+      errorMessage:''
     };
 
     this.handlePostalChange = this.handlePostalChange.bind(this);
@@ -51,9 +52,17 @@ class SignUpModal extends PureComponent {
           this.setState({modalOpen: false});
         })
         .catch(error => {
-          console.log(error);
-          this.setState({inputError: true});
+          console.log(error.message);
+          this.setState({inputError: true,
+                         errorMessage:error.message
+                       });
         })
+
+    }
+    else{
+      this.setState({inputError: true,
+                     errorMessage:"Passwords are different"
+                   });
 
     }
   }
