@@ -146,6 +146,12 @@ public class TreePLERestController {
     // GET ONE MAPPING API
     // ==============================
 
+    @PostMapping(value = {"/login/"})
+    public UserDto login(@RequestBody String jsonBody) throws Exception {
+        User user = service.login(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
+
     @GetMapping(value = {"/trees/{treeid}/"})
     public TreeDto getTreeById(@PathVariable("treeid") int treeId) throws Exception {
         Tree tree = service.getTreeById(treeId);
@@ -221,12 +227,6 @@ public class TreePLERestController {
     public ForecastDto createForecast(@RequestBody String jsonBody) throws Exception {
         Forecast forecast = service.createForecast(new JSONObject(jsonBody));
         return convertToDto(forecast);
-    }
-    
-    @PostMapping(value = {"/login/"})
-    public UserDto login(@RequestBody String jsonBody) throws Exception {
-        User user = service.login(new JSONObject(jsonBody));
-        return convertToDto(user);
     }
 
 

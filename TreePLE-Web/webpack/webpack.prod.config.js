@@ -8,7 +8,6 @@ var parentDir = path.join(__dirname, '../');
 module.exports = {
   entry: [
     path.join(parentDir, 'src/index.jsx')
-    // 'webpack-hot-middleware/client?reload=true'
   ],
   output: {
     path: path.join(parentDir, '/dist'),
@@ -44,10 +43,6 @@ module.exports = {
       }
     ]
   },
-  resolve: {
-    extensions: ['.js', '.jsx', '.css']
-  },
-  devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
@@ -78,5 +73,25 @@ module.exports = {
       threshold: 10240,
       minRatio: 0
     })
-  ]
+  ],
+  resolve: {
+    extensions: ['.js', '.jsx', '.css']
+  },
+  devtool: 'source-map',
+  devServer: {
+    port: 8080,
+    host: 'ecse321-11.novalocal',
+    public: 'ecse321-11.ece.mcgill.ca',
+    contentBase: parentDir,
+    historyApiFallback: true,
+    disableHostCheck: true,
+    proxy: {
+      '/api/*': {
+        target: 'http://ecse321-11.ece.mcgill.ca:8080/',
+        pathRewrite: {
+          '/api': ''
+        }
+      }
+    }
+  }
 };
