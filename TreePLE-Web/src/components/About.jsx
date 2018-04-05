@@ -16,8 +16,6 @@ class About extends PureComponent {
   }
 
   render () {
-    
-
     return (
       <div>
         <div>

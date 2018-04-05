@@ -55,7 +55,7 @@ class SignInModal extends PureComponent {
       >
         <Modal.Content image>
           <div>
-            <Image src='images/favicon.ico' size='small' spaced='right'/>
+            <Image src='../images/favicon.ico' size='small' spaced='right'/>
           </div>
           <Modal.Description>
             <Form>

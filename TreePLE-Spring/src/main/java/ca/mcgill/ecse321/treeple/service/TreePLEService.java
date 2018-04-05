@@ -155,7 +155,7 @@ public class TreePLEService {
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
         String scientistKey = jsonParams.getString("scientistKey");
-	String myAddresses = jsonParams.getString("myAddresses");
+    String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
 
         if (username.replaceAll("\\s", "").isEmpty())
@@ -633,18 +633,6 @@ public class TreePLEService {
         }
 
         return user;
-    }
-    
-    public User login(JSONObject jsonParams) throws Exception {
-    	 String username = jsonParams.getString("username");
-         String password = jsonParams.getString("password");
-    	 User user=sql.getUser(username);
-    	 if(user.getPassword().equals(password))
-    	 {
-    		return user; 
-    	 }
-         
-         return null;
     }
 
     // Update a Species
