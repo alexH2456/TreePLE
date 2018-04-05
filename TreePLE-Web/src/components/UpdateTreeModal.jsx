@@ -9,12 +9,12 @@ class UpdateTreeModal extends PureComponent {
     this.state = {
       modalOpen: false,
       treeSpecies: [],
-      species:'',
-      ownership:'',
-      land:'',
-      status:'',
-      height:'',
-      diameter:''
+      species: '',
+      ownership: '',
+      land: '',
+      status: '',
+      height: '',
+      diameter: ''
     }
   }
 
@@ -32,14 +32,10 @@ class UpdateTreeModal extends PureComponent {
        });
        this.setState({treeSpecies: speciesSelectable});
        console.log(speciesSelectable);
-       //response.data.map
-
-     })
-
+     });
   }
 
   handleOpen = () => this.setState({modalOpen: true});
-
   handleClose = () => this.setState({modalOpen: false});
 
   handleSpecies = (event, data) => this.setState({species: data.value});

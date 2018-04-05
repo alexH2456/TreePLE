@@ -20,19 +20,13 @@ class SignUpModal extends PureComponent {
   }
 
   handleOpen = () => this.setState({modalOpen: true});
-
   handleClose = () => this.setState({modalOpen: false});
 
   handleChangeU = (event, data) => this.setState({username: data.value});
-
   handleChangeP1 = (event, data) => this.setState({password1: data.value});
-
   handleChangeP2 = (event, data) => this.setState({password2: data.value});
-
   handleRoleChange = (event, data) => this.setState({role: data.value});
-
   handleKeyChange = (event, data) => this.setState({accessKey: data.value});
-
   handlePostalChange = (event, data) => this.setState({postalCode: data.value.toUpperCase()});
 
   handleSignUp = () => {
