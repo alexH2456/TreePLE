@@ -17,13 +17,13 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'war'
 
 group = 'ca.mcgill.ecse321'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = 1.8
 mainClassName = 'ca.mcgill.ecse321.treeple.TreePLESpringApplication'
 
 war {
     baseName = 'treeple'
-    version = '0.0.1-SNAPSHOT'
+    version = '1.0.0'
 }
 
 repositories {

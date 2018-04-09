@@ -131,5 +131,3 @@ export default GoogleApiWrapper({
   apiKey: 'AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo',
   version: '3.31'
 })(TreeMapContainer);
-
-// export default TreeMapContainer;
