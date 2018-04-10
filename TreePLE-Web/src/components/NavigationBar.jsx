@@ -51,9 +51,22 @@ class NavigationBar extends PureComponent {
 
     return (
       <div>
-        <Menu stackable fluid widths={5}>
-          <Menu.Item>
-            <Image as='Button' circular color='green' size='tiny' src={Logo} onClick={this.toggleSidebar}/>
+        <Menu size='small' stackable fluid widths={5}>
+
+          <Menu.Item onClick={this.toggleSidebar}>
+            <Image circular size='tiny' src={Logo}/>
+          </Menu.Item>
+
+          <Menu.Item
+            name='biodiversity'
+            fitted='vertically'
+          >
+            <Segment.Group horizontal size='mini'>
+              <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
+              <Segment>
+                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
+              </Segment>
+            </Segment.Group>
           </Menu.Item>
 
           <Menu.Item
@@ -85,18 +98,6 @@ class NavigationBar extends PureComponent {
           </Menu.Item>
 
           <Menu.Item
-            name='biodiversity'
-            fitted='vertically'
-          >
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
-              <Segment>
-                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
-
-          <Menu.Item
             name='energyConserved'
             fitted='vertically'
           >
@@ -109,6 +110,7 @@ class NavigationBar extends PureComponent {
               </Segment>
             </Segment.Group>
           </Menu.Item>
+
         </Menu>
         <IconMenu show={this.state.showSidebar}/>
       </div>

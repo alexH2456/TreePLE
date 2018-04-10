@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Sidebar, Segment, Button, Menu, Image, Icon, Header} from 'semantic-ui-react';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
-import TreeMapContainer from './TreeMapContainer';
+import TreeMap from './TreeMap';
 
 class IconMenu extends PureComponent {
   constructor(props) {
@@ -56,7 +56,7 @@ class IconMenu extends PureComponent {
           </Sidebar>
           <Sidebar.Pusher>
             <Segment basic>
-              <TreeMapContainer/>
+              <TreeMap/>
             </Segment>
           </Sidebar.Pusher>
         </Sidebar.Pushable>
