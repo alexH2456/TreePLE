@@ -378,10 +378,9 @@ public class TreePLEService {
         return Collections.unmodifiableList(sql.getAllForecasts());
     }
 
-    // Get sustainability factos for entire TreePLE system
+    // Get sustainability factors for entire TreePLE system
     public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
         Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
-        // JSONObject sustainabilityFactors = new JSONObject();
         Map<String, Double> stormwater = new HashMap<String, Double>();
         Map<String, Double> co2Reduced = new HashMap<String, Double>();
         Map<String, Double> biodiversity = new HashMap<String, Double>();

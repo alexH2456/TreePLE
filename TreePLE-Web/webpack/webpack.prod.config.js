@@ -10,7 +10,7 @@ module.exports = {
     path.join(parentDir, 'src/index.jsx')
   ],
   output: {
-    path: path.join(parentDir, '/dist'),
+    path: path.join(parentDir, 'dist'),
     filename: 'bundle.js',
   },
   module: {
@@ -46,6 +46,8 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
+      serverHost: JSON.stringify('ecse321-11.ece.mcgill.ca'),
+      serverPort: JSON.stringify('8080')
     }),
     new ExtractTextPlugin("bundle.css", {allChunks: false}),
     new webpack.optimize.AggressiveMergingPlugin(),
@@ -79,19 +81,15 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
+    https: {
+      key: fs.readFileSync(path.join(parentDir + 'ssl/treeple.key')),
+      cert: fs.readFileSync(path.join(parentDir + 'ssl/treeple.crt'))
+    },
     port: 8087,
     host: 'ecse321-11.novalocal',
     public: 'ecse321-11.ece.mcgill.ca',
     contentBase: parentDir,
     historyApiFallback: true,
-    disableHostCheck: true,
-    proxy: {
-      '/api/*': {
-        target: 'http://ecse321-11.ece.mcgill.ca:8080/',
-        pathRewrite: {
-          '/api': ''
-        }
-      }
-    }
+    disableHostCheck: true
   }
 };

@@ -1,13 +1,17 @@
 import React, {PureComponent} from 'react';
+import {} from "..";
 import axios from 'axios';
 
 // const backendUrl = 'http://localhost:8088/';
 // const frontendUrl = 'http://localhost:8087/';
-// const backendUrl = '';
-// const frontendUrl = '';
+// const backendUrl = 'http://ecse321-11.ece.mcgill.ca:8080/';
+// const frontendUrl = 'http://ecse321-11.ece.mcgill.ca:8087/';
+const backendUrl = 'http://' + serverHost + ':' + serverPort + '/';
+const frontendUrl = 'http://' +  serverHost + ':8087/';
+
 
 const AXIOS = axios.create({
-  // baseURL: backendUrl,
+  baseURL: backendUrl,
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE',
@@ -15,6 +19,7 @@ const AXIOS = axios.create({
   },
   timeout: 5000
 });
+
 
 // ==============================
 // GET ALL API
@@ -80,6 +85,7 @@ function login(jsonParams) {
   return postRequestWithParams(url, jsonParams);
 };
 
+
 // ==============================
 // POST API
 // ==============================
@@ -100,15 +106,15 @@ function createUser(jsonParams) {
 // ==============================
 
 function getRequest(url) {
-  return AXIOS.get(`/api` + url);
+  return AXIOS.get(url);
 };
 
 function postRequest(url) {
-  return AXIOS.post(`/api` + url);
+  return AXIOS.post(url);
 };
 
 function postRequestWithParams(url, params) {
-  return AXIOS.post(`/api` + url, params);
+  return AXIOS.post(url, params);
 };
 
 export {

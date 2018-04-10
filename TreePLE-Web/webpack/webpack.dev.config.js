@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const fs = require('fs');
 
 var parentDir = path.join(__dirname, '../');
 
@@ -8,7 +9,7 @@ module.exports = {
     path.join(parentDir, 'src/index.jsx')
   ],
   output: {
-    path: path.join(parentDir + '/dist'),
+    path: path.join(parentDir + 'dist'),
     filename: 'bundle.js'
   },
   module: {
@@ -41,23 +42,25 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      serverHost: JSON.stringify('localhost'),
+      serverPort: JSON.stringify('8088')
+    })
+  ],
   resolve: {
     extensions: ['.js', '.jsx', '.css']
   },
   devtool: 'eval-source-map',
   devServer: {
+    https: {
+      key: fs.readFileSync(path.join(parentDir + 'ssl/treeple.key')),
+      cert: fs.readFileSync(path.join(parentDir + 'ssl/treeple.crt'))
+    },
     port: 8087,
-    host: '127.0.0.1',
+    host: 'localhost',
     contentBase: parentDir,
     historyApiFallback: true,
-    disableHostCheck: true,
-    proxy: {
-      '/api/*': {
-        target: 'http://localhost:8088/',
-        pathRewrite: {
-          '/api': ''
-        }
-      }
-    }
+    disableHostCheck: true
   }
 };

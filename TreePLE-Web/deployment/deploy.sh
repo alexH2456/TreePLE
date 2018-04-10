@@ -18,6 +18,9 @@ exitStatus $?
 cp -f $1/TreePLE-Web/dist/bundle.js /var/www/html/
 exitStatus $?
 
+cp -f $1/TreePLE-Web/dist/bundle.js.map /var/www/html/
+exitStatus $?
+
 cp -f $1/TreePLE-Web/index.html /var/www/html/
 exitStatus $?
 
