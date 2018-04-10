@@ -830,7 +830,6 @@ public class TestTreePLEService {
         }
     }
 
-
     // ==============================
     // GET USER TEST
     // ==============================
@@ -1089,6 +1088,20 @@ public class TestTreePLEService {
     // ==============================
 
     //TODO
+    // ==============================
+    // GET TREES OF USER
+    // ==============================
+    
+    //TODO
+    // ==============================
+    // GET TREES OF SPECIES
+    // ==============================
+    
+    //TODO
+    // ==============================
+    // GET TREES OF MUNICIPALITY
+    // ==============================
+    
     // ==============================
     // UPDATE TREE TEST
     // ==============================
@@ -1969,6 +1982,45 @@ public class TestTreePLEService {
     }
 
     @Test
+    public void testDeleteTreeNegativeTreeID() throws Exception {
+    	String error = "";
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        JSONObject deleteTree = new JSONObject();
+        deleteTree.put("user", testUser.getString("username"));
+        deleteTree.put("treeId", -1);
+
+        try {
+        	service.deleteTree(deleteTree);
+        } catch (InvalidInputException e) {
+            error = e.getMessage();
+        }
+        assertEquals("Tree's ID cannot be negative or zero!", error);
+    }
+    
+    @Test
+    public void testDeleteTreeUserNameEmpty() throws Exception {
+    	String error = "";
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        service.createTree(testTree);
+
+        JSONObject deleteTree = new JSONObject();
+        deleteTree.put("user", "             ");
+        deleteTree.put("treeId", 3);
+
+        try {
+        	service.deleteTree(deleteTree);
+        } catch (InvalidInputException e) {
+            error = e.getMessage();
+        }
+        assertEquals("User is not logged in/Username is missing!", error);
+    }
+    @Test
     public void testDeleteTreeNonExistantTree() throws Exception {
         JSONObject deleteTree = new JSONObject();
         deleteTree.put("user", testUser.getString("username"));
@@ -2021,6 +2073,10 @@ public class TestTreePLEService {
         }
     }
 
+    //TODO
+    // ==============================
+    // DELETE FORECAST
+    // ==============================
 
     // ==============================
     // BUILD TEST OBJECTS API
