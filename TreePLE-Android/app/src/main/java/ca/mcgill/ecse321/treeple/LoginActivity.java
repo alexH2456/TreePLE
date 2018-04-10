@@ -47,6 +47,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -78,7 +80,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    try {
+                        attemptLogin();
+                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
@@ -89,7 +95,11 @@ public class LoginActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                try {
+                    attemptLogin();
+                } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -224,7 +234,7 @@ public class LoginActivity extends AppCompatActivity {
      * If there are form errors (invalid user, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptLogin() throws InvalidKeySpecException, NoSuchAlgorithmException {
         if (mAuthTask != null) {
             return;
         }
@@ -347,7 +357,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 user = loginReq.get(5, TimeUnit.SECONDS);
                 if (user != null) {
-                    if (user.getString("password").equals(mPassword)) {
+                    if (PasswordHash.validatePassword(mPassword, user.getString("password"))) {
                         loggedInUser = user;
                         loggedIn = true;
                         noAccount = false;
@@ -361,7 +371,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG, "Timeout occurred when waiting for response");
-            } catch (JSONException e) {
+            } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException e) {
                 e.printStackTrace();
             }
             return loggedIn;

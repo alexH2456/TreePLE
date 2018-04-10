@@ -9,7 +9,7 @@ import android.widget.DatePicker;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

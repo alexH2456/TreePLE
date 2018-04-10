@@ -8,7 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 @SuppressLint("StaticFieldLeak")
-public class VolleyController {
+class VolleyController {
 
     private static VolleyController mInstance;
     private RequestQueue mRequestQueue;

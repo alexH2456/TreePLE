@@ -8,7 +8,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InputStreamVolleyRequest extends Request<byte[]> {
+class InputStreamVolleyRequest extends Request<byte[]> {
     private final Response.Listener<byte[]> mListener;
     private Map<String, String> mParams;
 

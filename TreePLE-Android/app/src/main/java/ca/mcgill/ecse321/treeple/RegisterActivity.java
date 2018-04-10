@@ -32,6 +32,8 @@ import com.android.volley.toolbox.RequestFuture;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -103,7 +105,11 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptRegister();
+                    try {
+                        attemptRegister();
+                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
@@ -114,7 +120,11 @@ public class RegisterActivity extends AppCompatActivity {
         mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptRegister();
+                try {
+                    attemptRegister();
+                } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -156,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptRegister() {
+    private void attemptRegister() throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         if (mAuthTask != null) {
             return;
@@ -320,9 +330,9 @@ public class RegisterActivity extends AppCompatActivity {
         private JSONObject user;
         private boolean accountExists = false;
 
-        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) {
+        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) throws InvalidKeySpecException, NoSuchAlgorithmException {
             mUsername = username;
-            mPassword = password;
+            mPassword = PasswordHash.generateStrongPasswordHash(password);
             mRole = role;
             mPostalCode = postalCode;
             mRolePass = rolePass;
