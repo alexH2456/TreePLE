@@ -37,7 +37,7 @@ export class TreeMapContainer extends PureComponent {
           });
           alert('Unable to find your location.');
         }, {
-          timeout: 5000,
+          timeout: 7500,
           enableHighAccuracy: true
         }
       );

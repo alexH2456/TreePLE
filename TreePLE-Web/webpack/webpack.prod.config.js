@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
-const CompressionPlugin = require("compression-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var parentDir = path.join(__dirname, '../');
 
@@ -35,6 +36,7 @@ module.exports = {
         loaders: ['sass-loader', 'style-loader', 'css-loader']
       }, {
         test: /\.(png|jpg|gif|svg|ico|eot|ttf|woff|woff2)$/,
+        include: /images/,
         use: {
           loader: 'url-loader',
           options: {
@@ -50,7 +52,7 @@ module.exports = {
       serverHost: JSON.stringify('ecse321-11.ece.mcgill.ca'),
       serverPort: JSON.stringify('8080')
     }),
-    new ExtractTextPlugin("bundle.css", {allChunks: false}),
+    new ExtractTextPlugin('bundle.css', {allChunks: false}),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
@@ -70,8 +72,8 @@ module.exports = {
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
     new CompressionPlugin({
-      asset: "[path].gz[query]",
-      algorithm: "gzip",
+      asset: '[path].gz[query]',
+      algorithm: 'gzip',
       test: /\.js$|\.css$|\.html$/,
       threshold: 10240,
       minRatio: 0

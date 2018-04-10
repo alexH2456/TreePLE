@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 import {Menu, Divider, Image, Segment, Statistic} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
+import Logo from "../images/favicon.ico";
 
 class NavigationBar extends PureComponent {
   constructor(props) {
@@ -52,7 +53,7 @@ class NavigationBar extends PureComponent {
       <div>
         <Menu stackable fluid widths={5}>
           <Menu.Item>
-            <Image as='Button' circular color='green' size='tiny' src='../images/favicon.ico' onClick={this.toggleSidebar}/>
+            <Image as='Button' circular color='green' size='tiny' src={Logo} onClick={this.toggleSidebar}/>
           </Menu.Item>
 
           <Menu.Item
