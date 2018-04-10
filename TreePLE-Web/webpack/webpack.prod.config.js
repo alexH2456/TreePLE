@@ -82,10 +82,6 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    https: {
-      key: fs.readFileSync(path.join(parentDir + 'ssl/treeple.key')),
-      cert: fs.readFileSync(path.join(parentDir + 'ssl/treeple.crt'))
-    },
     port: 8087,
     host: 'ecse321-11.novalocal',
     public: 'ecse321-11.ece.mcgill.ca',
