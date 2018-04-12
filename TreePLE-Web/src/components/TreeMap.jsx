@@ -1,10 +1,13 @@
 import React, {PureComponent} from 'react';
-import {Map, InfoWindow, Marker, Polygon, GoogleApiWrapper} from 'google-maps-react';
+import PropTypes from 'prop-types';
+import {compose, withProps} from "recompose";
 import {Dimmer, Image, Loader, Segment} from "semantic-ui-react";
-import {getAllTrees, getAllMunicipalities} from './Requests';
+import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
+const { DrawingManager } = require("react-google-maps/lib/components/drawing/DrawingManager");
+import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability} from './Requests';
 import Logo from "../images/favicon.ico";
 
-export class TreeMap extends PureComponent {
+export class TreeMapp extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,6 +20,7 @@ export class TreeMap extends PureComponent {
 
   componentWillMount() {
     this.getUserLocation();
+    this.loadMap();
   }
 
   getUserLocation = () => {
@@ -46,10 +50,33 @@ export class TreeMap extends PureComponent {
     }
   }
 
+  getMapBounds = (locations) => {
+    let lat = [];
+    let lng = [];
+    locations.map(location => {
+      lat.push(location.lat);
+      lng.push(location.lng);
+    });
+
+    const bounds = {
+      south: Math.min(...lat),
+      north: Math.max(...lat),
+      west: Math.min(...lng),
+      east: Math.max(...lng)
+    }
+
+    return bounds;
+  }
+
+  loadMap = () => {
+    this.loadTrees();
+    this.loadMunicipalities();
+  }
+
   loadTrees = () => {
     getAllTrees()
-      .then(response => {
-        this.setState({trees: response.data});
+      .then(({data}) => {
+        this.setState({trees: data});
       })
       .catch(error => {
         console.error(error);
@@ -58,10 +85,10 @@ export class TreeMap extends PureComponent {
 
   loadMunicipalities = () => {
     getAllMunicipalities()
-      .then(response => {
+      .then(({data}) => {
         let municipalities = [];
 
-        response.data.map(municipality => {
+        data.map(municipality => {
           let borders = [];
           municipality.borders.map(location => {
             borders.push({
@@ -84,14 +111,37 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onReady = () => {
-    this.loadTrees();
-    this.loadMunicipalities();
-  }
-
-  moveMap = (mapProps, map) => {
+  onMoveMap = (mapProps, map) => {
     console.log(mapProps);
     console.log(map);
+  }
+
+  onMunicipalityClick = (e, municipality) => {
+    let viewport = this.getMapBounds(municipality.borders);
+    let sustainability;
+
+    new Promise(() => {
+      getMunicipalitySustainability(municipality.name)
+        .then(({data}) => {
+          sustainability = {
+            stormwater: data.stormwater,
+            co2Reduced: data.co2Reduced,
+            biodiversity: data.biodiversity,
+            energyConserved: data.energyConserved
+          };
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    })
+    .then(() => {
+      this.refs.map.fitBounds(viewport);
+      this.props.onSustainabilityChange(sustainability);
+    })
+  }
+
+  onTreeClick = (e, tree) => {
+    console.log(tree);
   }
 
   render() {
@@ -100,29 +150,27 @@ export class TreeMap extends PureComponent {
       height: '80vh'
     };
 
-    return (this.props.loaded && Object.keys(this.state.center).length !== 0) ? (
-      <div style={style}>
-        <Map google={this.props.google}
-             style={style}
-             zoom={this.state.zoom}
-             initialCenter={this.state.center}
-             onReady={this.onReady}
-             onDragend={this.moveMap}>
-          {this.state.municipalities.map(municipality => {
-            return <Polygon key={municipality.name}
-                            paths={municipality.borders}
-                            strokeColor="#0000FF"
-                            strokeOpacity={0.8}
-                            strokeWeight={2}
-                            fillColor="#0000FF"
-                            fillOpacity={0.3}/>;
-          })}
-          {this.state.trees.map(tree => {
-            return <Marker key={tree.treeId} name={tree.treeId}
-                           position={{lat: tree.location.latitude, lng: tree.location.longitude}}/>;
-          })}
-        </Map>
-      </div>
+    return (Object.keys(this.state.center).length !== 0) ? (
+      <GoogleMap
+        ref='map'
+        zoom={this.state.zoom}
+        center={this.state.center}
+        options={{scrollwheel: true}}
+      >
+        {this.state.municipalities.map(municipality => {
+          return <Polygon key={municipality.name}
+                          paths={municipality.borders}
+                          onClick={e => this.onMunicipalityClick(e, municipality)}/>;
+        })}
+        {this.state.trees.map(tree => {
+          return <Marker key={tree.treeId}
+                         position={{
+                           lat: tree.location.latitude,
+                           lng: tree.location.longitude
+                         }}
+                         onClick={e => this.onTreeClick(e, tree)} />;
+        })}
+      </GoogleMap>
     ) : (
       <Segment style={{...style, display: 'table-cell', verticalAlign: 'middle'}}>
         <Dimmer active>
@@ -134,7 +182,13 @@ export class TreeMap extends PureComponent {
   }
 }
 
-export default GoogleApiWrapper({
-  apiKey: 'AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo',
-  version: '3.31'
-})(TreeMap);
+export default compose(
+  withProps({
+    googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo&v=3.exp&libraries=geometry,drawing,places",
+    loadingElement: <div style={{width: '100vw', height: '100vh'}}/>,
+    containerElement: <div style={{height: '80vh'}}/>,
+    mapElement: <div style={{height: '80vh'}}/>,
+  }),
+  withScriptjs,
+  withGoogleMap
+)(props => <TreeMapp {...props}/>)

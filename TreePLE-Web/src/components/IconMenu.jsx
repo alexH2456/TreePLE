@@ -28,6 +28,8 @@ class IconMenu extends PureComponent {
   handleLogOut = () => localStorage.clear();
 
   render() {
+    console.log(this.props);
+
     return (
       <div>
         <Sidebar.Pushable as={Segment}>
@@ -45,18 +47,17 @@ class IconMenu extends PureComponent {
                 </Button>
               </Menu.Item>
               </div>
-            ) : null}
-            {localStorage.getItem('username') !== null ? (
+            ) : (
               <Menu.Item link name='logout'>
                 <Button basic color='black' name='logout' onClick={this.handleLogOut}>
                   Log Out
                 </Button>
               </Menu.Item>
-            ) : null}
+            )}
           </Sidebar>
           <Sidebar.Pusher>
             <Segment basic>
-              <TreeMap/>
+              <TreeMap onSustainabilityChange={this.props.onSustainabilityChange} random={5}/>
             </Segment>
           </Sidebar.Pusher>
         </Sidebar.Pushable>

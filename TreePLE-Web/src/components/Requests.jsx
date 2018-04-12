@@ -17,7 +17,7 @@ const AXIOS = axios.create({
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE',
     'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
   },
-  timeout: 5000
+  timeout: 10000
 });
 
 
@@ -61,7 +61,7 @@ function getAllForecasts() {
 }
 
 function getTreePLESustainability() {
-  const url = `/treeple/sustainability/`;
+  const url = `/sustainability/treeple/`;
   return getRequest(url);
 }
 
@@ -69,6 +69,11 @@ function getTreePLESustainability() {
 // ==============================
 // GET API
 // ==============================
+
+function login(jsonParams) {
+  const url = `/login/`;
+  return postRequestWithParams(url, jsonParams);
+};
 
 function getTree(treeId) {
   const url = `/trees/${treeId}/`;
@@ -80,10 +85,10 @@ function getUser(username) {
   return getRequest(url);
 };
 
-function login(jsonParams) {
-  const url = `/login/`;
-  return postRequestWithParams(url, jsonParams);
-};
+function getMunicipalitySustainability(municipality) {
+  const url = `/sustainability/${municipality}/`;
+  return getRequest(url);
+}
 
 
 // ==============================
@@ -124,6 +129,6 @@ export {
   getAllLocations,
   getAllMunicipalities,
   getAllForecasts,
-  getTreePLESustainability,
+  getTreePLESustainability, getMunicipalitySustainability,
   login
 };

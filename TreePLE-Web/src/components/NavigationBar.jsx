@@ -17,32 +17,36 @@ class NavigationBar extends PureComponent {
         energyConserved: {factor: 0, worth: 0}
       }
     };
+    this.onSustainabilityChange = this.onSustainabilityChange.bind(this);
   }
 
   componentWillMount() {
     getTreePLESustainability()
-      .then(response => {
-        console.log(response);
-
+      .then(({data}) => {
         this.setState({sustainability: {
-          stormwater: response.data.stormwater,
-          co2Reduced: response.data.co2Reduced,
-          biodiversity: response.data.biodiversity,
-          energyConserved: response.data.energyConserved
+          stormwater: data.stormwater,
+          co2Reduced: data.co2Reduced,
+          biodiversity: data.biodiversity,
+          energyConserved: data.energyConserved
         }});
       })
       .catch(error => {
         console.log(error);
-
       });
   }
 
   toggleSidebar = () => this.setState({showSidebar: !this.state.showSidebar});
 
+  // onSustainabilityChange = (sustainability) => this.setState({sustainability: sustainability});
+  onSustainabilityChange(sustainability) {
+    console.log(sustainability);
+
+    this.setState({sustainability: sustainability});
+  }
+
   render() {
     const {sustainability} = this.state;
     console.log(sustainability);
-    console.log(!!sustainability);
 
     const stormwater = !!sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
     const co2Reduced = !!sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};
@@ -112,7 +116,7 @@ class NavigationBar extends PureComponent {
           </Menu.Item>
 
         </Menu>
-        <IconMenu show={this.state.showSidebar}/>
+        <IconMenu show={this.state.showSidebar} onSustainabilityChange={this.onSustainabilityChange}/>
       </div>
     );
   }
