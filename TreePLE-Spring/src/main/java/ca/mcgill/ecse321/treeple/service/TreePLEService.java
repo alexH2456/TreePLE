@@ -348,6 +348,15 @@ public class TreePLEService {
         return Collections.unmodifiableList(sql.getAllTrees());
     }
 
+    public List<Tree> getAllTreesOfMunicipality(String name) throws Exception {
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+        if (!Municipality.hasWithName(name) && sql.getMunicipality(name) == null)
+            throw new InvalidInputException("No Municipality with that name exists!");
+
+        return Collections.unmodifiableList(sql.getAllTreesOfMunicipality(name));
+    }
+
     // Get a list of all Users
     public List<User> getAllUsers() {
         return Collections.unmodifiableList(sql.getAllUsers());
@@ -379,13 +388,12 @@ public class TreePLEService {
     }
 
     // Get sustainability factors for entire TreePLE system
-    public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
+    public Map<String, Map<String, Double>> getGroupSustainability(List<Tree> allTrees) throws Exception {
         Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
         Map<String, Double> stormwater = new HashMap<String, Double>();
         Map<String, Double> co2Reduced = new HashMap<String, Double>();
         Map<String, Double> biodiversity = new HashMap<String, Double>();
         Map<String, Double> energyConserved = new HashMap<String, Double>();
-        List<Tree> allTrees = getAllTrees();
 
         double factor = 0;
         stormwater.put("factor", (factor = forecastStormwaterIntercepted(allTrees)));
@@ -784,7 +792,6 @@ public class TreePLEService {
             throw new SQLException("SQL Tree delete query failed!");
 
         Municipality municipality = tree.getMunicipality();
-        Tree.setNextTreeId(Tree.getNextTreeId() - 1);
         municipality.setTotalTrees(municipality.getTotalTrees() - 1);
         sql.updateMunicipalityIncDecTotalTrees(municipality.getName(), -1);
 
@@ -844,8 +851,6 @@ public class TreePLEService {
         if (!sql.deleteLocation(locationId))
             throw new SQLException("SQL Location delete query failed!");
 
-        Location.setNextLocationId(Location.getNextLocationId() - 1);
-
         return location;
     }
 
@@ -891,8 +896,6 @@ public class TreePLEService {
         if (!sql.deleteForecast(forecastId))
             throw new SQLException("SQL Forecast delete query failed!");
 
-        Forecast.setNextForecastId(Forecast.getNextForecastId() - 1);
-
         return forecast;
     }
 
@@ -932,6 +935,10 @@ public class TreePLEService {
     public double forecastBiodiversityIndex(List<Tree> trees) {
         int totalTrees = trees.size();
         int totalSpecies = getUniqueSpecies(trees).size();
+
+        if (totalTrees == 0) {
+            return 0;
+        }
 
         return (double) totalSpecies/totalTrees;
     }
@@ -984,18 +991,21 @@ public class TreePLEService {
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-            curveNumber = 83.5;
+            curveNumber = 73.5;
         } else if (landType == Land.Residential) {
-            curveNumber = 93.2;
+            curveNumber = 83.2;
         } else if (landType == Land.Institutional) {
-            curveNumber = 96.3;
+            curveNumber = 86.3;
         } else if (landType == Land.Municipal) {
-            curveNumber = 100;
+            curveNumber = 91.6;
         }
 
-        double sorptivity = (1000/curveNumber) - 10; // Sorptivity of the tree (in inches)
-        double canopyArea = getCanopyArea(tree); // Estimation of the canopy area
-        stormwaterCaptured = sorptivity * canopyArea/12;
+        // Sorptivity of the tree (in inches)
+        double sorptivity = (1000/curveNumber) - 5;
+
+        // Estimation of the canopy area
+        double canopyArea = getCanopyArea(tree);
+        stormwaterCaptured = sorptivity * canopyArea;
 
         return cubicFeetToLiters(stormwaterCaptured);
     }
@@ -1011,8 +1021,8 @@ public class TreePLEService {
         // Survey was done at University of Nebraska showing avg dry weight 72.5%
         double dryWeight = 0.725 * weight;
 
-        // Percentage of Carbon in a tree is about 50% of the dry weight
-        double carbonWeight = 0.5 * dryWeight;
+        // Percentage of Carbon in a tree is about 68% of the dry weight
+        double carbonWeight = 0.68 * dryWeight;
 
         // CO2 to Carbon ratio in a CO2 molecule is 3.6663
         double co2Sequestered = 3.6663 * carbonWeight;
@@ -1040,7 +1050,9 @@ public class TreePLEService {
             energyCoefficient = 0.8896;
         }
 
-        double diameterCoefficient = tree.getDiameter()/50; // Average diameter of a tree is 50
+        // Average diameter of a tree is 50
+        double diameterCoefficient = tree.getDiameter()/50;
+
         return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
 
@@ -1056,12 +1068,12 @@ public class TreePLEService {
 
     // Monetary worth of CO2 reduced (in CAD)
     public double co2ReducedWorth(double co2Reduced) {
-        return 0.009498572 * co2Reduced;
+        return 2 * 0.009498572 * co2Reduced;
     }
 
     // Monetary worth of energy conserved (in CAD)
     public double energyConservedWorth(double energyConserved) {
-        return 0.162861 * energyConserved;
+        return 0.142861 * energyConserved;
     }
 
 
@@ -1105,17 +1117,17 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
 
-        int height = tree.getHeight();
-        int diameter = tree.getDiameter();
+        double height = cmToFeet(tree.getHeight());
+        double diameter = cmToInches(tree.getDiameter());
         double weight = 0;
 
         // A rough estimation of a weight for trees (in pounds)
-        // Times 0.25 or 0.15 depending on the species
+        // Times 0.45 or 0.35 depending on the species
         // Times 1.2 to account for the underground weight of the tree
         if (diameter < 11) {
-            weight = 0.25 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+            weight = 0.45 * 1.25 * Math.pow(diameter, 2) * height;
         } else {
-            weight = 0.15 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+            weight = 0.35 * 1.25 * Math.pow(diameter, 2) * height;
         }
 
         return poundsToKG(weight);

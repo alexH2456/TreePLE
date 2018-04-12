@@ -167,7 +167,7 @@ public class SQLiteJDBC {
         String insertTree = String.format(
             "INSERT INTO TREES (treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports) " +
             "VALUES (%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s');",
-            treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
+            treeId, height, diameter, address, datePlanted, land, status, ownership, species.replaceAll("'", "''"), location, municipality.replaceAll("'", "''"), reports);
 
         try {
             return c.createStatement().executeUpdate(insertTree) <= 0 ? false : true;
@@ -184,7 +184,7 @@ public class SQLiteJDBC {
             "UPDATE TREES " +
             "SET height = %d, diameter = %d, land = '%s', status = '%s', ownership = '%s', species = '%s', municipality = '%s', reports = '%s' " +
             "WHERE treeId = %d;",
-            height, diameter, land, status, ownership, species, municipality, reports, treeId);
+            height, diameter, land, status, ownership, species.replaceAll("'", "''"), municipality.replaceAll("'", "''"), reports, treeId);
 
         try {
             return c.createStatement().executeUpdate(updateTree) <= 0 ? false : true;
@@ -234,7 +234,7 @@ public class SQLiteJDBC {
     // Get all trees of type Species
     public ArrayList<Tree> getAllTreesOfSpecies(String species) {
         ArrayList<Tree> trees = new ArrayList<Tree>();
-        String getTreesOfSpecies = String.format("SELECT * FROM TREES WHERE species = '%s';", species);
+        String getTreesOfSpecies = String.format("SELECT * FROM TREES WHERE species = '%s';", species.replaceAll("'", "''"));
 
         try {
             ResultSet rs = c.createStatement().executeQuery(getTreesOfSpecies);
@@ -252,7 +252,7 @@ public class SQLiteJDBC {
     // Get all Trees from a Municipality
     public ArrayList<Tree> getAllTreesOfMunicipality(String municipality) {
         ArrayList<Tree> trees = new ArrayList<>();
-        String getTreesFromMunicipality = String.format("SELECT * FROM TREES WHERE municipality = '%s';", municipality);
+        String getTreesFromMunicipality = String.format("SELECT * FROM TREES WHERE municipality = '%s';", municipality.replaceAll("'", "''"));
 
         try {
             ResultSet rs = c.createStatement().executeQuery(getTreesFromMunicipality);
@@ -270,7 +270,7 @@ public class SQLiteJDBC {
     // Get Tree count of a Municipality
     public int getTreeCountOfMunicipality(String municipality) {
         int treeCount = -1;
-        String getTreeCountOfMunicipality = String.format("SELECT COUNT(treeId) AS treeCount FROM TREES WHERE municipality = '%s';", municipality);
+        String getTreeCountOfMunicipality = String.format("SELECT COUNT(treeId) AS treeCount FROM TREES WHERE municipality = '%s';", municipality.replaceAll("'", "''"));
 
         try {
             ResultSet rs = c.createStatement().executeQuery(getTreeCountOfMunicipality);
@@ -492,7 +492,7 @@ public class SQLiteJDBC {
         String insertSpecies = String.format(
             "INSERT INTO SPECIES (name, species, genus) " +
             "VALUES ('%s', '%s', '%s');",
-            name, species, genus);
+            name.replaceAll("'", "''"), species, genus);
 
         try {
             return c.createStatement().executeUpdate(insertSpecies) <= 0 ? false : true;
@@ -508,7 +508,7 @@ public class SQLiteJDBC {
             "UPDATE SPECIES " +
             "SET species = '%s', genus = '%s' " +
             "WHERE name = '%s';",
-            species, genus, name);
+            species, genus, name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(updateSpecies) <= 0 ? false : true;
@@ -545,7 +545,7 @@ public class SQLiteJDBC {
     // Get a Species
     public Species getSpecies(String name) {
         Species species = null;
-        String getSpecies = String.format("SELECT * FROM SPECIES WHERE name = '%s';", name);
+        String getSpecies = String.format("SELECT * FROM SPECIES WHERE name = '%s';", name.replaceAll("'", "''"));
 
         try {
             ResultSet rs = c.createStatement().executeQuery(getSpecies);
@@ -567,7 +567,7 @@ public class SQLiteJDBC {
 
     // Delete a Species
     public boolean deleteSpecies(String name) {
-        String speciesDelete = String.format("DELETE FROM SPECIES WHERE name = '%s';", name);
+        String speciesDelete = String.format("DELETE FROM SPECIES WHERE name = '%s';", name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(speciesDelete) <= 0 ? false : true;
@@ -692,7 +692,7 @@ public class SQLiteJDBC {
         String insertMunicipality = String.format(
             "INSERT INTO MUNICIPALITIES (name, totalTrees, borders) " +
             "VALUES ('%s', %d, '%s');",
-            name, totalTrees, borders);
+            name.replaceAll("'", "''"), totalTrees, borders);
 
         try {
             return c.createStatement().executeUpdate(insertMunicipality) <= 0 ? false : true;
@@ -708,7 +708,7 @@ public class SQLiteJDBC {
             "UPDATE MUNICIPALITIES " +
             "SET borders = '%s' " +
             "WHERE name = '%s';",
-            borders, name);
+            borders, name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
@@ -724,7 +724,7 @@ public class SQLiteJDBC {
             "UPDATE MUNICIPALITIES " +
             "SET totalTrees = %d " +
             "WHERE name = '%s';",
-            totalTrees, name);
+            totalTrees, name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
@@ -740,7 +740,7 @@ public class SQLiteJDBC {
             "UPDATE MUNICIPALITIES " +
             "SET totalTrees = totalTrees + %d " +
             "WHERE name = '%s';",
-            incDec, name);
+            incDec, name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(updateMunicipality) <= 0 ? false : true;
@@ -786,7 +786,7 @@ public class SQLiteJDBC {
     // Get a Municipality
     public Municipality getMunicipality(String name) {
         Municipality municipality = null;
-        String getMunicipality = String.format("SELECT * FROM MUNICIPALITIES WHERE name = '%s';", name);
+        String getMunicipality = String.format("SELECT * FROM MUNICIPALITIES WHERE name = '%s';", name.replaceAll("'", "''"));
 
         try {
             ResultSet rs = c.createStatement().executeQuery(getMunicipality);
@@ -815,7 +815,7 @@ public class SQLiteJDBC {
 
     // Delete a Municipality
     public boolean deleteMunicipality(String name) {
-        String deleteMunicipality = String.format("DELETE FROM MUNICIPALITIES WHERE name = '%s';", name);
+        String deleteMunicipality = String.format("DELETE FROM MUNICIPALITIES WHERE name = '%s';", name.replaceAll("'", "''"));
 
         try {
             return c.createStatement().executeUpdate(deleteMunicipality) <= 0 ? false : true;
