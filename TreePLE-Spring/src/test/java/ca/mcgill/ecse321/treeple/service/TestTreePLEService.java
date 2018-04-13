@@ -1,5 +1,6 @@
 package ca.mcgill.ecse321.treeple.service;
 
+import static org.assertj.core.api.Assertions.useRepresentation;
 import static org.junit.Assert.*;
 
 import java.sql.Date;
@@ -1772,11 +1773,234 @@ public class TestTreePLEService {
         assertEquals(error, "Municipality does not exist!");
     }
 
-    //TODO
     // ==============================
     // UPDATE USER TEST
     // ==============================
+    
+    @Test
+    public void testUpdateUser() throws Exception {
+    	service.createUser(testUser);
+    	
+    	try {
+    		JSONObject updateUserObj = new JSONObject();
+    		updateUserObj.put("username", "Abbas");
+            updateUserObj.put("password", "password123");
+            updateUserObj.put("role", "Scientist");
+            updateUserObj.put("scientistKey", "i<3tr33s");
+            updateUserObj.put("myAddresses", "H4L3N1");
+            
+            User user = service.updateUser(updateUserObj);
+            
+            assertEquals("Abbas", user.getUsername());
+            assertEquals("password123", user.getPassword());
+            assertEquals(UserRole.Scientist, user.getRole());
+            assertEquals("H4L3N1", user.getMyAddress(0));
+    	}catch(Exception e) {
+    		fail();
+    	}
+    }
+    
+    @Test(expected = JSONException.class)
+    public void testUpdateUserNullUsername() throws Exception {
+        service.createUser(testUser);
+        
+        JSONObject updateUserObj = new JSONObject();
+		updateUserObj.put("username", (String) null);
+        updateUserObj.put("password", "password123");
+        updateUserObj.put("role", "Scientist");
+        updateUserObj.put("scientistKey", "i<3tr33s");
+        updateUserObj.put("myAddresses", "H4L3N1");
 
+        service.updateUser(updateUserObj);
+    }
+
+    @Test
+    public void testUpdateUserNameEmpty() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        JSONObject user = new JSONObject();
+        user.put("username", "           ");
+        user.put("password", "123yunus");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Username cannot be empty!", error);
+    }
+
+    @Test
+    public void testUpdateUserNameNonAlphanumeric() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        JSONObject user = new JSONObject();
+        user.put("username", "???////***$$$!@#!@#!@#");
+        user.put("password", "123yunus");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Username must be alphanumeric!", error);
+    }
+
+    @Test
+    public void testUpdateUserAlreadyExists() throws Exception {
+    	String error = "";
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Username does not exist!", error);
+    }
+
+    @Test
+    public void testUpdateUserPasswordEmpty() throws Exception {
+    	String error = "";
+        JSONObject user = new JSONObject();
+        service.createUser(testUser);
+        user.put("username", "Abbas");
+        user.put("password", "         ");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Password cannot be empty!", error);
+    }
+    @Test
+    public void testUpdateUserPasswordNonAlphanumeric() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", "*****@@@###$$$%%%%>>>??");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Password must be alphanumeric!", error);
+    }
+
+    @Test
+    public void testUpdateUserWrongScientistKey() throws Exception {
+    	String error = "";
+    	service.createUser(testUser);
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", "Scientist");
+        user.put("scientistKey", "Wrong");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+        	service.updateUser(user);
+        }catch(Exception e) {
+        	error = e.getMessage();
+        }
+
+        assertEquals("Authorization key for Scientist role is invalid!", error);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testUpdateUserNullPassword() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", (String) null);
+        user.put("role", "Scientist");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        service.updateUser(user);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testUpdateUserNullRole() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", (String) null);
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        service.updateUser(user);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testUpdateUserNullAddress() throws Exception {
+        JSONObject user = new JSONObject();
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", "Scientist");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", (String) null);
+
+        service.updateUser(user);
+    }
+
+    @Test
+    public void testUpdateUserBadRole() throws Exception {
+        JSONObject user = new JSONObject();
+        service.createUser(testUser);
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", "NotARealRole");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "St-Lazare");
+
+        try {
+            service.updateUser(user);
+        } catch (InvalidInputException e) {
+            assertEquals("That role doesn't exist!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdateUserResidentialWithEmptyAddress() throws Exception {
+        JSONObject user = new JSONObject();
+        service.createUser(testUser);
+        user.put("username", "Abbas");
+        user.put("password", "123yunus");
+        user.put("role", "Resident");
+        user.put("scientistKey", "i<3tr33s");
+        user.put("myAddresses", "   ");
+
+        try {
+            service.updateUser(user);
+        } catch (InvalidInputException e) {
+            assertEquals("Address cannot be empty!", e.getMessage());
+        }
+    }
 
     // ==============================
     // UPDATE SPECIES TEST
@@ -1844,9 +2068,21 @@ public class TestTreePLEService {
         } catch (Exception e) {
             assertEquals("Species name cannot be empty!", e.getMessage());
         }
-
     }
+    
+    @Test
+    public void testUpdateSpeciesDNE() throws Exception {
+        JSONObject newSpecies = new JSONObject();
+        newSpecies.put("name", testSpecies.getString("name"));
+        newSpecies.put("species", "Salix Alba");
+        newSpecies.put("genus", "Willow");
 
+        try {
+        	service.updateSpecies(newSpecies);
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Species does not exist!");
+        }
+    }
 
     // ==============================
     // UPDATE MUNICIPALITY TEST

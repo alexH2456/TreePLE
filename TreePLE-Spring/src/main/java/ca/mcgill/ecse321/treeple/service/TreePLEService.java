@@ -634,6 +634,7 @@ public class TreePLEService {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
+        String scientistKey = jsonParams.getString("scientistKey");
         String myAddresses = jsonParams.getString("myAddresses");
 
         User user;
@@ -651,6 +652,8 @@ public class TreePLEService {
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
+        if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
+            throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
         user.setPassword(password);
         user.setRole(UserRole.valueOf(role));
