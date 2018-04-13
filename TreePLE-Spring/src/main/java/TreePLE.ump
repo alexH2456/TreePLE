@@ -156,11 +156,11 @@ class SurveyReport
 {
   autounique reportId;
   Date reportDate;
-  String reportingUser;
+  String reportUser;
 
-  public SurveyReport(Date aReportDate, String aReportingUser, int aReportId) {
+  public SurveyReport(Date aReportDate, String aReportUser, int aReportId) {
     reportDate = aReportDate;
-    reportingUser = aReportingUser;
+    reportUser = aReportUser;
     reportId = aReportId;
   }
 

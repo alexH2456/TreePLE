@@ -82,7 +82,7 @@ public class TestTreePLEService {
 
         service.createUser(user);
     }
-    
+
     @Test
     public void testCreateUserNameEmpty() throws Exception {
     	String error = "";
@@ -98,10 +98,10 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Username cannot be empty!", error);
     }
-    
+
     @Test
     public void testCreateUserNameNonAlphanumeric() throws Exception {
     	String error = "";
@@ -117,10 +117,10 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Username must be alphanumeric!", error);
     }
-    
+
     @Test
     public void testCreateUserAlreadyExists() throws Exception {
     	String error = "";
@@ -137,10 +137,10 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Username is already taken!", error);
     }
-    
+
     @Test
     public void testCreateUserPasswordEmpty() throws Exception {
     	String error = "";
@@ -156,7 +156,7 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Password cannot be empty!", error);
     }
     @Test
@@ -174,10 +174,10 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Password must be alphanumeric!", error);
     }
-    
+
     @Test
     public void testCreateUserWrongScientistKey() throws Exception {
     	String error = "";
@@ -193,7 +193,7 @@ public class TestTreePLEService {
         }catch(Exception e) {
         	error = e.getMessage();
         }
-        
+
         assertEquals("Authorization key for Scientist role is invalid!", error);
     }
 
@@ -294,7 +294,7 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     @Test
     public void testCreateSpeciesNameSpaces() {
     	String error = "";
@@ -308,10 +308,10 @@ public class TestTreePLEService {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        
+
         assertEquals("Species name cannot be empty!", error);
     }
-    
+
     @Test
     public void testCreateSpeciesExistsAlready() throws Exception {
     	String error = "";
@@ -326,7 +326,7 @@ public class TestTreePLEService {
         } catch (Exception e) {
             error = e.getMessage();
         }
-        
+
         assertEquals("Species already exists!", error);
     }
 
@@ -358,7 +358,7 @@ public class TestTreePLEService {
     @Test
     public void testCreateMunicipalityEmptyBorders() {
         JSONObject municipality = new JSONObject();
-        
+
         municipality.put("name", "Saint-Lazare");
         municipality.put("totalTrees", 12);
         municipality.put("borders", new JSONArray());
@@ -370,11 +370,11 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     @Test
     public void testCreateMunicipalityEmptyName() {
     	String error = "";
-    	
+
     	JSONArray borders = new JSONArray();
 
         borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
@@ -396,12 +396,12 @@ public class TestTreePLEService {
         }
         assertEquals("Municipality cannot be empty!", error);
     }
-    
+
     @Test
     public void testCreateMunicipalityAlreadyExists() throws Exception {
     	String error = "";
     	service.createMunicipality(testMunicipality);
-    	
+
     	JSONArray borders = new JSONArray();
         borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
         borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
@@ -410,7 +410,7 @@ public class TestTreePLEService {
         borders.put(new JSONArray(new double[]{45.459034, -73.683652}));
         borders.put(new JSONArray(new double[]{45.526536, -73.651208}));
         borders.put(new JSONArray(new double[]{45.522407, -73.730198}));
-        
+
         JSONObject municipality = new JSONObject();
         municipality.put("name", "Saint-Laurent");
         municipality.put("totalTrees", 12);
@@ -423,8 +423,8 @@ public class TestTreePLEService {
         }
         assertEquals("Municipality already exists!", error);
     }
-    
-    
+
+
 
     @Test(expected = InvalidInputException.class)
     public void testCreateMunicipalityTwoBorders() throws Exception {
@@ -675,7 +675,7 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     @Test
     public void testCreateTreeNegativeHeight() throws Exception {
     	String error = "";
@@ -684,7 +684,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("height", -30);
-        
+
         try {
             service.createTree(tree);
         }catch(Exception e) {
@@ -692,7 +692,7 @@ public class TestTreePLEService {
         }
         assertEquals(error, "Height cannot be negative!");
     }
-    
+
     @Test
     public void testCreateTreeNegativeDiameter() throws Exception {
     	String error = "";
@@ -701,7 +701,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("diameter", -30);
-        
+
         try {
         	service.createTree(tree);
         }catch(Exception e) {
@@ -709,7 +709,7 @@ public class TestTreePLEService {
         }
         assertEquals(error, "Diameter cannot be negative!");
     }
-    
+
     @Test
     public void testCreateTreeWrongLandType() throws Exception {
     	String error = "";
@@ -718,7 +718,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("land", "NonExistant");
-        
+
         try {
         	service.createTree(tree);
         }catch(Exception e) {
@@ -726,7 +726,7 @@ public class TestTreePLEService {
         }
         assertEquals(error, "That land type doesn't exist!");
     }
-    
+
     @Test
     public void testCreateTreeWrongOwnershipType() throws Exception {
     	String error = "";
@@ -735,7 +735,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("ownership", "NonExistant");
-        
+
         try {
         	service.createTree(tree);
         }catch(Exception e) {
@@ -743,7 +743,7 @@ public class TestTreePLEService {
         }
         assertEquals(error, "That ownership doesn't exist!");
     }
-    
+
     @Test
     public void testCreateTreeWrongStatusType() throws Exception {
     	String error = "";
@@ -752,7 +752,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("status", "NonExistant");
-        
+
         try {
         	service.createTree(tree);
         }catch(Exception e) {
@@ -1091,17 +1091,17 @@ public class TestTreePLEService {
     // ==============================
     // GET TREES OF USER
     // ==============================
-    
+
     //TODO
     // ==============================
     // GET TREES OF SPECIES
     // ==============================
-    
+
     //TODO
     // ==============================
     // GET TREES OF MUNICIPALITY
     // ==============================
-    
+
     // ==============================
     // UPDATE TREE TEST
     // ==============================
@@ -1831,8 +1831,6 @@ public class TestTreePLEService {
 
     @Test
     public void testDeleteLocation() throws Exception {
-        int locationsBefore = Location.getNextLocationId();
-
         Location locationObj = new Location(testLocation.getDouble("latitude"), testLocation.getDouble("longitude"));
         sql.insertLocation(locationObj.getLocationId(), locationObj.getLatitude(), locationObj.getLongitude());
 
@@ -1842,11 +1840,9 @@ public class TestTreePLEService {
 
         try {
             Location location = service.deleteLocation(deleteLocation);
-            int locationsAfter = Location.getNextLocationId();
 
             assertEquals(testLocation.getDouble("latitude"), location.getLatitude(), 0);
             assertEquals(testLocation.getDouble("longitude"), location.getLongitude(), 0);
-            assertEquals(locationsBefore, locationsAfter);
         } catch (Exception e) {
             fail();
         }
@@ -1950,7 +1946,6 @@ public class TestTreePLEService {
 
     @Test
     public void testDeleteTree() throws Exception {
-        int treesBefore = Tree.getNextTreeId();
         service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
@@ -1963,7 +1958,6 @@ public class TestTreePLEService {
 
         try {
             Tree tree = service.deleteTree(deleteTree);
-            int treesAfter = Tree.getNextTreeId();
 
             assertEquals(treeObj.getInt("height"), tree.getHeight());
             assertEquals(treeObj.getInt("diameter"), tree.getDiameter());
@@ -1975,7 +1969,6 @@ public class TestTreePLEService {
             assertEquals(treeObj.getDouble("latitude"), tree.getLocation().getLatitude(), 0);
             assertEquals(treeObj.getDouble("longitude"), tree.getLocation().getLongitude(), 0);
             assertEquals(treeObj.getString("municipality"), tree.getMunicipality().getName());
-            assertEquals(treesBefore, treesAfter);
         } catch (InvalidInputException e) {
             fail();
         }
@@ -2000,7 +1993,7 @@ public class TestTreePLEService {
         }
         assertEquals("Tree's ID cannot be negative or zero!", error);
     }
-    
+
     @Test
     public void testDeleteTreeUserNameEmpty() throws Exception {
     	String error = "";
