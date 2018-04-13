@@ -3,6 +3,8 @@ package ca.mcgill.ecse321.treeple.service;
 import static org.junit.Assert.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.*;
 import org.junit.*;
@@ -1196,20 +1198,117 @@ public class TestTreePLEService {
     	}
     	assertEquals("No Forecast with that ID exists!", error);
     }
-    //TODO
+    
     // ==============================
     // GET TREES OF USER
     // ==============================
 
-    //TODO
+    @Test
+    public void testGetTreesOfUser() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        List<Tree> trees = new ArrayList<Tree>();
+
+        for (int i = 0; i < 4; i++) {
+            trees.add(service.createTree(testTree));
+        }
+        try {
+        	List<Tree> userTrees = service.getTreesOfUser(testUser.getString("username"));
+
+            for (int i = 0; i < userTrees.size(); i++) {
+                Tree tree = trees.get(i);
+                Tree userTree = userTrees.get(i);
+                assertEquals(tree.getHeight(), userTree.getHeight());
+                assertEquals(tree.getDiameter(), userTree.getDiameter());
+                assertEquals(tree.getAddress(),userTree.getAddress());
+                assertEquals(tree.getDatePlanted(),userTree.getDatePlanted());
+                assertEquals(tree.getLand(),userTree.getLand());
+                assertEquals(tree.getLocation().getLatitude(),userTree.getLocation().getLatitude(),0);
+                assertEquals(tree.getLocation().getLongitude(),userTree.getLocation().getLongitude(),0);
+                assertEquals(tree.getMunicipality(),userTree.getMunicipality());
+                assertEquals(tree.getOwnership(), userTree.getOwnership());
+                assertEquals(tree.getSpecies(), userTree.getSpecies());
+                assertEquals(tree.getStatus(), userTree.getStatus());
+            }
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    
     // ==============================
     // GET TREES OF SPECIES
     // ==============================
 
-    //TODO
+    @Test
+    public void testGetTreesOfSpecies() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        List<Tree> trees = new ArrayList<Tree>();
+
+        for (int i = 0; i < 4; i++) {
+            trees.add(service.createTree(testTree));
+        }
+        try {
+        	List<Tree> speciesTrees = service.getTreesOfSpecies(testSpecies.getString("name"));
+
+            for (int i = 0; i < speciesTrees.size(); i++) {
+                Tree tree = trees.get(i);
+                Tree speciesTree = speciesTrees.get(i);
+                assertEquals(tree.getHeight(), speciesTree.getHeight());
+                assertEquals(tree.getDiameter(), speciesTree.getDiameter());
+                assertEquals(tree.getAddress(),speciesTree.getAddress());
+                assertEquals(tree.getDatePlanted(),speciesTree.getDatePlanted());
+                assertEquals(tree.getLand(),speciesTree.getLand());
+                assertEquals(tree.getLocation().getLatitude(),speciesTree.getLocation().getLatitude(),0);
+                assertEquals(tree.getLocation().getLongitude(),speciesTree.getLocation().getLongitude(),0);
+                assertEquals(tree.getMunicipality(),speciesTree.getMunicipality());
+                assertEquals(tree.getOwnership(), speciesTree.getOwnership());
+                assertEquals(tree.getSpecies(), speciesTree.getSpecies());
+                assertEquals(tree.getStatus(), speciesTree.getStatus());
+            }
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    
     // ==============================
     // GET TREES OF MUNICIPALITY
     // ==============================
+    
+    @Test
+    public void testGetTreesOfMunicipality() throws Exception {
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+        List<Tree> trees = new ArrayList<Tree>();
+
+        for (int i = 0; i < 4; i++) {
+            trees.add(service.createTree(testTree));
+        }
+        try {
+        	List<Tree> municipalityTrees = service.getTreesOfMunicipality(testMunicipality.getString("name"));
+
+            for (int i = 0; i < municipalityTrees.size(); i++) {
+                Tree tree = trees.get(i);
+                Tree municipalityTree = municipalityTrees.get(i);
+                assertEquals(tree.getHeight(), municipalityTree.getHeight());
+                assertEquals(tree.getDiameter(), municipalityTree.getDiameter());
+                assertEquals(tree.getAddress(),municipalityTree.getAddress());
+                assertEquals(tree.getDatePlanted(),municipalityTree.getDatePlanted());
+                assertEquals(tree.getLand(),municipalityTree.getLand());
+                assertEquals(tree.getLocation().getLatitude(),municipalityTree.getLocation().getLatitude(),0);
+                assertEquals(tree.getLocation().getLongitude(),municipalityTree.getLocation().getLongitude(),0);
+                assertEquals(tree.getMunicipality(),municipalityTree.getMunicipality());
+                assertEquals(tree.getOwnership(), municipalityTree.getOwnership());
+                assertEquals(tree.getSpecies(), municipalityTree.getSpecies());
+                assertEquals(tree.getStatus(), municipalityTree.getStatus());
+            }
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
     // ==============================
     // UPDATE TREE TEST

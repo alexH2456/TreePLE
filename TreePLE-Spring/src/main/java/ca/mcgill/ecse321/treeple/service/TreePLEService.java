@@ -1039,13 +1039,13 @@ public class TreePLEService {
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-            energyCoefficient = 0.7145;
-        } else if (landType == Land.Residential) {
-            energyCoefficient = 0.8874;
-        } else if (landType == Land.Institutional) {
             energyCoefficient = 0.9010;
+        } else if (landType == Land.Residential) {
+            energyCoefficient = 0.8374;
+        } else if (landType == Land.Institutional) {
+            energyCoefficient = 0.7505;
         } else if (landType == Land.Municipal) {
-            energyCoefficient = 0.8896;
+            energyCoefficient = 0.8394;
         }
 
         // Average diameter of a tree is 50
