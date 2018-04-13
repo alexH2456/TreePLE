@@ -34,11 +34,13 @@ class MunicipalityModal extends PureComponent {
         dimmer='blurring'
       >
         <Modal.Content>
-          <Modal.Description>
+          <Modal.Header>
             <Header as='h1' icon textAlign='center'>
               <Icon name='map' circular/>
               <Header.Content>Municipality</Header.Content>
             </Header>
+          </Modal.Header>
+          <Modal.Description>
             <Grid textAlign='center' columns={2}>
               <Grid.Row>
                 <Grid.Column>

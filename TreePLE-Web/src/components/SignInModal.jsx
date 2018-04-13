@@ -36,9 +36,8 @@ class SignInModal extends PureComponent {
     login(loginInfo)
       .then(({data, status}) => {
         if (status == 200) {
-          localStorage.setItem("username", JSON.stringify(data.username));
-          localStorage.setItem("role", JSON.stringify(data.role));
-          localStorage.setItem("adresses", JSON.stringify(data.myAddresses[0]));
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('role', data.role);
           this.setState({modalOpen: false});
         }
       })
@@ -62,10 +61,7 @@ class SignInModal extends PureComponent {
         onClose={this.handleClose}
         // trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
       >
-        <Modal.Content image>
-          <div>
-            <Image src='../images/favicon.ico' size='small' spaced='right'/>
-          </div>
+        <Modal.Content>
           <Modal.Description>
             <Form>
               <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.handleChangeU}/>
