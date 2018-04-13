@@ -6,15 +6,15 @@ public class SurveyReportDto {
 
     private int reportId;
     private Date reportDate;
-    private String reportingUser;
+    private String reportUser;
 
     public SurveyReportDto() {
     }
 
-    public SurveyReportDto(int reportId, Date reportDate, String reportingUser) {
+    public SurveyReportDto(int reportId, Date reportDate, String reportUser) {
         this.reportId = reportId;
         this.reportDate = reportDate;
-        this.reportingUser = reportingUser;
+        this.reportUser = reportUser;
     }
 
     public int getReportId() {
@@ -25,7 +25,7 @@ public class SurveyReportDto {
         return reportDate;
     }
 
-    public String getReportingUser() {
-        return reportingUser;
+    public String getReportUser() {
+        return reportUser;
     }
 }

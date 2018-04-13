@@ -65,11 +65,11 @@ public class SQLiteJDBC {
 
             // Users DB Table
             String sqlUsers = "CREATE TABLE IF NOT EXISTS USERS "
-            + "(username VARCHAR(50) PRIMARY KEY NOT NULL,"
-            + " password    VARCHAR(50) NOT NULL,"
-            + " role        VARCHAR(50) NOT NULL,"
-            + " myAddresses TEXT,"
-            + " myTrees     TEXT)";
+                            + "(username VARCHAR(50) PRIMARY KEY NOT NULL,"
+                            + " password    VARCHAR(50) NOT NULL,"
+                            + " role        VARCHAR(50) NOT NULL,"
+                            + " myAddresses TEXT,"
+                            + " myTrees     TEXT)";
 
             // Species DB Table
             String sqlSpecies = "CREATE TABLE IF NOT EXISTS SPECIES "
@@ -93,7 +93,7 @@ public class SQLiteJDBC {
             String sqlSurveyReports = "CREATE TABLE IF NOT EXISTS SURVEYREPORTS "
                                     + "(reportId INT PRIMARY KEY  NOT NULL,"
                                     + " reportDate    VARCHAR(50) NOT NULL,"
-                                    + " reportingUser VARCHAR(50) NOT NULL)";
+                                    + " reportUser    VARCHAR(50) NOT NULL)";
 
             // Forecasts DB Table
             String sqlForecasts = "CREATE TABLE IF NOT EXISTS FORECASTS "
@@ -832,11 +832,11 @@ public class SQLiteJDBC {
     // ==============================
 
     // Add a new Survey Report
-    public boolean insertSurveyReport(int reportId, String reportDate, String reportingUser) {
+    public boolean insertSurveyReport(int reportId, String reportDate, String reportUser) {
         String insertSurveyReport = String.format(
-            "INSERT INTO SURVEYREPORTS (reportId, reportDate, reportingUser) " +
+            "INSERT INTO SURVEYREPORTS (reportId, reportDate, reportUser) " +
             "VALUES (%d, '%s', '%s');",
-            reportId, reportDate, reportingUser);
+            reportId, reportDate, reportUser);
 
         try {
             return c.createStatement().executeUpdate(insertSurveyReport) <= 0 ? false : true;
@@ -854,7 +854,7 @@ public class SQLiteJDBC {
             ResultSet rs = c.createStatement().executeQuery("SELECT * FROM SURVEYREPORTS;");
 
             while (rs.next()) {
-                reportList.add(new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportingUser"), rs.getInt("reportId")));
+                reportList.add(new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportUser"), rs.getInt("reportId")));
             }
 
             rs.close();
@@ -873,7 +873,7 @@ public class SQLiteJDBC {
             ResultSet rs = c.createStatement().executeQuery(getSurveyReport);
 
             if (rs.next()) {
-                report = new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportingUser"), reportId);
+                report = new SurveyReport(Date.valueOf(rs.getString("reportDate")), rs.getString("reportUser"), reportId);
             }
 
             rs.close();
