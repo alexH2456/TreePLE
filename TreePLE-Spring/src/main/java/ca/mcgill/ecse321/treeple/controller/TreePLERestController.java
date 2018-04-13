@@ -308,13 +308,13 @@ public class TreePLERestController {
         return convertToDto(forecast);
     }
 
-    @DeleteMapping(value = {"/reset/"})
-    public void resetDatabase() throws Exception {
-        service.resetDatabase();
+    @PostMapping(value = {"/reset/"})
+    public void resetDatabase(@RequestBody String jsonBody) throws Exception {
+        service.resetDatabase(new JSONObject(jsonBody));
     }
 
-    @DeleteMapping(value = {"/delete/"})
-    public void deleteDatabase() throws Exception {
-        service.deleteDatabase();
+    @PostMapping(value = {"/delete/"})
+    public void deleteDatabase(@RequestBody String jsonBody) throws Exception {
+        service.deleteDatabase(new JSONObject(jsonBody));
     }
 }
