@@ -23,6 +23,7 @@ public class TreePLEService {
     private SQLiteJDBC sql;
     private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
     private final String sRoleKey = "i<3tr33s";
+    private final String dbKey = "ih8tr33s";
 
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
@@ -180,7 +181,7 @@ public class TreePLEService {
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
         String scientistKey = jsonParams.getString("scientistKey");
-    String myAddresses = jsonParams.getString("myAddresses");
+        String myAddresses = jsonParams.getString("myAddresses");
         String myTrees = "";
 
         if (username.replaceAll("\\s", "").isEmpty())
@@ -191,8 +192,6 @@ public class TreePLEService {
             throw new InvalidInputException("Username is already taken!");
         if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
-        if (!password.matches("[a-zA-Z0-9]+"))
-            throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
@@ -645,8 +644,6 @@ public class TreePLEService {
             throw new InvalidInputException("Username does not exist!");
         if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
-        if (!password.matches("[a-zA-Z0-9]+"))
-            throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
@@ -903,7 +900,12 @@ public class TreePLEService {
     // ==============================
 
     // Reset the database
-    public void resetDatabase() throws Exception {
+    public void resetDatabase(JSONObject jsonParams) throws Exception {
+        String dbAccessKey = jsonParams.getString("dbAccessKey");
+
+        if (!dbKey.equals(dbAccessKey))
+            throw new InvalidInputException("Authorization key for Reset Database is invalid!");
+
         if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to reset SQL database!");
 
@@ -914,7 +916,12 @@ public class TreePLEService {
     }
 
     // Delete the database
-    public void deleteDatabase() throws Exception {
+    public void deleteDatabase(JSONObject jsonParams) throws Exception {
+        String dbAccessKey = jsonParams.getString("dbAccessKey");
+
+        if (!dbKey.equals(dbAccessKey))
+            throw new InvalidInputException("Authorization key for Reset Database is invalid!");
+
         if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to delete SQL database!");
 

@@ -1,5 +1,3 @@
-import React, {PureComponent} from 'react';
-import {} from "..";
 import axios from 'axios';
 
 // const backendUrl = 'http://localhost:8088/';
@@ -14,8 +12,8 @@ const AXIOS = axios.create({
   baseURL: backendUrl,
   headers: {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE',
-    'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Authorization'
   },
   timeout: 10000
 });
@@ -65,9 +63,9 @@ function getTreePLESustainability() {
 // GET API
 // ==============================
 
-function login(jsonParams) {
+function login(params) {
   const url = `/login/`;
-  return postRequestWithParams(url, jsonParams);
+  return postRequestWithParams(url, params);
 };
 
 function getTree(treeId) {
@@ -90,14 +88,19 @@ function getMunicipalitySustainability(municipality) {
 // POST API
 // ==============================
 
-function createTree(jsonParams) {
+function createTree(params) {
   const url = `/newtree/`;
-  return postRequest(url);
+  return postRequestWithParams(url, params);
 }
 
-function createUser(jsonParams) {
+function updateTree(params) {
+  const url = `/tree/update/`;
+  return patchRequestWithParams(url, params);
+}
+
+function createUser(params) {
   const url = `/newuser/`;
-  return postRequestWithParams(url, jsonParams);
+  return postRequestWithParams(url, params);
 }
 
 
@@ -117,8 +120,12 @@ function postRequestWithParams(url, params) {
   return AXIOS.post(url, params);
 };
 
+function patchRequestWithParams(url, params) {
+  return AXIOS.patch(url, params);
+}
+
 export {
-  getAllTrees, getAllTreeLocations, createTree,
+  getAllTrees, getTree, createTree, updateTree,
   getAllUsers, getUser, createUser,
   getAllSpecies,
   getAllLocations,

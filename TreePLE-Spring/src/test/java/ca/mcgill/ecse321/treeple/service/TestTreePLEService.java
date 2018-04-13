@@ -45,7 +45,9 @@ public class TestTreePLEService {
 
     @After
     public void tearDown() throws Exception {
-        service.resetDatabase();
+        JSONObject dbAccessKey = new JSONObject();
+        dbAccessKey.put("dbAccessKey", "ih8tr33s");
+        service.resetDatabase(dbAccessKey);
     }
 
     @Test
@@ -95,7 +97,7 @@ public class TestTreePLEService {
 
         try {
         	service.createUser(user);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
 
@@ -114,7 +116,7 @@ public class TestTreePLEService {
 
         try {
         	service.createUser(user);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
 
@@ -134,7 +136,7 @@ public class TestTreePLEService {
 
         try {
         	service.createUser(user);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
 
@@ -153,29 +155,11 @@ public class TestTreePLEService {
 
         try {
         	service.createUser(user);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
 
         assertEquals("Password cannot be empty!", error);
-    }
-    @Test
-    public void testCreateUserPasswordNonAlphanumeric() throws Exception {
-    	String error = "";
-        JSONObject user = new JSONObject();
-        user.put("username", "Yunus");
-        user.put("password", "*****@@@###$$$%%%%>>>??");
-        user.put("role", "Resident");
-        user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
-
-        try {
-        	service.createUser(user);
-        }catch(Exception e) {
-        	error = e.getMessage();
-        }
-
-        assertEquals("Password must be alphanumeric!", error);
     }
 
     @Test
@@ -190,7 +174,7 @@ public class TestTreePLEService {
 
         try {
         	service.createUser(user);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
 
@@ -687,7 +671,7 @@ public class TestTreePLEService {
 
         try {
             service.createTree(tree);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
         assertEquals(error, "Height cannot be negative!");
@@ -704,7 +688,7 @@ public class TestTreePLEService {
 
         try {
         	service.createTree(tree);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
         assertEquals(error, "Diameter cannot be negative!");
@@ -721,7 +705,7 @@ public class TestTreePLEService {
 
         try {
         	service.createTree(tree);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
         assertEquals(error, "That land type doesn't exist!");
@@ -738,7 +722,7 @@ public class TestTreePLEService {
 
         try {
         	service.createTree(tree);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
         assertEquals(error, "That ownership doesn't exist!");
@@ -755,7 +739,7 @@ public class TestTreePLEService {
 
         try {
         	service.createTree(tree);
-        }catch(Exception e) {
+        } catch (Exception e) {
         	error = e.getMessage();
         }
         assertEquals(error, "That status doesn't exist!");

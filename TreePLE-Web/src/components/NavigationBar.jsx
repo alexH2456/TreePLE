@@ -40,7 +40,6 @@ class NavigationBar extends PureComponent {
 
   render() {
     const {sustainability} = this.state;
-    console.log(sustainability);
 
     const stormwater = !!sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
     const co2Reduced = !!sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};

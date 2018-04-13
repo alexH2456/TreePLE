@@ -66,8 +66,8 @@ public class SQLiteJDBC {
             // Users DB Table
             String sqlUsers = "CREATE TABLE IF NOT EXISTS USERS "
                             + "(username VARCHAR(50) PRIMARY KEY NOT NULL,"
-                            + " password    VARCHAR(50) NOT NULL,"
-                            + " role        VARCHAR(50) NOT NULL,"
+                            + " password    VARCHAR(100) NOT NULL,"
+                            + " role        VARCHAR(50)  NOT NULL,"
                             + " myAddresses TEXT,"
                             + " myTrees     TEXT)";
 

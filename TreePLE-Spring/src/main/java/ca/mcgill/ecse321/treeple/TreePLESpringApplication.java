@@ -41,8 +41,8 @@ public class TreePLESpringApplication extends SpringBootServletInitializer {
 
     @Bean
     public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
         // Let the model matcher map corresponding fields by name
+        ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setFieldMatchingEnabled(true).setFieldAccessLevel(AccessLevel.PRIVATE);
         modelMapper.getConfiguration().setSourceNamingConvention(NamingConventions.NONE).setDestinationNamingConvention(NamingConventions.NONE);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
