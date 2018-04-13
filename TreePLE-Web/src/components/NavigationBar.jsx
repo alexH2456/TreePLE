@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 import {Menu, Divider, Image, Segment, Statistic} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
+import Logo from "../images/favicon.ico";
 
 class NavigationBar extends PureComponent {
   constructor(props) {
@@ -20,28 +21,26 @@ class NavigationBar extends PureComponent {
 
   componentWillMount() {
     getTreePLESustainability()
-      .then(response => {
-        console.log(response);
-
+      .then(({data}) => {
         this.setState({sustainability: {
-          stormwater: response.data.stormwater,
-          co2Reduced: response.data.co2Reduced,
-          biodiversity: response.data.biodiversity,
-          energyConserved: response.data.energyConserved
+          stormwater: data.stormwater,
+          co2Reduced: data.co2Reduced,
+          biodiversity: data.biodiversity,
+          energyConserved: data.energyConserved
         }});
       })
       .catch(error => {
         console.log(error);
-
       });
   }
 
   toggleSidebar = () => this.setState({showSidebar: !this.state.showSidebar});
 
+  onSustainabilityChange = (sustainability) => this.setState({sustainability: sustainability});
+
   render() {
     const {sustainability} = this.state;
     console.log(sustainability);
-    console.log(!!sustainability);
 
     const stormwater = !!sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
     const co2Reduced = !!sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};
@@ -50,9 +49,22 @@ class NavigationBar extends PureComponent {
 
     return (
       <div>
-        <Menu stackable fluid widths={5}>
-          <Menu.Item>
-            <Image as='Button' circular color='green' size='tiny' src='../images/favicon.ico' onClick={this.toggleSidebar}/>
+        <Menu size='small' stackable fluid widths={5}>
+
+          <Menu.Item onClick={this.toggleSidebar}>
+            <Image circular size='tiny' src={Logo}/>
+          </Menu.Item>
+
+          <Menu.Item
+            name='biodiversity'
+            fitted='vertically'
+          >
+            <Segment.Group horizontal size='mini'>
+              <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
+              <Segment>
+                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
+              </Segment>
+            </Segment.Group>
           </Menu.Item>
 
           <Menu.Item
@@ -84,18 +96,6 @@ class NavigationBar extends PureComponent {
           </Menu.Item>
 
           <Menu.Item
-            name='biodiversity'
-            fitted='vertically'
-          >
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
-              <Segment>
-                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
-
-          <Menu.Item
             name='energyConserved'
             fitted='vertically'
           >
@@ -108,8 +108,9 @@ class NavigationBar extends PureComponent {
               </Segment>
             </Segment.Group>
           </Menu.Item>
+
         </Menu>
-        <IconMenu show={this.state.showSidebar}/>
+        <IconMenu show={this.state.showSidebar} onSustainabilityChange={this.onSustainabilityChange}/>
       </div>
     );
   }

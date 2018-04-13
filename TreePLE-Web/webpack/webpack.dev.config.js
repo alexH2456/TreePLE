@@ -32,7 +32,11 @@ module.exports = {
         test: /\.s[a|c]ss$/,
         loaders: ['sass-loader', 'style-loader', 'css-loader']
       }, {
-        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\.(html)$/,
+        loader: 'html-loader'
+      }, {
+        test: /\.(png|jpg|gif|svg|ico|eot|ttf|woff|woff2)$/,
+        include: /images/,
         use: {
           loader: 'url-loader',
           options: {
@@ -46,6 +50,10 @@ module.exports = {
     new webpack.DefinePlugin({
       serverHost: JSON.stringify('localhost'),
       serverPort: JSON.stringify('8088')
+    // }),
+    // new HtmlWebpackPlugin({
+    //   title: 'TreePLE',
+    //   favicon: '/src/images/favicon.ico'
     })
   ],
   resolve: {

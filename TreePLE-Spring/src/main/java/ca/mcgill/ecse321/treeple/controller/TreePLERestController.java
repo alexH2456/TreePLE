@@ -141,11 +141,6 @@ public class TreePLERestController {
         return forecasts;
     }
 
-    @GetMapping(value = {"/treeple/sustainability/"})
-    public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
-        return service.getTreePLESustainability();
-    }
-
 
     // ==============================
     // GET ONE MAPPING API
@@ -191,6 +186,15 @@ public class TreePLERestController {
     public ForecastDto getForecastById(@PathVariable("forecastid") int forecastId) throws Exception {
         Forecast forecast = service.getForecastById(forecastId);
         return convertToDto(forecast);
+    }
+
+    @GetMapping(value = {"/sustainability/{group}"})
+    public Map<String, Map<String, Double>> getGroupSustainability(@PathVariable("group") String group) throws Exception {
+        if (group.equals("treeple")) {
+            return service.getGroupSustainability(service.getAllTrees());
+        } else {
+            return service.getGroupSustainability(service.getAllTreesOfMunicipality(group));
+        }
     }
 
 

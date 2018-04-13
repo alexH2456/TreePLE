@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Sidebar, Segment, Button, Menu, Image, Icon, Header} from 'semantic-ui-react';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
-import TreeMapContainer from './TreeMapContainer';
+import TreeMap from './TreeMap';
 
 class IconMenu extends PureComponent {
   constructor(props) {
@@ -45,18 +45,17 @@ class IconMenu extends PureComponent {
                 </Button>
               </Menu.Item>
               </div>
-            ) : null}
-            {localStorage.getItem('username') !== null ? (
+            ) : (
               <Menu.Item link name='logout'>
                 <Button basic color='black' name='logout' onClick={this.handleLogOut}>
                   Log Out
                 </Button>
               </Menu.Item>
-            ) : null}
+            )}
           </Sidebar>
           <Sidebar.Pusher>
             <Segment basic>
-              <TreeMapContainer/>
+              <TreeMap onSustainabilityChange={this.props.onSustainabilityChange} random={5}/>
             </Segment>
           </Sidebar.Pusher>
         </Sidebar.Pushable>

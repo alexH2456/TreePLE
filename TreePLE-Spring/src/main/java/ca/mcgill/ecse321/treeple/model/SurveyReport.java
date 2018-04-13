@@ -20,7 +20,7 @@ public class SurveyReport
 
   //SurveyReport Attributes
   private Date reportDate;
-  private String reportingUser;
+  private String reportUser;
 
   //Autounique Attributes
   private int reportId;
@@ -29,10 +29,10 @@ public class SurveyReport
   // CONSTRUCTOR
   //------------------------
 
-  public SurveyReport(Date aReportDate, String aReportingUser)
+  public SurveyReport(Date aReportDate, String aReportUser)
   {
     reportDate = aReportDate;
-    reportingUser = aReportingUser;
+    reportUser = aReportUser;
     reportId = nextReportId++;
   }
 
@@ -48,10 +48,10 @@ public class SurveyReport
     return wasSet;
   }
 
-  public boolean setReportingUser(String aReportingUser)
+  public boolean setReportUser(String aReportUser)
   {
     boolean wasSet = false;
-    reportingUser = aReportingUser;
+    reportUser = aReportUser;
     wasSet = true;
     return wasSet;
   }
@@ -61,9 +61,9 @@ public class SurveyReport
     return reportDate;
   }
 
-  public String getReportingUser()
+  public String getReportUser()
   {
-    return reportingUser;
+    return reportUser;
   }
 
   public int getReportId()
@@ -75,9 +75,9 @@ public class SurveyReport
   {}
 
   // line 162 "../../../../../TreePLE.ump"
-   public  SurveyReport(Date aReportDate, String aReportingUser, int aReportId){
+   public  SurveyReport(Date aReportDate, String aReportUser, int aReportId){
     reportDate = aReportDate;
-    reportingUser = aReportingUser;
+    reportUser = aReportUser;
     reportId = aReportId;
   }
 
@@ -99,7 +99,7 @@ public class SurveyReport
   {
     return super.toString() + "["+
             "reportId" + ":" + getReportId()+ "," +
-            "reportingUser" + ":" + getReportingUser()+ "]" + System.getProperties().getProperty("line.separator") +
+            "reportUser" + ":" + getReportUser()+ "]" + System.getProperties().getProperty("line.separator") +
             "  " + "reportDate" + "=" + (getReportDate() != null ? !getReportDate().equals(this)  ? getReportDate().toString().replaceAll("  ","    ") : "this" : "null");
   }
 }

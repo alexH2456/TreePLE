@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import IconMenu from './components/IconMenu';
 import NavigationBar from './components/NavigationBar';
-import TreeMapContainer from './components/TreeMapContainer';
+import TreeMap from './components/TreeMap';
 
 // CSS Sheets
 
@@ -20,7 +20,7 @@ if (url.includes('/about')) {
 } else if (url.includes('/menu')) {
   component = <IconMenu/>;
 } else if (url.includes('/map')) {
-    component = <TreeMapContainer/>;
+    component = <TreeMap/>;
 } else {
   component = <NavigationBar/>;
 }

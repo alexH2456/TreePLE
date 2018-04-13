@@ -1,7 +1,6 @@
 package ca.mcgill.ecse321.treeple.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,13 +19,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ca.mcgill.ecse321.treeple.dto.TreeDto;
-import ca.mcgill.ecse321.treeple.model.Location;
-import ca.mcgill.ecse321.treeple.model.SurveyReport;
-import ca.mcgill.ecse321.treeple.model.Tree;
-import ca.mcgill.ecse321.treeple.model.Tree.Land;
-import ca.mcgill.ecse321.treeple.model.Tree.Ownership;
-import ca.mcgill.ecse321.treeple.model.Tree.Status;
+import ca.mcgill.ecse321.treeple.dto.*;
+import ca.mcgill.ecse321.treeple.model.*;
+import ca.mcgill.ecse321.treeple.model.Tree.*;
 import ca.mcgill.ecse321.treeple.service.TestTreePLEService;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
@@ -65,10 +60,10 @@ public class TestTreePLERestController {
 //    	for (int i = 0; i < 4; i++) {
 //            mockService.createTree(testTree);
 //        }
-//    	
+//
 //    	try {
 //    		List<TreeDto> trees = mockController.getAllTrees();
-//    		
+//
 //    		for(TreeDto treeDto: trees) {
 //                assertEquals(testTree.getInt("treeId"), treeDto.getTreeId());
 //                assertEquals(testTree.getInt("height"), treeDto.getHeight());
@@ -94,8 +89,8 @@ public class TestTreePLERestController {
             .andExpect(content().contentType(APPLICATION_JSON_UTF8))
             .andExpect(content().string("[]"));
     }
-    
-    
+
+
 
     @Test
     public void testGetAllUsersEmptyDB() throws Exception {
