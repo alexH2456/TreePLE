@@ -51,11 +51,6 @@ public class TestTreePLERestController {
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(mockController).build();
-        testTree = TestTreePLEService.buildTestTree();
-        testUser = TestTreePLEService.buildTestUser();
-        testSpecies = TestTreePLEService.buildTestSpecies();
-        testLocation = TestTreePLEService.buildTestLocation();
-        testMunicipality = TestTreePLEService.buildTestMunicipality();
     }
 //    @Test
 //    public void testGetAllTrees() throws Exception{
