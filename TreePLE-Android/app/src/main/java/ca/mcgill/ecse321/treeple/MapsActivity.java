@@ -2,6 +2,7 @@ package ca.mcgill.ecse321.treeple;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -26,7 +27,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -61,9 +61,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import ca.mcgill.ecse321.treeple.utils.DatePickerFragment;
+import ca.mcgill.ecse321.treeple.utils.InvalidInputException;
+import ca.mcgill.ecse321.treeple.utils.VolleyController;
+
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    //TODO: Move popups for adding new trees/updating tree info to activities
+    //TODO: Add forecasting functionality for Scientists
+    //TODO: Add creating species for Scientists
+    //TODO: Remove debug methods before submission(getUser)
 
     private GoogleMap mMap;
 
@@ -131,12 +140,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             refreshUser();
             populateMap();
         } else if (item.getItemId() == R.id.loggedin_user) {
+            // Debug method, remove before release
             Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.logout_button) {
+            switchToLogin();
         } else if (item.getItemId() == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void switchToLogin() {
+        Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 
     @Override
@@ -349,7 +367,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, error.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "SpinnerDataError: " + backendResponse);
             }
         });
 
@@ -411,7 +430,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PopulateError: " + error.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "PopulateError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -457,7 +477,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "UserRefreshError: " + error.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "UserRefreshError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_LONG).show();
             }
         });
@@ -692,7 +713,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PlantError: " + error.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "PlantError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -731,7 +753,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "CutError: " + error.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "CutError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -804,16 +827,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     plantObj.put("tree", treeObj);
 
-                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "trees/update/", plantObj, new Response.Listener<JSONObject>() {
+                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "tree/update/", plantObj, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            System.out.println("PlantResponse: " + response.toString());
+                            Log.e(TAG, "PlantResponse: " + response.toString());
                             popupWindow.dismiss();
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "UpdateError: " + error.toString());
+                            String backendResponse = VolleyController.parseNetworkResponse(error);
+                            Log.e(TAG, "UpdateError: " + backendResponse);
                             Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
                         }
                     });

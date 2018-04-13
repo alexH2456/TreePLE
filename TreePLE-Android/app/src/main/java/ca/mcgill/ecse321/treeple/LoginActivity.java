@@ -27,18 +27,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,11 +44,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import ca.mcgill.ecse321.treeple.utils.InputStreamVolleyRequest;
+import ca.mcgill.ecse321.treeple.utils.PasswordHash;
+import ca.mcgill.ecse321.treeple.utils.VolleyController;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -80,11 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    try {
-                        attemptLogin();
-                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    }
+                    attemptLogin();
                     return true;
                 }
                 return false;
@@ -95,11 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    attemptLogin();
-                } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
+                attemptLogin();
             }
         });
 
@@ -111,14 +102,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //Debug method
-//        Button gotoMapButton = findViewById(R.id.action_goto_map);
-//        gotoMapButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                switchToMap();
-//            }
-//        });
+        Button resetPassButton = findViewById(R.id.reset_password_button);
+        resetPassButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchToResetPassword();
+            }
+        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -127,6 +117,12 @@ public class LoginActivity extends AppCompatActivity {
     public void switchToRegister() {
         Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
         startActivity(registerIntent);
+        finish();
+    }
+
+    public void switchToResetPassword() {
+        Intent resetIntent = new Intent(getApplicationContext(), ResetPasswordActivity.class);
+        startActivity(resetIntent);
         finish();
     }
 
@@ -234,7 +230,7 @@ public class LoginActivity extends AppCompatActivity {
      * If there are form errors (invalid user, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    private void attemptLogin() {
         if (mAuthTask != null) {
             return;
         }
@@ -350,29 +346,33 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
 
+            JSONObject userObj = new JSONObject();
+            try {
+                userObj.put("username", mUsername);
+                userObj.put("password", PasswordHash.generatePasswordHash(mPassword));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             RequestFuture<JSONObject> loginReq = RequestFuture.newFuture();
-            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + mUsername + "/", new JSONObject(), loginReq, loginReq);
+            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "login/", userObj, loginReq, loginReq);
             VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
             try {
                 user = loginReq.get(5, TimeUnit.SECONDS);
                 if (user != null) {
-                    if (PasswordHash.validatePassword(mPassword, user.getString("password"))) {
-                        loggedInUser = user;
-                        loggedIn = true;
-                        noAccount = false;
-                    }
+                    loggedInUser = user;
+                    loggedIn = true;
+                    noAccount = false;
                 }
             } catch (InterruptedException | ExecutionException e) {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
-                    NetworkResponse networkResponse = volleyError.networkResponse;
-                    Log.e(TAG, "Backend error: " + networkResponse.toString());
+                    String backendResponse = VolleyController.parseNetworkResponse(volleyError);
+                    Log.e(TAG, "Backend error: " + backendResponse);
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG, "Timeout occurred when waiting for response");
-            } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-                e.printStackTrace();
             }
             return loggedIn;
         }

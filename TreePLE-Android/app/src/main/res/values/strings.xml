@@ -60,6 +60,12 @@
     <string name="user_refresh">Get User</string>
     <string name="prompt_role_pass">Role Password</string>
     <string name="update_tree_button">Update Tree</string>
+    <string name="reset_password">Change Password</string>
+    <string name="prompt_old_password">Old Password</string>
+    <string name="prompt_new_password">New Password</string>
+    <string name="prompt_new_pass_reentry">Reenter New Password</string>
+    <string name="title_reset_pass">Change Password</string>
+    <string name="logout_button">Logout</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>

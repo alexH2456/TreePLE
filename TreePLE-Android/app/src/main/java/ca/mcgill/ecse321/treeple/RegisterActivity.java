@@ -23,7 +23,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -32,18 +31,19 @@ import com.android.volley.toolbox.RequestFuture;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.mcgill.ecse321.treeple.utils.PasswordHash;
+import ca.mcgill.ecse321.treeple.utils.VolleyController;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private UserLoginTask mAuthTask = null;
-    private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final String TAG = RegisterActivity.class.getSimpleName();
 
     // UI references.
     private EditText mUserView;
@@ -105,11 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    try {
-                        attemptRegister();
-                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    }
+                    attemptRegister();
                     return true;
                 }
                 return false;
@@ -120,11 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
         mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    attemptRegister();
-                } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
+                attemptRegister();
             }
         });
 
@@ -166,7 +158,7 @@ public class RegisterActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptRegister() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    private void attemptRegister() {
 
         if (mAuthTask != null) {
             return;
@@ -184,7 +176,7 @@ public class RegisterActivity extends AppCompatActivity {
         String password = mPasswordView.getText().toString();
         String reenter = mReenterView.getText().toString();
         String role = mRoleView.getSelectedItem().toString();
-        String postalCode = mPostalView.getText().toString();
+        String postalCode = mPostalView.getText().toString().toUpperCase();
         String rolePass = "";
 
         boolean cancel = false;
@@ -330,9 +322,9 @@ public class RegisterActivity extends AppCompatActivity {
         private JSONObject user;
         private boolean accountExists = false;
 
-        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) {
             mUsername = username;
-            mPassword = PasswordHash.generateStrongPasswordHash(password);
+            mPassword = PasswordHash.generatePasswordHash(password);
             mRole = role;
             mPostalCode = postalCode;
             mRolePass = rolePass;
@@ -354,8 +346,8 @@ public class RegisterActivity extends AppCompatActivity {
             } catch (InterruptedException | ExecutionException e) {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
-                    NetworkResponse networkResponse = volleyError.networkResponse;
-                    Log.e(TAG, "Backend error: " + networkResponse.toString());
+                    String backendResponse = VolleyController.parseNetworkResponse(volleyError);
+                    Log.e(TAG, "Backend error: " + backendResponse);
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG,"Timeout occurred when waiting for response");
@@ -373,6 +365,8 @@ public class RegisterActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+            System.out.println(user.toString());
+
             RequestFuture<JSONObject> newAccountReq = RequestFuture.newFuture();
             JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newuser/", user, newAccountReq, newAccountReq);
             VolleyController.getInstance(getApplicationContext()).addToRequestQueue(accountReq);
@@ -383,8 +377,8 @@ public class RegisterActivity extends AppCompatActivity {
             } catch (InterruptedException | ExecutionException e) {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
-                    NetworkResponse networkResponse = volleyError.networkResponse;
-                    Log.e(TAG, "Backend error: " + networkResponse.allHeaders.toString());
+                    String backendResponse = VolleyController.parseNetworkResponse(volleyError);
+                    Log.e(TAG, "Backend error: " + backendResponse);
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG,"Timeout occurred when waiting for response");
