@@ -1077,16 +1077,125 @@ public class TestTreePLEService {
             assertEquals("No Location with that ID exists!", error);
     }
 
-    //TODO
     // ==============================
     // GET SURVEY REPORT BY ID TEST
     // ==============================
 
-    //TODO
+    @Test
+    public void testGetSurveyReportById() throws Exception {
+    	service.createMunicipality(testMunicipality);
+    	service.createSpecies(testSpecies);
+    	service.createUser(testUser);
+    	Tree tree = service.createTree(testTree);
+    	
+    	SurveyReport report = tree.getReport(0);
+    	
+    	try {
+    		SurveyReport databaseReport = service.getSurveyReportById(report.getReportId());
+    		assertEquals(report.getReportDate().toString(), databaseReport.getReportDate().toString());
+    		assertEquals(report.getReportId(), databaseReport.getReportId());
+    		assertEquals(report.getReportUser(),databaseReport.getReportUser());
+    	}catch(Exception e) {
+    		fail();
+    	}
+    }
+    
+    @Test
+    public void testGetSurveyReportByIdNegativeId() {
+    	String error = "";
+    	try {
+    		service.getSurveyReportById(-1);
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	assertEquals("Report's ID cannot be negative!", error);
+    }
+    
+    @Test
+    public void testGetSurveyReportByIdReportDNE() {
+    	String error = "";
+    	try {
+    		service.getSurveyReportById(SurveyReport.getNextReportId());
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	assertEquals("No Survey Report with that ID exists!", error);
+    }
+    
     // ==============================
     // GET FORECAST BY ID TEST
     // ==============================
+    
+    @Test
+    public void testGetForecastById() throws Exception {
+    	JSONObject testForecast = new JSONObject();
+        JSONArray trees = new JSONArray();
 
+        service.createUser(testUser);
+        service.createSpecies(testSpecies);
+        service.createMunicipality(testMunicipality);
+
+        for (int i = 0; i < 4; i++) {
+            Tree tree = service.createTree(testTree);
+            trees.put(tree.getTreeId());
+        }
+
+        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcUser", "Abbas");
+        testForecast.put("fcTrees", trees);
+        
+        Forecast forecast = service.createForecast(testForecast);
+        
+        try {
+        	Forecast databaseForecast = service.getForecastById(forecast.getForecastId());
+        	for(int i = 0; i < databaseForecast.getFcTrees().size(); i++) {
+        		Tree fcTree = forecast.getFcTree(i);
+                Tree dbTree = databaseForecast.getFcTree(i);
+                assertEquals(fcTree.getHeight(), dbTree.getHeight());
+                assertEquals(fcTree.getDiameter(), dbTree.getDiameter());
+                assertEquals(fcTree.getAddress(),dbTree.getAddress());
+                assertEquals(fcTree.getDatePlanted(),dbTree.getDatePlanted());
+                assertEquals(fcTree.getLand(),dbTree.getLand());
+                assertEquals(fcTree.getLocation().getLatitude(),dbTree.getLocation().getLatitude(),0);
+                assertEquals(fcTree.getLocation().getLongitude(),dbTree.getLocation().getLongitude(),0);
+                assertEquals(fcTree.getMunicipality(),dbTree.getMunicipality());
+                assertEquals(fcTree.getOwnership(), dbTree.getOwnership());
+                assertEquals(fcTree.getSpecies(), dbTree.getSpecies());
+                assertEquals(fcTree.getStatus(), dbTree.getStatus());
+        	}
+        	assertEquals(forecast.getBiodiversity(),databaseForecast.getBiodiversity(),0.01);
+        	assertEquals(forecast.getCo2Reduced(), databaseForecast.getCo2Reduced(), 0.01);
+        	assertEquals(forecast.getEnergyConserved(), databaseForecast.getEnergyConserved(), 0.01);
+        	assertEquals(forecast.getStormwater(), databaseForecast.getStormwater(), 0.01);
+        	assertEquals(forecast.getFcDate().toString(), forecast.getFcDate().toString());
+        	assertEquals(forecast.getFcUser(),databaseForecast.getFcUser());
+        	assertEquals(forecast.getForecastId(),databaseForecast.getForecastId());
+        	
+        }catch(Exception e) {
+        	fail();
+        }
+    }
+    @Test
+    public void testGetForecastByIdNegativeId() {
+    	String error = "";
+    	try {
+    		service.getForecastById(-1);
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	assertEquals("Forecast's ID cannot be negative!", error);
+    }
+    
+    @Test
+    public void testGetForecastByIdReportDNE() {
+    	String error = "";
+    	try {
+    		service.getForecastById(Forecast.getNextForecastId());
+    	}catch(Exception e) {
+    		error = e.getMessage();
+    	}
+    	assertEquals("No Forecast with that ID exists!", error);
+    }
     //TODO
     // ==============================
     // GET TREES OF USER
@@ -1564,6 +1673,7 @@ public class TestTreePLEService {
         assertEquals(error, "Municipality does not exist!");
     }
 
+    //TODO
     // ==============================
     // UPDATE USER TEST
     // ==============================
