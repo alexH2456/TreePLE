@@ -633,6 +633,7 @@ public class TreePLEService {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
+        String scientistKey = jsonParams.getString("scientistKey");
         String myAddresses = jsonParams.getString("myAddresses");
 
         User user;
@@ -648,6 +649,8 @@ public class TreePLEService {
             throw new InvalidInputException("That role doesn't exist!");
         if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
             throw new InvalidInputException("Address cannot be empty!");
+        if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
+            throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
         user.setPassword(password);
         user.setRole(UserRole.valueOf(role));
@@ -1046,13 +1049,13 @@ public class TreePLEService {
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-            energyCoefficient = 0.7145;
-        } else if (landType == Land.Residential) {
-            energyCoefficient = 0.8874;
-        } else if (landType == Land.Institutional) {
             energyCoefficient = 0.9010;
+        } else if (landType == Land.Residential) {
+            energyCoefficient = 0.8374;
+        } else if (landType == Land.Institutional) {
+            energyCoefficient = 0.7505;
         } else if (landType == Land.Municipal) {
-            energyCoefficient = 0.8896;
+            energyCoefficient = 0.8394;
         }
 
         // Average diameter of a tree is 50
