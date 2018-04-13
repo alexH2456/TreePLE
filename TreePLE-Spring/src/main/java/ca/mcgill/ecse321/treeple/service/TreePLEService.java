@@ -107,7 +107,6 @@ public class TreePLEService {
             throw new InvalidInputException("That ownership doesn't exist!");
 
         String address = "";
-        String postalCode = "";
         try {
             String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
                                             latitude, longitude, gmapsKey);
@@ -116,8 +115,7 @@ public class TreePLEService {
             if (statusCode >= 200 && statusCode < 300) {
                 JSONObject gmapsJSON = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
                 JSONArray addressInfo = gmapsJSON.getJSONArray("results").getJSONObject(0).getJSONArray("address_components");
-                address = gmapsJSON.getJSONArray("results").getJSONObject(0).getString("place_id");
-                postalCode = addressInfo.getJSONObject(addressInfo.length() - 1).getString("long_name").replaceAll("\\s", "");
+                address = addressInfo.getJSONObject(addressInfo.length() - 1).getString("long_name").replaceAll("\\s", "");
             } else if (statusCode >= 400) {
                 throw new InvalidInputException("Invalid Google Maps API request!");
             }
@@ -133,7 +131,7 @@ public class TreePLEService {
         Municipality municipalityObj;
         if ((userObj = sql.getUser(username)) == null)
             throw new InvalidInputException("User does not exist!");
-        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), postalCode))
+        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), address))
             throw new InvalidInputException("You cannot plant on someone else's property!");
         if ((speciesObj = sql.getSpecies(species)) == null)
             throw new InvalidInputException("Species does not exist!");
@@ -1051,7 +1049,7 @@ public class TreePLEService {
         }
 
         // Average diameter of a tree is 50
-        double diameterCoefficient = tree.getDiameter()/50;
+        double diameterCoefficient = tree.getDiameter()/50.0;
 
         return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
     }
