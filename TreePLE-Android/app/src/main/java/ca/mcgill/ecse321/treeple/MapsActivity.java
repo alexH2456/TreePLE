@@ -70,7 +70,6 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     //TODO: Move popups for adding new trees/updating tree info to activities
-    //TODO: Add forecasting functionality for Scientists
     //TODO: Add creating species for Scientists
     //TODO: Remove debug methods before submission(getUser)
 
@@ -131,6 +130,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
+        try {
+            if (LoginActivity.loggedInUser.getString("role").equals("Scientist")) {
+                MenuItem item = menu.findItem(R.id.create_species);
+                item.setVisible(true);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -144,6 +151,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.logout_button) {
             switchToLogin();
+        } else if (item.getItemId() == R.id.create_species) {
+            showSpeciesPopup();
         } else if (item.getItemId() == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
@@ -843,6 +852,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     });
 
                     VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -855,6 +865,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onDismiss() {
                 populateMap();
                 refreshUser();
+            }
+        });
+    }
+
+    public void showSpeciesPopup() {
+
+        LinearLayout mapsLayout = findViewById(R.id.map_layout);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        assert inflater != null;
+        popupView = inflater.inflate(R.layout.species_popup, null);
+
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        final EditText speciesName = popupView.findViewById(R.id.species_name);
+        final EditText speciesGenus = popupView.findViewById(R.id.species_genus);
+        final EditText speciesSpecies = popupView.findViewById(R.id.species_species);
+        Button addSpeciesButton = popupView.findViewById(R.id.add_species_button);
+
+        popupWindow = new PopupWindow(popupView, width, height, true);
+        popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
+
+        addSpeciesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONObject speciesObj = new JSONObject();
+                try {
+                    speciesObj.put("name", speciesName.getText().toString());
+                    speciesObj.put("genus", speciesGenus.getText().toString());
+                    speciesObj.put("species", speciesSpecies.getText().toString());
+
+                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newspecies/", speciesObj, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e(TAG, "SpeciesResponse: " + response.toString());
+                            popupWindow.dismiss();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            String backendResponse = VolleyController.parseNetworkResponse(error);
+                            Log.e(TAG, "SpeciesError: " + backendResponse);
+                            Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

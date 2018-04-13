@@ -154,6 +154,13 @@ public class ResetPasswordActivity extends AppCompatActivity{
                     JSONObject updatedUser = new JSONObject();
                     updatedUser.put("username", response.getString("username"));
                     updatedUser.put("role", response.getString("role"));
+
+                    if (updatedUser.getString("role").equals("Scientist")) {
+                        updatedUser.put("scientistKey", "i<3tr33s");
+                    } else {
+                        updatedUser.put("scientistKey", "");
+                    }
+
                     updatedUser.put("myAddresses", response.getJSONArray("myAddresses"));
 
                     String newPassHashed = PasswordHash.generatePasswordHash(newPass);
