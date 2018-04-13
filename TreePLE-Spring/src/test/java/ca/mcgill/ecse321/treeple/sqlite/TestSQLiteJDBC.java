@@ -375,7 +375,7 @@ public class TestSQLiteJDBC {
         boolean success = sql.insertSpecies(defaultSpecies.getString("name"), defaultSpecies.getString("species"), defaultSpecies.getString("genus"));
         assertEquals(true, success);
 
-    	int treeId = 1;
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -393,24 +393,24 @@ public class TestSQLiteJDBC {
         sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
         sql.insertTree(treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
 
-    	try {
-    		ArrayList<Tree> trees = sql.getAllTreesOfSpecies("Maple");
-    		for(Tree tree : trees) {
-    			assertEquals(tree.getTreeId(), treeId);
-    	        assertEquals(tree.getHeight(), height);
-    	        assertEquals(tree.getDiameter(), diameter);
-    	        assertEquals(tree.getAddress(), address);
-    	        assertEquals(tree.getDatePlanted().toString(), datePlanted);
-    	        assertEquals(tree.getLand().name(), land);
-    	        assertEquals(tree.getStatus().name(), status);
-    	        assertEquals(tree.getOwnership().name(), ownership);
-    	        assertEquals(tree.getSpecies().getName(), species);
-    	        assertEquals(tree.getLocation().getLocationId(), location);
-    	        assertEquals(tree.getMunicipality().getName(), municipality);
-    		}
-    	} catch (Exception e) {
-    		fail();
-    	}
+        try {
+            ArrayList<Tree> trees = sql.getAllTreesOfSpecies("Maple");
+            for(Tree tree : trees) {
+                assertEquals(tree.getTreeId(), treeId);
+                assertEquals(tree.getHeight(), height);
+                assertEquals(tree.getDiameter(), diameter);
+                assertEquals(tree.getAddress(), address);
+                assertEquals(tree.getDatePlanted().toString(), datePlanted);
+                assertEquals(tree.getLand().name(), land);
+                assertEquals(tree.getStatus().name(), status);
+                assertEquals(tree.getOwnership().name(), ownership);
+                assertEquals(tree.getSpecies().getName(), species);
+                assertEquals(tree.getLocation().getLocationId(), location);
+                assertEquals(tree.getMunicipality().getName(), municipality);
+            }
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
@@ -623,7 +623,7 @@ public class TestSQLiteJDBC {
         success = sql.insertSpecies(defaultSpecies.getString("name"), defaultSpecies.getString("species"), defaultSpecies.getString("genus"));
         assertEquals(true, success);
 
-    	int treeId = 1;
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -641,28 +641,28 @@ public class TestSQLiteJDBC {
         sql.insertTree(treeId, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
 
         try {
-        	ArrayList<Tree> trees = sql.getAllTreesOfMunicipality(defaultMun.getString("name"));
-        	for(Tree tree: trees) {
-        		assertEquals(tree.getTreeId(), treeId);
-    	        assertEquals(tree.getHeight(), height);
-    	        assertEquals(tree.getDiameter(), diameter);
-    	        assertEquals(tree.getAddress(), address);
-    	        assertEquals(tree.getDatePlanted().toString(), datePlanted);
-    	        assertEquals(tree.getLand().name(), land);
-    	        assertEquals(tree.getStatus().name(), status);
-    	        assertEquals(tree.getOwnership().name(), ownership);
-    	        assertEquals(tree.getSpecies().getName(), species);
-    	        assertEquals(tree.getLocation().getLocationId(), location);
-    	        assertEquals(tree.getMunicipality().getName(), municipality);
-        	}
+            ArrayList<Tree> trees = sql.getAllTreesOfMunicipality(defaultMun.getString("name"));
+            for(Tree tree: trees) {
+                assertEquals(tree.getTreeId(), treeId);
+                assertEquals(tree.getHeight(), height);
+                assertEquals(tree.getDiameter(), diameter);
+                assertEquals(tree.getAddress(), address);
+                assertEquals(tree.getDatePlanted().toString(), datePlanted);
+                assertEquals(tree.getLand().name(), land);
+                assertEquals(tree.getStatus().name(), status);
+                assertEquals(tree.getOwnership().name(), ownership);
+                assertEquals(tree.getSpecies().getName(), species);
+                assertEquals(tree.getLocation().getLocationId(), location);
+                assertEquals(tree.getMunicipality().getName(), municipality);
+            }
         } catch (Exception e) {
-        	fail();
+            fail();
         }
     }
 
     @Test
     public void testGetTreeCountOfMunicipality() {
-    	boolean success = sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
+        boolean success = sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
         assertEquals(true, success);
         int treeId = 1;
         int height = 10;
@@ -688,15 +688,15 @@ public class TestSQLiteJDBC {
         assertEquals(true, success);
 
         for(int i = 0; i < defaultMun.getInt("totalTrees"); i++) {
-	        success = sql.insertTree(treeId+i, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
-	        assertEquals(true, success);
+            success = sql.insertTree(treeId+i, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
+            assertEquals(true, success);
         }
 
         try {
-        	int treeCount = sql.getTreeCountOfMunicipality(defaultMun.getString("name"));
-        	assertEquals(treeCount, defaultMun.getInt("totalTrees"));
+            int treeCount = sql.getTreeCountOfMunicipality(defaultMun.getString("name"));
+            assertEquals(treeCount, defaultMun.getInt("totalTrees"));
         } catch (Exception e) {
-        	fail();
+            fail();
         }
     }
     @Test
@@ -741,7 +741,7 @@ public class TestSQLiteJDBC {
 
     @Test
     public void testUpdateMunicipalityIncDecTrees() {
-    	boolean success = sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
+        boolean success = sql.insertMunicipality(defaultMun.getString("name"), defaultMun.getInt("totalTrees"), defaultMun.getString("borders"));
         assertEquals(true, success);
         int treeId = 1;
         int height = 10;
@@ -767,16 +767,16 @@ public class TestSQLiteJDBC {
         assertEquals(true, success);
 
         for(int i = 0; i < defaultMun.getInt("totalTrees"); i++) {
-	        success = sql.insertTree(treeId+i, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
-	        assertEquals(true, success);
+            success = sql.insertTree(treeId+i, height, diameter, address, datePlanted, land, status, ownership, species, location, municipality, reports);
+            assertEquals(true, success);
         }
 
         try {
-        	success = sql.updateMunicipalityIncDecTotalTrees(defaultMun.getString("name"), 1);
-        	assertEquals(true, success);
-        	assertEquals(defaultMun.getInt("totalTrees")+1, sql.getMunicipality(defaultMun.getString("name")).getTotalTrees());
+            success = sql.updateMunicipalityIncDecTotalTrees(defaultMun.getString("name"), 1);
+            assertEquals(true, success);
+            assertEquals(defaultMun.getInt("totalTrees")+1, sql.getMunicipality(defaultMun.getString("name")).getTotalTrees());
         } catch (Exception e) {
-        	fail();
+            fail();
         }
     }
 

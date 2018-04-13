@@ -418,40 +418,40 @@
     "password": "memegod",
     "role": "Resident",
     "scientistKey": "",
-    "myAddresses": "H4L3N1"
+    "myAddresses": ["H4L3N1"]
 }
 {
     "username": "Fetish",
     "password": "meme123",
     "role": "Resident",
     "scientistKey": "",
-    "myAddresses": "J7T"
+    "myAddresses": ["J7T"]
 }
 {
     "username": "Gareth",
     "password": "gingerboi",
     "role": "Scientist",
     "scientistKey": "i<3tr33s",
-    "myAddresses": "H4A2X8"
+    "myAddresses": ["H4A2X8"]
 }
 {
     "username": "Filip",
     "password": "filipino",
     "role": "Scientist",
     "scientistKey": "i<3tr33s",
-    "myAddresses": "J5A1R4"
+    "myAddresses": ["J5A1R4"]
 }
 {
     "username": "Yunus",
     "password": "turkishboi",
     "role": "Scientist",
     "scientistKey": "i<3tr33s",
-    "myAddresses": "J5A1R4"
+    "myAddresses": ["J5A1R4"]
 }
 {
     "username": "Admin",
     "password": "guccigang",
     "role": "Scientist",
     "scientistKey": "i<3tr33s",
-    "myAddresses": ""
+    "myAddresses": [""]
 }
