@@ -28,8 +28,6 @@ class IconMenu extends PureComponent {
   handleLogOut = () => localStorage.clear();
 
   render() {
-    console.log(this.props);
-
     return (
       <div>
         <Sidebar.Pushable as={Segment}>

@@ -17,7 +17,6 @@ class NavigationBar extends PureComponent {
         energyConserved: {factor: 0, worth: 0}
       }
     };
-    this.onSustainabilityChange = this.onSustainabilityChange.bind(this);
   }
 
   componentWillMount() {
@@ -37,12 +36,7 @@ class NavigationBar extends PureComponent {
 
   toggleSidebar = () => this.setState({showSidebar: !this.state.showSidebar});
 
-  // onSustainabilityChange = (sustainability) => this.setState({sustainability: sustainability});
-  onSustainabilityChange(sustainability) {
-    console.log(sustainability);
-
-    this.setState({sustainability: sustainability});
-  }
+  onSustainabilityChange = (sustainability) => this.setState({sustainability: sustainability});
 
   render() {
     const {sustainability} = this.state;

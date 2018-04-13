@@ -30,11 +30,6 @@ function getAllTrees() {
   return getRequest(url);
 };
 
-function getAllTreeLocations() {
-  const url = `/trees/?query=locations`;
-  return getRequest(url);
-}
-
 function getAllUsers() {
   const url = `/users/`;
   return getRequest(url);
