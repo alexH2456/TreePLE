@@ -243,13 +243,13 @@ public class TreePLERestController {
     // PATCH MAPPING API
     // ==============================
 
-    @PatchMapping(value = {"/trees/update/"})
+    @PatchMapping(value = {"/tree/update/"})
     public TreeDto updateTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.updateTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
-    @PatchMapping(value = {"/users/update/"})
+    @PatchMapping(value = {"/user/update/"})
     public UserDto patchDto(@RequestBody String jsonBody) throws Exception {
         User user = service.updateUser(new JSONObject(jsonBody));
         return convertToDto(user);
@@ -261,7 +261,7 @@ public class TreePLERestController {
         return convertToDto(species);
     }
 
-    @PatchMapping(value = {"/municipalities/update/"})
+    @PatchMapping(value = {"/municipality/update/"})
     public MunicipalityDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.updateMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
