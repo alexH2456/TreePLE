@@ -1876,25 +1876,6 @@ public class TestTreePLEService {
 
         assertEquals("Password cannot be empty!", error);
     }
-    @Test
-    public void testUpdateUserPasswordNonAlphanumeric() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
-        JSONObject user = new JSONObject();
-        user.put("username", "Abbas");
-        user.put("password", "*****@@@###$$$%%%%>>>??");
-        user.put("role", "Resident");
-        user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
-
-        try {
-        	service.updateUser(user);
-        }catch(Exception e) {
-        	error = e.getMessage();
-        }
-
-        assertEquals("Password must be alphanumeric!", error);
-    }
 
     @Test
     public void testUpdateUserWrongScientistKey() throws Exception {
