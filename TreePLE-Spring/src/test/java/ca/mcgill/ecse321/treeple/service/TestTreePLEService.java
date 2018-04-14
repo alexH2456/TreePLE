@@ -83,25 +83,25 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", "Scientist");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         service.createUser(user);
     }
 
     @Test
     public void testCreateUserNameEmpty() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         user.put("username", "           ");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.createUser(user);
+            service.createUser(user);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username cannot be empty!", error);
@@ -109,18 +109,18 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateUserNameNonAlphanumeric() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         user.put("username", "???////***$$$!@#!@#!@#");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.createUser(user);
+            service.createUser(user);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username must be alphanumeric!", error);
@@ -128,19 +128,19 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateUserAlreadyExists() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         service.createUser(testUser);
         user.put("username", "Abbas");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.createUser(user);
+            service.createUser(user);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username is already taken!", error);
@@ -148,18 +148,18 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateUserPasswordEmpty() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         user.put("username", "Yunus");
         user.put("password", "         ");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.createUser(user);
+            service.createUser(user);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Password cannot be empty!", error);
@@ -167,18 +167,18 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateUserWrongScientistKey() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         user.put("username", "Yunus");
         user.put("password", "123yunus");
         user.put("role", "Scientist");
         user.put("scientistKey", "Wrong");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.createUser(user);
+            service.createUser(user);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Authorization key for Scientist role is invalid!", error);
@@ -191,7 +191,7 @@ public class TestTreePLEService {
         user.put("password", (String) null);
         user.put("role", "Scientist");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         service.createUser(user);
     }
@@ -203,7 +203,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", (String) null);
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         service.createUser(user);
     }
@@ -227,7 +227,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", "NotARealRole");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
             service.createUser(user);
@@ -243,7 +243,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "   ");
+        user.put("myAddresses", new JSONArray(new String[]{"   "}));
 
         try {
             service.createUser(user);
@@ -284,7 +284,7 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateSpeciesNameSpaces() {
-    	String error = "";
+        String error = "";
         JSONObject species = new JSONObject();
         species.put("name", "         ");
         species.put("species", (String) null);
@@ -301,7 +301,7 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateSpeciesExistsAlready() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject species = new JSONObject();
         service.createSpecies(testSpecies);
         species.put("name", "Weeping Willow");
@@ -360,9 +360,9 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateMunicipalityEmptyName() {
-    	String error = "";
+        String error = "";
 
-    	JSONArray borders = new JSONArray();
+        JSONArray borders = new JSONArray();
 
         borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
         borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
@@ -386,10 +386,10 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateMunicipalityAlreadyExists() throws Exception {
-    	String error = "";
-    	service.createMunicipality(testMunicipality);
+        String error = "";
+        service.createMunicipality(testMunicipality);
 
-    	JSONArray borders = new JSONArray();
+        JSONArray borders = new JSONArray();
         borders.put(new JSONArray(new double[]{45.497470, -73.772830}));
         borders.put(new JSONArray(new double[]{45.481864, -73.773715}));
         borders.put(new JSONArray(new double[]{45.460268, -73.750029}));
@@ -665,8 +665,8 @@ public class TestTreePLEService {
 
     @Test
     public void testCreateTreeNegativeHeight() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
@@ -675,75 +675,75 @@ public class TestTreePLEService {
         try {
             service.createTree(tree);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "Height cannot be negative!");
     }
 
     @Test
     public void testCreateTreeNegativeDiameter() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("diameter", -30);
 
         try {
-        	service.createTree(tree);
+            service.createTree(tree);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "Diameter cannot be negative!");
     }
 
     @Test
     public void testCreateTreeWrongLandType() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("land", "NonExistant");
 
         try {
-        	service.createTree(tree);
+            service.createTree(tree);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "That land type doesn't exist!");
     }
 
     @Test
     public void testCreateTreeWrongOwnershipType() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("ownership", "NonExistant");
 
         try {
-        	service.createTree(tree);
+            service.createTree(tree);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "That ownership doesn't exist!");
     }
 
     @Test
     public void testCreateTreeWrongStatusType() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
         JSONObject tree = new JSONObject(testTree.toString());
         tree.getJSONObject("tree").put("status", "NonExistant");
 
         try {
-        	service.createTree(tree);
+            service.createTree(tree);
         } catch (Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "That status doesn't exist!");
     }
@@ -830,8 +830,8 @@ public class TestTreePLEService {
 
             assertEquals(testUser.getString("username"), user.getUsername());
             assertEquals(testUser.getString("password"), user.getPassword());
-            assertEquals(UserRole.valueOf(testUser.getString("role")) ,user.getRole());
-            assertEquals(testUser.getString("myAddresses"), user.getMyAddress(0));
+            assertEquals(UserRole.valueOf(testUser.getString("role")), user.getRole());
+            assertEquals(testUser.getJSONArray("myAddresses").get(0), user.getMyAddress(0));
             assertEquals(1, user.getMyAddresses().length);
         } catch (Exception e) {
             fail();
@@ -1070,52 +1070,52 @@ public class TestTreePLEService {
 
     @Test
     public void testGetSurveyReportById() throws Exception {
-    	service.createMunicipality(testMunicipality);
-    	service.createSpecies(testSpecies);
-    	service.createUser(testUser);
-    	Tree tree = service.createTree(testTree);
-    	
-    	SurveyReport report = tree.getReport(0);
-    	
-    	try {
-    		SurveyReport databaseReport = service.getSurveyReportById(report.getReportId());
-    		assertEquals(report.getReportDate().toString(), databaseReport.getReportDate().toString());
-    		assertEquals(report.getReportId(), databaseReport.getReportId());
-    		assertEquals(report.getReportUser(),databaseReport.getReportUser());
-    	}catch(Exception e) {
-    		fail();
-    	}
+        service.createMunicipality(testMunicipality);
+        service.createSpecies(testSpecies);
+        service.createUser(testUser);
+        Tree tree = service.createTree(testTree);
+
+        SurveyReport report = tree.getReport(0);
+
+        try {
+            SurveyReport databaseReport = service.getSurveyReportById(report.getReportId());
+            assertEquals(report.getReportDate().toString(), databaseReport.getReportDate().toString());
+            assertEquals(report.getReportId(), databaseReport.getReportId());
+            assertEquals(report.getReportUser(),databaseReport.getReportUser());
+        }catch(Exception e) {
+            fail();
+        }
     }
-    
+
     @Test
     public void testGetSurveyReportByIdNegativeId() {
-    	String error = "";
-    	try {
-    		service.getSurveyReportById(-1);
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	assertEquals("Report's ID cannot be negative!", error);
+        String error = "";
+        try {
+            service.getSurveyReportById(-1);
+        }catch(Exception e) {
+            error = e.getMessage();
+        }
+        assertEquals("Report's ID cannot be negative!", error);
     }
-    
+
     @Test
     public void testGetSurveyReportByIdReportDNE() {
-    	String error = "";
-    	try {
-    		service.getSurveyReportById(SurveyReport.getNextReportId());
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	assertEquals("No Survey Report with that ID exists!", error);
+        String error = "";
+        try {
+            service.getSurveyReportById(SurveyReport.getNextReportId());
+        }catch(Exception e) {
+            error = e.getMessage();
+        }
+        assertEquals("No Survey Report with that ID exists!", error);
     }
-    
+
     // ==============================
     // GET FORECAST BY ID TEST
     // ==============================
-    
+
     @Test
     public void testGetForecastById() throws Exception {
-    	JSONObject testForecast = new JSONObject();
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -1130,13 +1130,13 @@ public class TestTreePLEService {
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
-        
+
         Forecast forecast = service.createForecast(testForecast);
-        
+
         try {
-        	Forecast databaseForecast = service.getForecastById(forecast.getForecastId());
-        	for(int i = 0; i < databaseForecast.getFcTrees().size(); i++) {
-        		Tree fcTree = forecast.getFcTree(i);
+            Forecast databaseForecast = service.getForecastById(forecast.getForecastId());
+            for(int i = 0; i < databaseForecast.getFcTrees().size(); i++) {
+                Tree fcTree = forecast.getFcTree(i);
                 Tree dbTree = databaseForecast.getFcTree(i);
                 assertEquals(fcTree.getHeight(), dbTree.getHeight());
                 assertEquals(fcTree.getDiameter(), dbTree.getDiameter());
@@ -1149,41 +1149,41 @@ public class TestTreePLEService {
                 assertEquals(fcTree.getOwnership(), dbTree.getOwnership());
                 assertEquals(fcTree.getSpecies(), dbTree.getSpecies());
                 assertEquals(fcTree.getStatus(), dbTree.getStatus());
-        	}
-        	assertEquals(forecast.getBiodiversity(),databaseForecast.getBiodiversity(),0.01);
-        	assertEquals(forecast.getCo2Reduced(), databaseForecast.getCo2Reduced(), 0.01);
-        	assertEquals(forecast.getEnergyConserved(), databaseForecast.getEnergyConserved(), 0.01);
-        	assertEquals(forecast.getStormwater(), databaseForecast.getStormwater(), 0.01);
-        	assertEquals(forecast.getFcDate().toString(), forecast.getFcDate().toString());
-        	assertEquals(forecast.getFcUser(),databaseForecast.getFcUser());
-        	assertEquals(forecast.getForecastId(),databaseForecast.getForecastId());
-        	
+            }
+            assertEquals(forecast.getBiodiversity(),databaseForecast.getBiodiversity(),0.01);
+            assertEquals(forecast.getCo2Reduced(), databaseForecast.getCo2Reduced(), 0.01);
+            assertEquals(forecast.getEnergyConserved(), databaseForecast.getEnergyConserved(), 0.01);
+            assertEquals(forecast.getStormwater(), databaseForecast.getStormwater(), 0.01);
+            assertEquals(forecast.getFcDate().toString(), forecast.getFcDate().toString());
+            assertEquals(forecast.getFcUser(),databaseForecast.getFcUser());
+            assertEquals(forecast.getForecastId(),databaseForecast.getForecastId());
+
         }catch(Exception e) {
-        	fail();
+            fail();
         }
     }
     @Test
     public void testGetForecastByIdNegativeId() {
-    	String error = "";
-    	try {
-    		service.getForecastById(-1);
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	assertEquals("Forecast's ID cannot be negative!", error);
+        String error = "";
+        try {
+            service.getForecastById(-1);
+        }catch(Exception e) {
+            error = e.getMessage();
+        }
+        assertEquals("Forecast's ID cannot be negative!", error);
     }
-    
+
     @Test
     public void testGetForecastByIdReportDNE() {
-    	String error = "";
-    	try {
-    		service.getForecastById(Forecast.getNextForecastId());
-    	}catch(Exception e) {
-    		error = e.getMessage();
-    	}
-    	assertEquals("No Forecast with that ID exists!", error);
+        String error = "";
+        try {
+            service.getForecastById(Forecast.getNextForecastId());
+        }catch(Exception e) {
+            error = e.getMessage();
+        }
+        assertEquals("No Forecast with that ID exists!", error);
     }
-    
+
     // ==============================
     // GET TREES OF USER
     // ==============================
@@ -1199,7 +1199,7 @@ public class TestTreePLEService {
             trees.add(service.createTree(testTree));
         }
         try {
-        	List<Tree> userTrees = service.getTreesOfUser(testUser.getString("username"));
+            List<Tree> userTrees = service.getTreesOfUser(testUser.getString("username"));
 
             for (int i = 0; i < userTrees.size(); i++) {
                 Tree tree = trees.get(i);
@@ -1220,7 +1220,7 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     // ==============================
     // GET TREES OF SPECIES
     // ==============================
@@ -1236,7 +1236,7 @@ public class TestTreePLEService {
             trees.add(service.createTree(testTree));
         }
         try {
-        	List<Tree> speciesTrees = service.getTreesOfSpecies(testSpecies.getString("name"));
+            List<Tree> speciesTrees = service.getTreesOfSpecies(testSpecies.getString("name"));
 
             for (int i = 0; i < speciesTrees.size(); i++) {
                 Tree tree = trees.get(i);
@@ -1257,11 +1257,11 @@ public class TestTreePLEService {
             fail();
         }
     }
-    
+
     // ==============================
     // GET TREES OF MUNICIPALITY
     // ==============================
-    
+
     @Test
     public void testGetTreesOfMunicipality() throws Exception {
         service.createUser(testUser);
@@ -1273,7 +1273,7 @@ public class TestTreePLEService {
             trees.add(service.createTree(testTree));
         }
         try {
-        	List<Tree> municipalityTrees = service.getTreesOfMunicipality(testMunicipality.getString("name"));
+            List<Tree> municipalityTrees = service.getTreesOfMunicipality(testMunicipality.getString("name"));
 
             for (int i = 0; i < municipalityTrees.size(); i++) {
                 Tree tree = trees.get(i);
@@ -1760,59 +1760,59 @@ public class TestTreePLEService {
     // ==============================
     // UPDATE USER TEST
     // ==============================
-    
+
     @Test
     public void testUpdateUser() throws Exception {
-    	service.createUser(testUser);
-    	
-    	try {
-    		JSONObject updateUserObj = new JSONObject();
-    		updateUserObj.put("username", "Abbas");
+        service.createUser(testUser);
+
+        try {
+            JSONObject updateUserObj = new JSONObject();
+            updateUserObj.put("username", "Abbas");
             updateUserObj.put("password", "password123");
             updateUserObj.put("role", "Scientist");
             updateUserObj.put("scientistKey", "i<3tr33s");
-            updateUserObj.put("myAddresses", "H4L3N1");
-            
+            updateUserObj.put("myAddresses", new JSONArray(new String[]{"H4L3N1"}));
+
             User user = service.updateUser(updateUserObj);
-            
+
             assertEquals("Abbas", user.getUsername());
             assertEquals("password123", user.getPassword());
             assertEquals(UserRole.Scientist, user.getRole());
             assertEquals("H4L3N1", user.getMyAddress(0));
-    	}catch(Exception e) {
-    		fail();
-    	}
+        }catch(Exception e) {
+            fail();
+        }
     }
-    
+
     @Test(expected = JSONException.class)
     public void testUpdateUserNullUsername() throws Exception {
         service.createUser(testUser);
-        
+
         JSONObject updateUserObj = new JSONObject();
-		updateUserObj.put("username", (String) null);
+        updateUserObj.put("username", (String) null);
         updateUserObj.put("password", "password123");
         updateUserObj.put("role", "Scientist");
         updateUserObj.put("scientistKey", "i<3tr33s");
-        updateUserObj.put("myAddresses", "H4L3N1");
+        updateUserObj.put("myAddresses", new JSONArray(new String[]{"H4L3N1"}));
 
         service.updateUser(updateUserObj);
     }
 
     @Test
     public void testUpdateUserNameEmpty() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         JSONObject user = new JSONObject();
         user.put("username", "           ");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.updateUser(user);
+            service.updateUser(user);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username cannot be empty!", error);
@@ -1820,19 +1820,19 @@ public class TestTreePLEService {
 
     @Test
     public void testUpdateUserNameNonAlphanumeric() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         JSONObject user = new JSONObject();
         user.put("username", "???////***$$$!@#!@#!@#");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.updateUser(user);
+            service.updateUser(user);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username must be alphanumeric!", error);
@@ -1840,18 +1840,18 @@ public class TestTreePLEService {
 
     @Test
     public void testUpdateUserAlreadyExists() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         user.put("username", "Abbas");
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.updateUser(user);
+            service.updateUser(user);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Username does not exist!", error);
@@ -1859,19 +1859,19 @@ public class TestTreePLEService {
 
     @Test
     public void testUpdateUserPasswordEmpty() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject user = new JSONObject();
         service.createUser(testUser);
         user.put("username", "Abbas");
         user.put("password", "         ");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.updateUser(user);
+            service.updateUser(user);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Password cannot be empty!", error);
@@ -1879,19 +1879,19 @@ public class TestTreePLEService {
 
     @Test
     public void testUpdateUserWrongScientistKey() throws Exception {
-    	String error = "";
-    	service.createUser(testUser);
+        String error = "";
+        service.createUser(testUser);
         JSONObject user = new JSONObject();
         user.put("username", "Abbas");
         user.put("password", "123yunus");
         user.put("role", "Scientist");
         user.put("scientistKey", "Wrong");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
-        	service.updateUser(user);
+            service.updateUser(user);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
 
         assertEquals("Authorization key for Scientist role is invalid!", error);
@@ -1904,7 +1904,7 @@ public class TestTreePLEService {
         user.put("password", (String) null);
         user.put("role", "Scientist");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         service.updateUser(user);
     }
@@ -1916,7 +1916,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", (String) null);
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         service.updateUser(user);
     }
@@ -1941,7 +1941,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", "NotARealRole");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "St-Lazare");
+        user.put("myAddresses", new JSONArray(new String[]{"St-Lazare"}));
 
         try {
             service.updateUser(user);
@@ -1958,7 +1958,7 @@ public class TestTreePLEService {
         user.put("password", "123yunus");
         user.put("role", "Resident");
         user.put("scientistKey", "i<3tr33s");
-        user.put("myAddresses", "   ");
+        user.put("myAddresses", new JSONArray(new String[]{"   "}));
 
         try {
             service.updateUser(user);
@@ -2034,7 +2034,7 @@ public class TestTreePLEService {
             assertEquals("Species name cannot be empty!", e.getMessage());
         }
     }
-    
+
     @Test
     public void testUpdateSpeciesDNE() throws Exception {
         JSONObject newSpecies = new JSONObject();
@@ -2043,7 +2043,7 @@ public class TestTreePLEService {
         newSpecies.put("genus", "Willow");
 
         try {
-        	service.updateSpecies(newSpecies);
+            service.updateSpecies(newSpecies);
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Species does not exist!");
         }
@@ -2129,7 +2129,7 @@ public class TestTreePLEService {
             assertEquals(testUser.getString("username"), user.getUsername());
             assertEquals(testUser.getString("password"), user.getPassword());
             assertEquals(UserRole.valueOf(testUser.getString("role")), user.getRole());
-            assertEquals(testUser.getString("myAddresses"), user.getMyAddress(0));
+            assertEquals(testUser.getJSONArray("myAddresses").get(0), user.getMyAddress(0));
             assertEquals(false, User.hasWithUsername(testUser.getString("username")));
             try {
                 service.getUserByUsername(testUser.getString("username"));
@@ -2192,11 +2192,11 @@ public class TestTreePLEService {
             assertEquals(testSpecies.getString("species"), species.getSpecies());
             assertEquals(testSpecies.getString("genus"), species.getGenus());
             assertEquals(false, Species.hasWithName(testSpecies.getString("name")));
-            // try {
-            //     service.getSpeciesByName(testSpecies.getString("name"));
-            // } catch (InvalidInputException e) {
-            //     assertEquals("No Species with that name exists!", e.getMessage());
-            // }
+            try {
+                service.getSpeciesByName(testSpecies.getString("name"));
+            } catch (InvalidInputException e) {
+                assertEquals("No Species with that name exists!", e.getMessage());
+            }
         } catch (Exception e) {
             fail();
         }
@@ -2386,7 +2386,7 @@ public class TestTreePLEService {
 
     @Test
     public void testDeleteTreeNegativeTreeID() throws Exception {
-    	String error = "";
+        String error = "";
         service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
@@ -2397,7 +2397,7 @@ public class TestTreePLEService {
         deleteTree.put("treeId", -1);
 
         try {
-        	service.deleteTree(deleteTree);
+            service.deleteTree(deleteTree);
         } catch (InvalidInputException e) {
             error = e.getMessage();
         }
@@ -2406,7 +2406,7 @@ public class TestTreePLEService {
 
     @Test
     public void testDeleteTreeUserNameEmpty() throws Exception {
-    	String error = "";
+        String error = "";
         service.createUser(testUser);
         service.createSpecies(testSpecies);
         service.createMunicipality(testMunicipality);
@@ -2417,7 +2417,7 @@ public class TestTreePLEService {
         deleteTree.put("treeId", 3);
 
         try {
-        	service.deleteTree(deleteTree);
+            service.deleteTree(deleteTree);
         } catch (InvalidInputException e) {
             error = e.getMessage();
         }
@@ -2480,10 +2480,10 @@ public class TestTreePLEService {
     // ==============================
     // DELETE FORECAST
     // ==============================
-    
+
     @Test
     public void testDeleteForecast() throws Exception {
-    	JSONObject testForecast = new JSONObject();
+        JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
         service.createUser(testUser);
@@ -2498,15 +2498,15 @@ public class TestTreePLEService {
         testForecast.put("fcDate", "2018-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
-        
+
         service.createForecast(testForecast);
-        
+
         try {
-        	JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
-        	forecastObj.put("user", "Abbas");
-        	
-        	Forecast forecast = service.deleteForecast(forecastObj);
+            JSONObject forecastObj = new JSONObject();
+            forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
+            forecastObj.put("user", "Abbas");
+
+            Forecast forecast = service.deleteForecast(forecastObj);
 
             assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
             assertEquals("Abbas", forecast.getFcUser());
@@ -2531,12 +2531,12 @@ public class TestTreePLEService {
             assertEquals(4*service.getStormwaterIntercepted(service.getTreeById(trees.getInt(0))),forecast.getStormwater(), 0.01);
             assertEquals(4*service.getEnergyConserved(service.getTreeById(trees.getInt(0))),forecast.getEnergyConserved(), 0.01);
             assertEquals(0.25,forecast.getBiodiversity(), 0.01);
-        	
+
         }catch(Exception e){
-        	fail();
+            fail();
         }
     }
-    
+
     @Test(expected = JSONException.class)
     public void testDeleteForecastUserNull() throws Exception {
         JSONObject testForecast = new JSONObject();
@@ -2556,12 +2556,12 @@ public class TestTreePLEService {
         testForecast.put("fcTrees", trees);
 
         service.createForecast(testForecast);
-        
+
         JSONObject forecastObj = new JSONObject();
-    	forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
-    	forecastObj.put("user", (String) null);
-    	
-    	service.deleteForecast(forecastObj);
+        forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
+        forecastObj.put("user", (String) null);
+
+        service.deleteForecast(forecastObj);
     }
 
     @Test
@@ -2585,11 +2585,11 @@ public class TestTreePLEService {
 
         service.createForecast(testForecast);
         try {
-        	JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
-        	forecastObj.put("user", "          ");
-        	
-        	service.deleteForecast(forecastObj);
+            JSONObject forecastObj = new JSONObject();
+            forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
+            forecastObj.put("user", "          ");
+
+            service.deleteForecast(forecastObj);
         } catch (Exception e) {
             error = e.getMessage();
         }
@@ -2619,20 +2619,20 @@ public class TestTreePLEService {
 
         try {
             JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
-        	forecastObj.put("user", "Gareth");
-        	
-        	service.deleteForecast(forecastObj);
+            forecastObj.put("forecastId", Forecast.getNextForecastId() - 1);
+            forecastObj.put("user", "Gareth");
+
+            service.deleteForecast(forecastObj);
         } catch (Exception e) {
             error = e.getMessage();
         }
 
         assertEquals(error, "That username doesn't exist!");
     }
-    
+
     @Test
     public void testDeleteForecastNegativeId() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
@@ -2652,36 +2652,36 @@ public class TestTreePLEService {
 
         try {
             JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", -1);
-        	forecastObj.put("user", "Abbas");
-        	
-        	service.deleteForecast(forecastObj);
+            forecastObj.put("forecastId", -1);
+            forecastObj.put("user", "Abbas");
+
+            service.deleteForecast(forecastObj);
         } catch (Exception e) {
             error = e.getMessage();
         }
         assertEquals(error, "Forecast's ID cannot be negative or zero!");
     }
-    
+
     @Test
     public void testDeleteForecastNonexistantForecast() throws Exception {
-    	String error = "";
+        String error = "";
         service.createUser(testUser);
 
         try {
             JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", Forecast.getNextForecastId());
-        	forecastObj.put("user", "Abbas");
-        	
-        	service.deleteForecast(forecastObj);
+            forecastObj.put("forecastId", Forecast.getNextForecastId());
+            forecastObj.put("user", "Abbas");
+
+            service.deleteForecast(forecastObj);
         } catch (Exception e) {
             error = e.getMessage();
         }
         assertEquals(error, "No Forecast with that ID exists!");
     }
-    
+
     @Test
     public void testDeleteForecastNotCreatedByUser() throws Exception {
-    	String error = "";
+        String error = "";
         JSONObject testForecast = new JSONObject();
         JSONArray trees = new JSONArray();
 
@@ -2698,27 +2698,27 @@ public class TestTreePLEService {
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
         service.createForecast(testForecast);
-        
+
         JSONObject secondUser = new JSONObject();
 
         secondUser.put("username", "Gareth");
         secondUser.put("password", "ecse321pw");
         secondUser.put("role", "Resident");
         secondUser.put("scientistKey", "");
-        secondUser.put("myAddresses", "H4L3N1");
-        
+        secondUser.put("myAddresses", new JSONArray(new String[]{"H4L3N1"}));
+
         service.createUser(secondUser);
-        
+
         try {
-        	JSONObject forecastObj = new JSONObject();
-        	forecastObj.put("forecastId", Forecast.getNextForecastId()-1);
-        	forecastObj.put("user", "Gareth");
-        	service.deleteForecast(forecastObj);
+            JSONObject forecastObj = new JSONObject();
+            forecastObj.put("forecastId", Forecast.getNextForecastId()-1);
+            forecastObj.put("user", "Gareth");
+            service.deleteForecast(forecastObj);
         }catch(Exception e) {
-        	error = e.getMessage();
+            error = e.getMessage();
         }
         assertEquals(error, "This Forecast wasn't created by you!");
-        
+
     }
 
 
@@ -2755,7 +2755,7 @@ public class TestTreePLEService {
         testUser.put("password", "ecse321pw");
         testUser.put("role", "Resident");
         testUser.put("scientistKey", "");
-        testUser.put("myAddresses", "H4L3N1");
+        testUser.put("myAddresses", new JSONArray(new String[]{"H4L3N1"}));
 
         return testUser;
     }

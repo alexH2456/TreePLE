@@ -1,4 +1,4 @@
-package ca.mcgill.ecse321.treeple;
+package ca.mcgill.ecse321.treeple.utils;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -8,6 +8,8 @@ import android.widget.DatePicker;
 
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import ca.mcgill.ecse321.treeple.MapsActivity;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 

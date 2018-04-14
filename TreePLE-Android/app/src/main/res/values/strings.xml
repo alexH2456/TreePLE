@@ -14,8 +14,8 @@
     <string name="action_sign_up">Sign up</string>
     <string name="error_account_exists">Account already exists</string>
     <string name="error_no_account">Login Error</string>
-    <string name="prompt_height">Height(in cm)</string>
-    <string name="prompt_diameter">Diameter(in cm)</string>
+    <string name="prompt_height">Height (cm)</string>
+    <string name="prompt_diameter">Diameter (cm)</string>
     <string name="prompt_date">YYYY-MM-DD</string>
     <string name="date_first">Select Date</string>
     <string name="date_label">Date Planted</string>
@@ -26,8 +26,8 @@
     <string name="tree_coords">coord_placeholder</string>
     <string name="tree_coords_prompt">Coordinates</string>
     <string name="species">Species</string>
-    <string name="height">Height</string>
-    <string name="diameter">Diameter</string>
+    <string name="height">Height (cm)</string>
+    <string name="diameter">Diameter (cm)</string>
     <string name="add_tree_button">Plant Tree</string>
     <string name="height_placeholder">height_placeholder</string>
     <string name="diameter_placeholder">diameter_placeholder</string>
@@ -46,8 +46,8 @@
     <string name="user_placeholder">User</string>
     <string name="backto_signin_button">Back to sign in</string>
     <string name="error_registration">Registration Error</string>
-    <string name="treeID">treeID</string>
-    <string name="treeID_placeholder">treeID</string>
+    <string name="treeID">Tree ID</string>
+    <string name="treeID_placeholder">Tree ID</string>
     <string name="repassword_prompt">Re-enter Password</string>
     <string name="error_not_matching">Passwords do not match</string>
     <string name="error_no_address">Please enter an address</string>
@@ -60,6 +60,17 @@
     <string name="user_refresh">Get User</string>
     <string name="prompt_role_pass">Role Password</string>
     <string name="update_tree_button">Update Tree</string>
+    <string name="reset_password">Change Password</string>
+    <string name="prompt_old_password">Old Password</string>
+    <string name="prompt_new_password">New Password</string>
+    <string name="prompt_new_pass_reentry">Reenter New Password</string>
+    <string name="title_reset_pass">Change Password</string>
+    <string name="logout_button">Logout</string>
+    <string name="create_species">Create Species</string>
+    <string name="species_name">Name</string>
+    <string name="species_genus">Genus</string>
+    <string name="species_species">Species</string>
+    <string name="add_species_button">Add Species</string>
     <string-array name="land_enum">
         <item>Park</item>
         <item>Residential</item>

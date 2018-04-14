@@ -21,7 +21,7 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 public class TreePLEService {
 
     private SQLiteJDBC sql;
-    private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
+    private final String gmapsKey = "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk";
     private final String sRoleKey = "i<3tr33s";
     private final String dbKey = "ih8tr33s";
 
@@ -180,8 +180,8 @@ public class TreePLEService {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
-        String scientistKey = jsonParams.getString("scientistKey");
-        String myAddresses = jsonParams.getString("myAddresses");
+        String scientistKey = jsonParams.optString("scientistKey");
+        JSONArray myAddresses = jsonParams.getJSONArray("myAddresses");
         String myTrees = "";
 
         if (username.replaceAll("\\s", "").isEmpty())
@@ -194,20 +194,21 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
         User user = new User(username, password, UserRole.valueOf(role));
 
-        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
-            if (addressId != null && !addressId.isEmpty()) {
-                user.addMyAddress(addressId);
+        for (Object address : myAddresses) {
+            String postalCode = (String) address;
+            if (postalCode != null && !(postalCode = postalCode.replaceAll("\\s", "")).isEmpty()) {
+                user.addMyAddress(postalCode.toUpperCase());
             }
         }
 
-        if (!sql.insertUser(username, password, role, myAddresses, myTrees)) {
+        if (!sql.insertUser(username, password, role, myAddresses.toString().replaceAll("(\\[)|(\\])", ""), myTrees)) {
             user.delete();
             throw new SQLException("SQL User insert query failed!");
         }
@@ -218,18 +219,8 @@ public class TreePLEService {
     // Create a new Species
     public Species createSpecies(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name").trim();
-        String species;
-        String genus;
-        try {
-            species = jsonParams.getString("species").trim();
-        } catch (JSONException e) {
-            species = "";
-        }
-        try {
-            genus = jsonParams.getString("genus").trim();
-        } catch (JSONException e) {
-            genus = "";
-        }
+        String species = jsonParams.optString("species").trim();
+        String genus = jsonParams.optString("genus").trim();
 
         if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species name cannot be empty!");
@@ -633,8 +624,8 @@ public class TreePLEService {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
-        String scientistKey = jsonParams.getString("scientistKey");
-        String myAddresses = jsonParams.getString("myAddresses");
+        String scientistKey = jsonParams.optString("scientistKey");
+        JSONArray myAddresses = jsonParams.getJSONArray("myAddresses");
 
         User user;
         if (username.replaceAll("\\s", "").isEmpty())
@@ -647,7 +638,7 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
@@ -656,13 +647,14 @@ public class TreePLEService {
         user.setRole(UserRole.valueOf(role));
         user.clearMyAddresses();
 
-        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
-            if (addressId != null && !addressId.isEmpty()) {
-                user.addMyAddress(addressId);
+        for (Object address : myAddresses) {
+            String postalCode = (String) address;
+            if (postalCode != null && !(postalCode = postalCode.replaceAll("\\s", "")).isEmpty()) {
+                user.addMyAddress(postalCode.toUpperCase());
             }
         }
 
-        if (!sql.updateUser(username, password, role, myAddresses)) {
+        if (!sql.updateUser(username, password, role, myAddresses.toString().replaceAll("(\\[)|(\\])", ""))) {
             user.delete();
             throw new SQLException("SQL User update query failed!");
         }
@@ -672,19 +664,9 @@ public class TreePLEService {
 
     // Update a Species
     public Species updateSpecies(JSONObject jsonParams) throws Exception {
-        String name = jsonParams.getString("name");
-        String species;
-        String genus;
-        try {
-            species = jsonParams.getString("species").trim();
-        } catch (JSONException e) {
-            species = "";
-        }
-        try {
-            genus = jsonParams.getString("genus").trim();
-        } catch (JSONException e) {
-            genus = "";
-        }
+        String name = jsonParams.getString("name").trim();
+        String species = jsonParams.optString("species").trim();
+        String genus = jsonParams.optString("genus").trim();
 
         Species speciesObj;
         if (name.replaceAll("\\s", "").isEmpty())

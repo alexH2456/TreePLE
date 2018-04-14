@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {compose, withProps} from 'recompose';
 import {Button, Divider, Header, Icon, Form, Grid, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
-import {landSelectable, statusSelectable, ownershipSelectable} from '../constants';
+import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 import {updateTree} from "./Requests";
 import {getSpeciesSelectable, getMunicipalitySelectable} from './Utils';
 
@@ -278,7 +278,7 @@ class TreeModal extends PureComponent {
 
 const GMap = compose(
   withProps({
-    googleMapURL: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo&v=3.exp&libraries=geometry,drawing,places',
+    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
     containerElement: <div style={{height: '40vh'}}/>,
     mapElement: <div style={{height: '40vh'}}/>,
