@@ -1,6 +1,5 @@
 package ca.mcgill.ecse321.treeple.service;
 
-import static org.assertj.core.api.Assertions.useRepresentation;
 import static org.junit.Assert.*;
 
 import java.sql.Date;
@@ -9,6 +8,7 @@ import java.util.List;
 
 import org.json.*;
 import org.junit.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.model.Tree.*;
@@ -829,7 +829,7 @@ public class TestTreePLEService {
             User user = service.getUserByUsername(testUser.getString("username"));
 
             assertEquals(testUser.getString("username"), user.getUsername());
-            assertEquals(testUser.getString("password"), user.getPassword());
+            assertEquals(true, BCrypt.checkpw(testUser.getString("password"), user.getPassword()));
             assertEquals(UserRole.valueOf(testUser.getString("role")), user.getRole());
             assertEquals(testUser.getJSONArray("myAddresses").get(0), user.getMyAddress(0));
             assertEquals(1, user.getMyAddresses().length);
@@ -1776,7 +1776,7 @@ public class TestTreePLEService {
             User user = service.updateUser(updateUserObj);
 
             assertEquals("Abbas", user.getUsername());
-            assertEquals("password123", user.getPassword());
+            assertEquals(true, BCrypt.checkpw(updateUserObj.getString("password"), user.getPassword()));
             assertEquals(UserRole.Scientist, user.getRole());
             assertEquals("H4L3N1", user.getMyAddress(0));
         }catch(Exception e) {
@@ -2127,7 +2127,7 @@ public class TestTreePLEService {
             User user = service.deleteUser(deleteUser);
 
             assertEquals(testUser.getString("username"), user.getUsername());
-            assertEquals(testUser.getString("password"), user.getPassword());
+            assertEquals(true, BCrypt.checkpw(testUser.getString("password"), user.getPassword()));
             assertEquals(UserRole.valueOf(testUser.getString("role")), user.getRole());
             assertEquals(testUser.getJSONArray("myAddresses").get(0), user.getMyAddress(0));
             assertEquals(false, User.hasWithUsername(testUser.getString("username")));

@@ -10,6 +10,7 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.*;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import ca.mcgill.ecse321.treeple.model.*;
@@ -51,21 +52,21 @@ public class TreePLEService {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
 
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
+        if (username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
-        if (password == null || password.replaceAll("\\s", "").isEmpty())
+        if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
 
         User user = null;
         if ((user = User.getWithUsername(username)) != null) {
-            if (user.getPassword().equals(password)) {
+            if (BCrypt.checkpw(password, user.getPassword())) {
                 return user;
             }
         } else {
             if ((user = sql.getUser(username)) == null)
                 throw new InvalidInputException("That username doesn't exist!");
 
-            if (user.getPassword().equals(password)) {
+            if (BCrypt.checkpw(password, user.getPassword())) {
                 return user;
             }
         }
@@ -174,7 +175,6 @@ public class TreePLEService {
         return treeObj;
     }
 
-    // TODO: Change myAddresses to JSONArray
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
@@ -198,6 +198,8 @@ public class TreePLEService {
             throw new InvalidInputException("Address cannot be empty!");
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
+
+        password = BCrypt.hashpw(password, BCrypt.gensalt());
 
         User user = new User(username, password, UserRole.valueOf(role));
 
@@ -618,7 +620,6 @@ public class TreePLEService {
         return treeObj;
     }
 
-    // TODO: Change myAddresses to JSONArray
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
@@ -643,6 +644,8 @@ public class TreePLEService {
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
+        password = BCrypt.hashpw(password, BCrypt.gensalt());
+
         user.setPassword(password);
         user.setRole(UserRole.valueOf(role));
         user.clearMyAddresses();
@@ -655,6 +658,36 @@ public class TreePLEService {
         }
 
         if (!sql.updateUser(username, password, role, myAddresses.toString().replaceAll("(\\[)|(\\])", ""))) {
+            user.delete();
+            throw new SQLException("SQL User update query failed!");
+        }
+
+        return user;
+    }
+
+    // Update a User Password
+    public User updateUserPassword(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+        String oldPass = jsonParams.getString("oldPass");
+        String newPass = jsonParams.getString("newPass");
+
+        User user;
+        if (username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (!username.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Username must be alphanumeric!");
+        if ((user = sql.getUser(username)) == null)
+            throw new InvalidInputException("Username does not exist!");
+        if (newPass.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("New password cannot be empty!");
+
+
+        if (BCrypt.checkpw(oldPass, user.getPassword())) {
+            newPass = BCrypt.hashpw(newPass, BCrypt.gensalt());
+            user.setPassword(newPass);
+        }
+
+        if (!sql.updateUserPassword(username, newPass)) {
             user.delete();
             throw new SQLException("SQL User update query failed!");
         }

@@ -45,6 +45,8 @@ dependencies {
     compile('org.springframework:spring-webmvc:4.2.6.RELEASE')
     compile('com.thoughtworks.xstream:xstream:1.4.7')
     compile('org.xerial:sqlite-jdbc:3.21.0')
+    compile('org.mindrot:jbcrypt:0.4')
+
     providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
 
     testCompile('org.springframework.boot:spring-boot-starter-test')

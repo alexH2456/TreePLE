@@ -250,19 +250,25 @@ public class TreePLERestController {
     }
 
     @PatchMapping(value = {"/user/update/"})
-    public UserDto patchDto(@RequestBody String jsonBody) throws Exception {
+    public UserDto updateUser(@RequestBody String jsonBody) throws Exception {
         User user = service.updateUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
+    @PatchMapping(value = {"/user/update/password/"})
+    public UserDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
+        User user = service.updateUserPassword(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
+
     @PatchMapping(value = {"/species/update/"})
-    public SpeciesDto updateUserPoints(@RequestBody String jsonBody) throws Exception {
+    public SpeciesDto updateSpecies(@RequestBody String jsonBody) throws Exception {
         Species species = service.updateSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
     @PatchMapping(value = {"/municipality/update/"})
-    public MunicipalityDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
+    public MunicipalityDto updateMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.updateMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
