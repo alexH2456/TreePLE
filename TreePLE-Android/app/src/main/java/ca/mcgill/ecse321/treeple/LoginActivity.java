@@ -44,6 +44,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -110,6 +111,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        Button bypass = findViewById(R.id.bypass_login);
+        bypass.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byPassLogin();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -130,6 +139,16 @@ public class LoginActivity extends AppCompatActivity {
         Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(mapsIntent);
         finish();
+    }
+
+    public void byPassLogin() {
+        loggedInUser = new JSONObject();
+        try {
+            loggedInUser.put("username", "test");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        switchToMap();
     }
 
     @Override
@@ -251,10 +270,6 @@ public class LoginActivity extends AppCompatActivity {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        } else if (!isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
         }
 
         // Check for a valid user address.
@@ -262,31 +277,15 @@ public class LoginActivity extends AppCompatActivity {
             mUserView.setError(getString(R.string.error_field_required));
             focusView = mUserView;
             cancel = true;
-        } else if (!isUsernameValid(user)) {
-            mUserView.setError(getString(R.string.error_invalid_user));
-            focusView = mUserView;
-            cancel = true;
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(user, password);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isUsernameValid(String username) {
-        return username.length() > 1;
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 5;
     }
 
     /**
@@ -335,7 +334,6 @@ public class LoginActivity extends AppCompatActivity {
         private final String mUsername;
         private final String mPassword;
         private JSONObject user;
-        private boolean noAccount = true;
         private boolean loggedIn = false;
 
         UserLoginTask(String username, String password) {
@@ -350,7 +348,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 userObj.put("username", mUsername);
                 userObj.put("password", PasswordHash.generatePasswordHash(mPassword));
-            } catch (JSONException e) {
+            } catch (JSONException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
 
@@ -363,16 +361,17 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     loggedInUser = user;
                     loggedIn = true;
-                    noAccount = false;
                 }
             } catch (InterruptedException | ExecutionException e) {
                 if (e.getCause() instanceof VolleyError) {
                     VolleyError volleyError = (VolleyError) e.getCause();
                     String backendResponse = VolleyController.parseNetworkResponse(volleyError);
                     Log.e(TAG, "Backend error: " + backendResponse);
+                    Toast.makeText(getApplicationContext(), "Login Error", Toast.LENGTH_SHORT).show();
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG, "Timeout occurred when waiting for response");
+                Toast.makeText(getApplicationContext(), "Network Error", Toast.LENGTH_LONG).show();
             }
             return loggedIn;
         }
@@ -385,12 +384,9 @@ public class LoginActivity extends AppCompatActivity {
 
             if (success) {
                 switchToMap();
-            } else if (noAccount) {
+            } else {
                 mUserView.setError(getString(R.string.error_no_account));
                 mUserView.requestFocus();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
             }
         }
 

@@ -31,6 +31,7 @@ import com.android.volley.toolbox.RequestFuture;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -105,7 +106,11 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptRegister();
+                    try {
+                        attemptRegister();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
@@ -116,7 +121,11 @@ public class RegisterActivity extends AppCompatActivity {
         mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptRegister();
+                try {
+                    attemptRegister();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -158,7 +167,7 @@ public class RegisterActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptRegister() {
+    private void attemptRegister() throws NoSuchAlgorithmException {
 
         if (mAuthTask != null) {
             return;
@@ -214,7 +223,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (TextUtils.isEmpty(postalCode)) {
-            mPostalView.setError(getString(R.string.error_no_postal));
+            mPostalView.setError(getString(R.string.error_field_required));
             focusView = mPostalView;
             cancel = true;
         } else if (!isPostalCodeValid(postalCode)) {
@@ -239,12 +248,8 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(user, password, role, postalCode, rolePass);
             mAuthTask.execute((Void) null);
@@ -322,7 +327,7 @@ public class RegisterActivity extends AppCompatActivity {
         private JSONObject user;
         private boolean accountExists = false;
 
-        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) {
+        UserLoginTask(String username, String password, String role, String postalCode, String rolePass) throws NoSuchAlgorithmException {
             mUsername = username;
             mPassword = PasswordHash.generatePasswordHash(password);
             mRole = role;
