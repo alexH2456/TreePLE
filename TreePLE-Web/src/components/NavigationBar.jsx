@@ -1,8 +1,8 @@
 import React, {PureComponent} from 'react';
 import {Menu, Divider, Image, Segment, Statistic} from 'semantic-ui-react';
+import Logo from "../images/favicon.ico";
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
-import Logo from "../images/favicon.ico";
 
 class NavigationBar extends PureComponent {
   constructor(props) {

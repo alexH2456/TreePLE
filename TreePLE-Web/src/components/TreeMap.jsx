@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {Dimmer, Image, Loader, Segment} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
+import Logo from '../images/favicon.ico';
 import {gmapsKey} from '../constants';
 import TreeModal from './TreeModal';
 import MunicipalityModal from './MunicipalityModal';
 import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability} from './Requests';
-import Logo from '../images/favicon.ico';
+import {getLatLngBorders, getMapBounds} from './Utils';
 
 export class TreeMap extends PureComponent {
   constructor(props) {
@@ -56,24 +57,6 @@ export class TreeMap extends PureComponent {
     }
   }
 
-  getMapBounds = (locations) => {
-    let lat = [];
-    let lng = [];
-    locations.map(location => {
-      lat.push(location.lat);
-      lng.push(location.lng);
-    });
-
-    const bounds = {
-      south: Math.min(...lat),
-      north: Math.max(...lat),
-      west: Math.min(...lng),
-      east: Math.max(...lng)
-    }
-
-    return bounds;
-  }
-
   loadMap = () => {
     this.loadTrees();
     this.loadMunicipalities();
@@ -95,20 +78,10 @@ export class TreeMap extends PureComponent {
         let municipalities = [];
 
         data.map(municipality => {
-          let borders = [];
-
-          municipality.borders.map(location => {
-            borders.push({
-              id: location.locationId,
-              lat: location.latitude,
-              lng: location.longitude
-            });
-          });
-
           municipalities.push({
             name: municipality.name,
             totalTrees: municipality.totalTrees,
-            borders: borders
+            borders: getLatLngBorders(municipality.borders)
           });
         });
 
@@ -125,7 +98,6 @@ export class TreeMap extends PureComponent {
   }
 
   onMunicipalityClick = (e, municipality) => {
-    let viewport = this.getMapBounds(municipality.borders);
 
     getMunicipalitySustainability(municipality.name)
       .then(({data}) => {
@@ -138,6 +110,7 @@ export class TreeMap extends PureComponent {
         return sustainability;
       })
       .then(sustainability => {
+        let viewport = getMapBounds(municipality.borders);
         this.refs.map.fitBounds(viewport);
         this.props.onSustainabilityChange(sustainability);
       })

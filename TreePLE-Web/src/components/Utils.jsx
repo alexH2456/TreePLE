@@ -40,7 +40,42 @@ function getMunicipalitySelectable() {
   return municipalitySelectable;
 }
 
+function getLatLngBorders(borders) {
+  let latLngBorders = [];
+
+  borders.map(location => {
+    latLngBorders.push({
+      id: location.locationId,
+      lat: location.latitude,
+      lng: location.longitude
+    });
+  });
+
+  return latLngBorders;
+}
+
+function getMapBounds(locations) {
+  let lat = [];
+  let lng = [];
+
+  locations.map(location => {
+    lat.push(location.lat);
+    lng.push(location.lng);
+  });
+
+  const bounds = {
+    south: Math.min(...lat),
+    north: Math.max(...lat),
+    west: Math.min(...lng),
+    east: Math.max(...lng)
+  }
+
+  return bounds;
+}
+
 export {
   getSpeciesSelectable,
-  getMunicipalitySelectable
+  getMunicipalitySelectable,
+  getLatLngBorders,
+  getMapBounds
 };

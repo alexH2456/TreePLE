@@ -35,12 +35,12 @@
     "@types/react": "^16.3.8",
     "ajv": "^6.2.1",
     "axios": "^0.18.0",
-    "bcrypt": "^2.0.0",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "react-google-maps": "^9.4.5",
     "semantic-ui-css": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
+    "sha512": "0.0.1",
     "webpack": "^3.5.5"
   },
   "devDependencies": {

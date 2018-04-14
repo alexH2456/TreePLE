@@ -4,24 +4,13 @@ import {Button, Divider, Header, Icon, Form, Grid, Modal} from 'semantic-ui-reac
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 import {updateTree} from "./Requests";
-import {getSpeciesSelectable, getMunicipalitySelectable} from './Utils';
+import {getSpeciesSelectable, getMunicipalitySelectable, getLatLngBorders} from './Utils';
 
 class TreeModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      user: {},
-      // treeId: props.tree.treeId,
-      // height: props.tree.height,
-      // diameter: props.tree.diameter,
-      // datePlanted: props.tree.datePlanted,
-      // land: props.tree.land,
-      // status: props.tree.status,
-      // ownership: props.tree.ownership,
-      // species: props.tree.species,
-      // location: props.tree.location,
-      // municipality: props.tree.municipality,
-      // reports: props.tree.reports,
+      user: '',
       updatedTree: {
         treeId: props.tree.treeId,
         height: 0,
@@ -39,10 +28,7 @@ class TreeModal extends PureComponent {
 
   componentWillMount() {
     this.setState({
-      user: {
-        username: localStorage.getItem('username'),
-        role: localStorage.getItem('role')
-      },
+      user: localStorage.getItem('username'),
       speciesSelectable: getSpeciesSelectable(),
       municipalitySelectable: getMunicipalitySelectable()
     });
@@ -249,7 +235,7 @@ class TreeModal extends PureComponent {
                   <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' onChange={this.onOwnershipChange}/>
                   <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' onChange={this.onLandChange} />
                 </Form.Group>
-            </Form>
+              </Form>
             )}
 
             <Divider hidden/>
@@ -259,7 +245,7 @@ class TreeModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 {!this.state.update ? (
-                  <Button inverted color='blue' size='small' disabled={!this.state.user.username} onClick={this.onStartEdit}>Edit</Button>
+                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onStartEdit}>Edit</Button>
                 ) : (
                   <div>
                     <Button inverted color='green' size='small' onClick={this.onUpdateTree}>Save</Button>
@@ -286,18 +272,11 @@ const GMap = compose(
   withScriptjs,
   withGoogleMap
 )(({tree}) => {
-  let borders = [];
+  let borders = getLatLngBorders(tree.municipality.borders);
   let location = {
     lat: tree.location.latitude,
     lng: tree.location.longitude
   };
-
-  tree.municipality.borders.map(location => {
-    borders.push({
-      lat: location.latitude,
-      lng: location.longitude
-    });
-  });
 
   return (
     <GoogleMap zoom={15} center={location} options={{scrollwheel: false}}>

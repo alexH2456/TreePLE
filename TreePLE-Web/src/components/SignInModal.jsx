@@ -1,75 +1,67 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Image, Modal, Form} from 'semantic-ui-react';
+import sha512 from 'sha512';
+import {Button, Divider, Grid, Header, Icon, Modal, Form} from 'semantic-ui-react';
 import {login} from './Requests';
 
 class SignInModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      modalOpen: false,
-      inputError: false,
       username: '',
       password: '',
-      errorMessage: ''
+      error: false,
+      errorMsg: ''
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.show !== nextProps.show) {
-      this.setState({modalOpen: nextProps.show});
-    }
-  }
+  onUsernameChange = (e, {value}) => this.setState({username: value});
+  onPasswordChange = (e, {value}) => this.setState({password: value});
 
-  handleOpen = () => this.setState({modalOpen: true});
-  handleClose = () => this.setState({modalOpen: false});
-
-  handleChangeU = (e, data) => this.setState({username: data.value});
-  handleChangeP = (e, data) => this.setState({password: data.value});
-
-  handleSignIn = () => {
+  onSignIn = () => {
     const loginInfo = {
       username: this.state.username,
-      password: this.state.password,
+      password: sha512(this.state.password).toString('hex')
     };
 
     login(loginInfo)
       .then(({data, status}) => {
         if (status == 200) {
           localStorage.setItem('username', data.username);
-          this.setState({modalOpen: false});
+          this.props.onClose();
         }
       })
       .catch(error => {
-        console.log(error.message);
         this.setState({
-          inputError: true,
-          errorMessage: error.message
+          error: true,
+          errorMsg: error.message
         });
       });
   }
 
   render() {
     return (
-      <Modal
-        basic
-        closeIcon
-        size='small'
-        open={this.state.modalOpen}
-        // open={this.props.show}
-        onClose={this.handleClose}
-        // trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
-      >
+      <Modal open size='mini' dimmer='blurring'>
         <Modal.Content>
+          <Modal.Header>
+            <Header as='h1' icon textAlign='center'>
+              <Icon name='user' circular/>
+              <Header.Content>Sign In</Header.Content>
+            </Header>
+          </Modal.Header>
           <Modal.Description>
             <Form>
-              <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.handleChangeU}/>
-              <Form.Input fluid type='password' placeholder='Password' error={this.state.error} onChange={this.handleChangeP}/>
-              <Form.Group inline>
-                <Form.Button inverted color='green' size='small' onClick={this.handleSignIn}>Sign In</Form.Button>
-                <Form.Button inverted color='red' size='small' onClick={this.handleClose}>Close</Form.Button>
-              </Form.Group>
+              <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.onUsernameChange}/>
+              <Form.Input fluid type='password' placeholder='Password' error={this.state.error} onChange={this.onPasswordChange}/>
             </Form>
+            <Divider hidden/>
+            <Grid centered>
+              <Grid.Row>
+                <Form.Button inverted color='green' size='small' onClick={this.onSignIn}>Sign In</Form.Button>
+                <Form.Button inverted color='blue' size='small' onClick={this.props.onRegister}>Sign Up</Form.Button>
+                <Form.Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Form.Button>
+              </Grid.Row>
+            </Grid>
           </Modal.Description>
         </Modal.Content>
       </Modal>
@@ -78,7 +70,7 @@ class SignInModal extends PureComponent {
 }
 
 SignInModal.propTypes = {
-  show: PropTypes.bool.isRequired
+  onClose: PropTypes.func.isRequired
 }
 
 export default SignInModal;
