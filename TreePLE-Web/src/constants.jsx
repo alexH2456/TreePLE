@@ -1,3 +1,5 @@
+export const gmapsKey = 'AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk';
+
 export const roleSelectable = [
   {key: 'R', text: 'Resident', value: 'Resident'},
   {key: 'S', text: 'Scientist', value: 'Scientist'},

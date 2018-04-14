@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {Dimmer, Image, Loader, Segment} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
+import {gmapsKey} from '../constants';
 import TreeModal from './TreeModal';
 import MunicipalityModal from './MunicipalityModal';
 import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability} from './Requests';
@@ -206,7 +207,7 @@ export class TreeMap extends PureComponent {
 
 export default compose(
   withProps({
-    googleMapURL: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo&v=3.exp&libraries=geometry,drawing,places',
+    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '100vh'}}/>,
     containerElement: <div style={{height: '80vh'}}/>,
     mapElement: <div style={{height: '80vh'}}/>,

@@ -37,7 +37,6 @@ class SignInModal extends PureComponent {
       .then(({data, status}) => {
         if (status == 200) {
           localStorage.setItem('username', data.username);
-          localStorage.setItem('role', data.role);
           this.setState({modalOpen: false});
         }
       })
