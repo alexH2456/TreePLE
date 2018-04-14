@@ -18,11 +18,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ca.mcgill.ecse321.treeple.utils.InvalidInputException;
+import java.security.NoSuchAlgorithmException;
+
 import ca.mcgill.ecse321.treeple.utils.PasswordHash;
 import ca.mcgill.ecse321.treeple.utils.VolleyController;
 
-public class ResetPasswordActivity extends AppCompatActivity{
+public class ResetPasswordActivity extends AppCompatActivity {
 
     private static final String TAG = ResetPasswordActivity.class.getSimpleName();
 
@@ -94,10 +95,6 @@ public class ResetPasswordActivity extends AppCompatActivity{
             mOldPassView.setError(getString(R.string.error_field_required));
             focusView = mOldPassView;
             cancel = true;
-        } else if (!isPasswordValid(oldPass)) {
-            mOldPassView.setError(getString(R.string.error_invalid_password));
-            focusView = mOldPassView;
-            cancel = true;
         }
 
         if (TextUtils.isEmpty(newPass)) {
@@ -114,12 +111,8 @@ public class ResetPasswordActivity extends AppCompatActivity{
             mNewPassReenterView.setError(getString(R.string.error_field_required));
             focusView = mNewPassReenterView;
             cancel = true;
-        } else if (!isPasswordValid(newPassReenter)) {
-            mNewPassReenterView.setError(getString(R.string.error_invalid_password));
-            focusView = mNewPassReenterView;
-            cancel = true;
         } else if (!newPass.equals(newPassReenter)) {
-            mNewPassReenterView.setError(getString(R.string.error_incorrect_password));
+            mNewPassReenterView.setError(getString(R.string.error_not_matching));
             focusView = mNewPassReenterView;
             cancel = true;
         }
@@ -139,65 +132,32 @@ public class ResetPasswordActivity extends AppCompatActivity{
         return password.length() > 5;
     }
 
-    private void resetPassword(String user, final String oldPass, final String newPass) {
+    private void resetPassword(String user, String oldPass, String newPass) {
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "users/" + user + "/", null, new Response.Listener<JSONObject>() {
+        JSONObject updatedUser = new JSONObject();
+        try {
+            updatedUser.put("username", user);
+            updatedUser.put("oldPass", PasswordHash.generatePasswordHash(oldPass));
+            updatedUser.put("newPass", PasswordHash.generatePasswordHash(newPass));
+        } catch (JSONException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest updateReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "user/update/password/", updatedUser, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                try {
-                    String storedPass = response.getString("password");
-
-                    if (!PasswordHash.validatePassword(oldPass, storedPass)) {
-                        throw new InvalidInputException("Passwords do not match");
-                    }
-
-                    JSONObject updatedUser = new JSONObject();
-                    updatedUser.put("username", response.getString("username"));
-                    updatedUser.put("role", response.getString("role"));
-
-                    if (updatedUser.getString("role").equals("Scientist")) {
-                        updatedUser.put("scientistKey", "i<3tr33s");
-                    } else {
-                        updatedUser.put("scientistKey", "");
-                    }
-
-                    updatedUser.put("myAddresses", response.getJSONArray("myAddresses"));
-
-                    String newPassHashed = PasswordHash.generatePasswordHash(newPass);
-                    updatedUser.put("password", newPassHashed);
-
-                    JsonObjectRequest updateReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "user/update/", updatedUser, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.e(TAG, "ResetResponse: " + response.toString());
-                            Toast.makeText(getApplicationContext(), "Password reset", Toast.LENGTH_SHORT).show();
-                            switchToSignIn();
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "ResetError: " + error.getMessage());
-                            Toast.makeText(getApplicationContext(), "Error resetting password", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                    VolleyController.getInstance(getApplicationContext()).addToRequestQueue(updateReq);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (InvalidInputException e) {
-                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-                }
+                Log.e(TAG, "ResetResponse: " + response.toString());
+                Toast.makeText(getApplicationContext(), "Password reset", Toast.LENGTH_SHORT).show();
+                switchToSignIn();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "ResetError: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), "User not found", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error resetting password", Toast.LENGTH_LONG).show();
             }
         });
 
-        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(updateReq);
     }
-
 }
