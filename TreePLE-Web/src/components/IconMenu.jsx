@@ -9,6 +9,7 @@ class IconMenu extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      user: localStorage.getItem('username'),
       showMenu: false,
       showSignIn: false,
       showSignUp: false
@@ -21,18 +22,21 @@ class IconMenu extends PureComponent {
     }
   }
 
-  toggleSignIn = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn}));
-  toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp}));
+  toggleSignIn = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
+  toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
   toggleRegister = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
 
-  onLogOut = () => localStorage.clear();
+  onLogOut = () => {
+    localStorage.clear();
+    this.setState({user: localStorage.getItem('username')});
+  }
 
   render() {
     return (
       <div>
         <Sidebar.Pushable as={Segment}>
           <Sidebar as={Menu} animation='push' width='thin' visible={this.state.showMenu} icon='labeled' size='tiny' vertical>
-            {localStorage.getItem('username') == null ? (
+            {!this.state.user ? (
               <div>
               <Menu.Item link name='signin'>
                 <Button basic color='black' name='signin' onClick={this.toggleSignIn}>

@@ -34,7 +34,7 @@ class SignUpModal extends PureComponent {
         password: sha512(this.state.password1).toString('hex'),
         role: this.state.role,
         scientistKey: this.state.accessKey,
-        myAddresses: this.state.postalCode
+        myAddresses: [this.state.postalCode]
       };
 
       createUser(signupInfo)
@@ -59,8 +59,6 @@ class SignUpModal extends PureComponent {
   }
 
   render() {
-    console.log(sha512('guccigang').toString('hex'));
-
     return (
       <Modal open size="mini" dimmer='blurring'>
         <Modal.Content>

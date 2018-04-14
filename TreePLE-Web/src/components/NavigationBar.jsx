@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Menu, Divider, Image, Segment, Statistic} from 'semantic-ui-react';
-import Logo from "../images/favicon.ico";
+import Logo from "../images/treeple_logo.png";
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
 
@@ -51,7 +51,7 @@ class NavigationBar extends PureComponent {
         <Menu size='small' stackable fluid widths={5}>
 
           <Menu.Item onClick={this.toggleSidebar}>
-            <Image circular size='tiny' src={Logo}/>
+            <Image circular size='small' src={Logo}/>
           </Menu.Item>
 
           <Menu.Item

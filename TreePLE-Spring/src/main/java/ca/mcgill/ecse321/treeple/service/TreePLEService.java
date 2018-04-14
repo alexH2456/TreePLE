@@ -1058,7 +1058,8 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
 
-        double averageEnergyConsumed = 22332.2; // In kWh/yr
+        // Average energy consumed per citizen (in kWh/yr)
+        double averageEnergyConsumed = 12332.2;
 
         double energyCoefficient = 0;
         Land landType = tree.getLand();
