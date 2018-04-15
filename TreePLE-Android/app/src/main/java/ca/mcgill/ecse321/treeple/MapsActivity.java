@@ -69,8 +69,6 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    //TODO: Remove debug methods before submission(getUser)
-
     private GoogleMap mMap;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -144,9 +142,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (item.getItemId() == R.id.option_refresh_markers) {
             refreshUser();
             populateMap();
-        } else if (item.getItemId() == R.id.loggedin_user) {
-            // Debug method, remove before release
-            Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.logout_button) {
             switchToLogin();
         } else if (item.getItemId() == R.id.create_species) {
@@ -256,7 +251,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        //Show tree info when marker pressed and cutDown button
+        //Show tree info when marker pressed and cutDown/update button
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
             @SuppressLint({"SetTextI18n", "InflateParams"})
@@ -402,6 +397,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return false;
     }
 
+    // Refreshes markers on the map with trees from backend
     private void populateMap() {
 
         //Remove current markers
@@ -751,7 +747,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         System.out.println(treeCutDown.toString());
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "trees/update/", treeCutDown, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "tree/update/", treeCutDown, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("CutResponse: " + response.toString());
@@ -867,6 +863,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    // Creates popup for adding a new species
     public void showSpeciesPopup() {
 
         LinearLayout mapsLayout = findViewById(R.id.map_layout);
