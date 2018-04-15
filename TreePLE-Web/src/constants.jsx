@@ -15,7 +15,7 @@ export const lands = {
 export const statuses = {
   planted: {enum: 'Planted', color: 'green'},
   diseased: {enum: 'Diseased', color: 'yellow'},
-  markedForCutdown: {enum: 'Marked For Cutdown', color: 'pink'},
+  markedForCutdown: {enum: 'MarkedForCutdown', color: 'orange'},
   cutdown: {enum: 'Cutdown', color: 'red'}
 };
 

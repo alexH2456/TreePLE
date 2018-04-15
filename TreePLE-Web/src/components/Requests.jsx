@@ -6,11 +6,11 @@ const frontendUrl = 'http://' +  serverHost + ':8087/';
 
 const AXIOS = axios.create({
   baseURL: backendUrl,
-  // headers: {
-    // 'Access-Control-Allow-Origin': frontendUrl,
-    // 'Access-Control-Allow-Methods': 'GET, POST, PATCH',
-    // 'Access-Control-Allow-Headers': 'Origin, Content-Type'
-  // },
+  headers: {
+    'Access-Control-Allow-Origin': frontendUrl,
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH',
+    'Access-Control-Allow-Headers': 'Origin, Content-Type, Authorization'
+  },
   timeout: 15000
 });
 
@@ -94,12 +94,12 @@ function getMunicipalitySustainability(municipality) {
 // ==============================
 
 function createTree(params) {
-  const url = `/newtree/`;
+  const url = `/tree/new/`;
   return postRequestWithParams(url, params);
 }
 
 function createUser(params) {
-  const url = `/newuser/`;
+  const url = `/user/new/`;
   return postRequestWithParams(url, params);
 }
 

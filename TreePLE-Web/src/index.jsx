@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom';
 import IconMenu from './components/IconMenu';
 import NavigationBar from './components/NavigationBar';
 import TreeMap from './components/TreeMap';
+import About from "./components/About";
 
 // CSS Sheets
+import 'react-day-picker/lib/style.css';
 
 // Render Page
 

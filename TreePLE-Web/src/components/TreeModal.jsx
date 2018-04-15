@@ -22,7 +22,9 @@ class TreeModal extends PureComponent {
         municipality: props.tree.municipality.name
       },
       update: false,
-      showReports: false
+      showReports: false,
+      speciesSelectable: [],
+      municipalitySelectable: []
     }
   }
 
@@ -34,38 +36,22 @@ class TreeModal extends PureComponent {
     });
   }
 
-  onStartEdit = () => this.setState({update: true});
-
-  onCancelEdit = () => {
-    this.setState({
-      update: false,
-      updatedTree: {
-        treeId: this.props.tree.treeId,
-        height: 0,
-        diameter: 0,
-        land: '',
-        status: '',
-        ownership: '',
-        species: '',
-        municipality: ''
-      }
-    });
-  }
+  onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
 
   onUpdateTree = () => {
-    const updateObj = {tree: this.state.updatedTree, user: this.state.user}
-    console.log(updateObj);
+    const treeParams = {
+      user: this.state.user,
+      tree: this.state.updatedTree
+    };
 
-    updateTree(updateObj)
+    updateTree(treeParams)
       .then(({data}) => {
-        console.log(data);
-
+        this.props.onClose(null, null);
       })
       .catch(error => {
-        console.error(error);
+        console.log(error);
 
       })
-    this.setState({update: false})
   }
 
   onShowReports = () => this.setState(prevState => ({showReports: !prevState.showReports}));
@@ -89,7 +75,7 @@ class TreeModal extends PureComponent {
           <Modal.Header>
             <Header as='h1' icon textAlign='center'>
               <Icon name='tree' circular/>
-              <Header.Content>Tree</Header.Content>
+              <Header.Content>{!this.state.update ? 'View' : 'Update'} Tree</Header.Content>
             </Header>
           </Modal.Header>
           <Modal.Description>
@@ -223,11 +209,11 @@ class TreeModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 {!this.state.update ? (
-                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onStartEdit}>Edit</Button>
+                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onToggleEdit}>Edit</Button>
                 ) : (
                   <div>
-                    <Button inverted color='green' size='small' onClick={this.onUpdateTree}>Save</Button>
-                    <Button inverted color='orange' size='small' onClick={this.onCancelEdit}>Back</Button>
+                    <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onUpdateTree}>Save</Button>
+                    <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
                   </div>
                 )}
                 <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, null)}>Close</Button>

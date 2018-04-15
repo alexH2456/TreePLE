@@ -15,7 +15,7 @@ function getSpeciesSelectable() {
       });
     })
     .catch(error => {
-      console.error(error);
+      console.log(error);
     });
 
   return speciesSelectable;
@@ -35,7 +35,7 @@ function getMunicipalitySelectable() {
       });
     })
     .catch(error => {
-      console.error(error);
+      console.log(error);
     });
 
   return municipalitySelectable;
@@ -110,13 +110,13 @@ function getTreeIcons(tree) {
       icons.color = statuses.planted.color;
       break;
     case statuses.diseased.enum:
-      icons.color = statuses.color;
+      icons.color = statuses.diseased.color;
       break;
     case statuses.markedForCutdown.enum:
-      icons.color = statuses.color;
+      icons.color = statuses.markedForCutdown.color;
       break;
     case statuses.cutdown.enum:
-      icons.color = statuses.color;
+      icons.color = statuses.cutdown.color;
       break;
     default:
       icons.color = 'black';
@@ -125,10 +125,15 @@ function getTreeIcons(tree) {
   return icons;
 }
 
+function formatDate(date) {
+  return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+}
+
 export {
   getSpeciesSelectable,
   getMunicipalitySelectable,
   getLatLngBorders,
   getMapBounds,
-  getTreeIcons
+  getTreeIcons,
+  formatDate
 };

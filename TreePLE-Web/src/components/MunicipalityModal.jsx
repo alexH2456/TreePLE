@@ -19,9 +19,7 @@ class MunicipalityModal extends PureComponent {
     this.setState({user: localStorage.getItem('username')});
   }
 
-  onMakeUpdate = () => {
-    this.setState({update: !this.state.update})
-  }
+  onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
 
   onShowBorders = () => {
     this.setState({showBorders: !this.state.showBorders})
@@ -118,9 +116,12 @@ class MunicipalityModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 {!this.state.update ? (
-                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onMakeUpdate}>Edit</Button>
+                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onToggleEdit}>Edit</Button>
                 ) : (
-                  <Button inverted color='green' size='small' onClick={this.onUpdateMunicipality}>Save</Button>
+                  <div>
+                    <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onUpdateMunicipality}>Save</Button>
+                    <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
+                  </div>
                 )}
                 <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, null)}>Close</Button>
               </Grid.Row>
