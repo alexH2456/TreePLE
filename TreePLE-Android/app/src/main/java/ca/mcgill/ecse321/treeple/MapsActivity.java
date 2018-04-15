@@ -745,8 +745,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         treeCutDown.put("tree", newTree);
 
-        System.out.println(treeCutDown.toString());
-
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "tree/update/", treeCutDown, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
