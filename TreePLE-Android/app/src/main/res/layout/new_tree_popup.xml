@@ -60,8 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -73,8 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -86,8 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dialog" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -99,8 +96,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dialog"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -112,8 +108,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.DropDown"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dialog"/>
 
     <TextView
         android:layout_width="wrap_content"

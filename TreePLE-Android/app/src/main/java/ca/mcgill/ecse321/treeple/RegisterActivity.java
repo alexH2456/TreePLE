@@ -71,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
         mRolePassView = findViewById(R.id.role_password);
 
         //Populate spinner with enum
-        final ArrayAdapter<CharSequence> roleAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.role_enum, R.layout.support_simple_spinner_dropdown_item);
+        final ArrayAdapter<CharSequence> roleAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.role_enum, R.layout.spinner_dialog);
         mRoleView.setAdapter(roleAdapter);
         mRoleView.setSelection(0);
 
