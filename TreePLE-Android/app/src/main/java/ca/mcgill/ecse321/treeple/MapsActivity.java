@@ -2,6 +2,7 @@ package ca.mcgill.ecse321.treeple;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -53,17 +55,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import ca.mcgill.ecse321.treeple.utils.DatePickerFragment;
+import ca.mcgill.ecse321.treeple.utils.InvalidInputException;
+import ca.mcgill.ecse321.treeple.utils.VolleyController;
+
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    // TODO: Add update function for tree properties
-    // TODO: Replace tree icon with default marker, color based on ownership
+    //TODO: Remove debug methods before submission(getUser)
 
     private GoogleMap mMap;
 
@@ -122,6 +128,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
+        try {
+            if (LoginActivity.loggedInUser.getString("role").equals("Scientist")) {
+                MenuItem item = menu.findItem(R.id.create_species);
+                item.setVisible(true);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -131,12 +145,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             refreshUser();
             populateMap();
         } else if (item.getItemId() == R.id.loggedin_user) {
+            // Debug method, remove before release
             Toast.makeText(getApplicationContext(), "Current user: " + LoginActivity.loggedInUser, Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.logout_button) {
+            switchToLogin();
+        } else if (item.getItemId() == R.id.create_species) {
+            showSpeciesPopup();
         } else if (item.getItemId() == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void switchToLogin() {
+        Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 
     @Override
@@ -159,7 +184,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapLongClick(LatLng latLng) {
 
-                final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                final Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(getMarkerColor("Planted"))));
                 CameraUpdate centerCam = CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM);
                 mMap.animateCamera(centerCam, 400, null);
 
@@ -172,6 +197,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Spinner landSpinner = popupView.findViewById(R.id.land_spinner);
                 Spinner statusSpinner = popupView.findViewById(R.id.status_spinner);
                 Spinner ownershipSpinner = popupView.findViewById(R.id.ownership_spinner);
+                Spinner speciesSpinner = popupView.findViewById(R.id.tree_species);
+                Spinner municipalitySpinner = popupView.findViewById(R.id.tree_municipality);
 
                 int width = LinearLayout.LayoutParams.WRAP_CONTENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -180,7 +207,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng markerPos = marker.getPosition();
                 Double latitude = markerPos.latitude;
                 Double longitude = markerPos.longitude;
-                String latlng = latitude + " " + longitude;
+                String latlng = "Lat: " + latitude + ",Lng: " + longitude;
 
                 coords.setText(latlng);
 
@@ -189,18 +216,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.support_simple_spinner_dropdown_item);
                 landSpinner.setAdapter(landAdapter);
+                landSpinner.setSelection(0);
 
                 ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.support_simple_spinner_dropdown_item);
                 statusSpinner.setAdapter(statusAdapter);
+                statusSpinner.setSelection(0);
 
                 ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.support_simple_spinner_dropdown_item);
                 ownershipSpinner.setAdapter(ownershipAdapter);
+                ownershipSpinner.setSelection(0);
+
+                getSpinnerData(speciesSpinner, VolleyController.DEFAULT_BASE_URL + "species/");
+                getSpinnerData(municipalitySpinner, VolleyController.DEFAULT_BASE_URL + "municipalities/");
 
                 //Remove created marker if tree not added to database
                 popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                     @Override
                     public void onDismiss() {
                         populateMap();
+                        refreshUser();
                     }
                 });
 
@@ -211,11 +245,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onClick(View view) {
                         try {
                             plantTree(popupView);
-                            populateMap();
-                            refreshUser();
-
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } catch (InvalidInputException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -265,7 +299,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 TextView treeCoords = popupView.findViewById(R.id.tree_coords);
-                treeCoords.setText(marker.getPosition().toString());
+                double latitude = marker.getPosition().latitude;
+                double longitude = marker.getPosition().longitude;
+                String coords = "Lat: " + latitude + ",Lng: " + longitude;
+                treeCoords.setText(coords);
 
                 popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
@@ -275,26 +312,94 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onDismiss() {
                         populateMap();
+                        refreshUser();
                     }
                 });
 
                 //Wait for cutDown to be pressed then refresh map
                 Button cutdownButton = popupView.findViewById(R.id.cutdown_tree);
-                cutdownButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            cutDownTree(marker);
-                            populateMap();
-                            refreshUser();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                if (getTreePermissions(marker)) {
+                    cutdownButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                cutDownTree(marker);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    cutdownButton.setVisibility(View.GONE);
+                }
+
+                Button updateTreeButton = popupView.findViewById(R.id.update_tree);
+                if (getTreePermissions(marker)) {
+
+                    updateTreeButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                updateTree(marker);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
+                    updateTreeButton.setVisibility(View.GONE);
+                }
+
                 return true;
             }
         });
+    }
+
+    private void getSpinnerData(final Spinner spinner, String url) {
+        final ArrayList<String> spinnerData = new ArrayList<>();
+        JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject entry = response.getJSONObject(i);
+                        spinnerData.add(entry.getString("name"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                spinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, spinnerData));
+                spinner.setSelection(0);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "SpinnerDataError: " + backendResponse);
+            }
+        });
+
+        VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+    }
+
+    private boolean getTreePermissions(Marker marker) {
+        JSONObject tree = trees.get(marker);
+        try {
+            if (LoginActivity.loggedInUser.getString("role").equals("Scientist")) {
+                return true;
+            }
+
+            int treeId = tree.getInt("treeId");
+            JSONArray userTrees = LoginActivity.loggedInUser.getJSONArray("myTrees");
+            for (int i = 0; i < userTrees.length(); i++) {
+                if (treeId == userTrees.getInt(i)) {
+                    return true;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void populateMap() {
@@ -302,7 +407,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Remove current markers
         clearTrees();
 
-        //TODO: Don't display trees if they have status cutDown
         //Query database for list of all trees and add each to the map + trees list
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, VolleyController.DEFAULT_BASE_URL + "trees/", null, new Response.Listener<JSONArray>() {
             @Override
@@ -310,14 +414,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject tree = response.getJSONObject(i);
+                        String status = tree.getString("status");
 
+                        System.out.println(status);
+
+                        //Don't add trees to map if they have status "Cutdown"
                         JSONObject location = tree.getJSONObject("location");
                         double latitude = (double) location.get("latitude");
                         double longitude = (double) location.get("longitude");
-
                         LatLng latLng = new LatLng(latitude, longitude);
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(getMarkerColor(tree.getString("status")))));
                         trees.put(marker, tree);
 
                     } catch (JSONException e) {
@@ -330,13 +437,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PopulateError: " + error.networkResponse.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "PopulateError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
 
+    }
+
+    private float getMarkerColor(String status) {
+        if (status.equals("Planted")) {
+            return BitmapDescriptorFactory.HUE_GREEN;
+        }
+        if (status.equals("Diseased")) {
+            return BitmapDescriptorFactory.HUE_YELLOW;
+        }
+        if (status.equals("MarkedForCutdown")) {
+            return BitmapDescriptorFactory.HUE_ROSE;
+        }
+        else {
+            return BitmapDescriptorFactory.HUE_RED;
+        }
     }
 
     //Get updated user info from database
@@ -361,7 +484,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "UserRefreshError: " + error.networkResponse.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "UserRefreshError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Failed retrieving user", Toast.LENGTH_LONG).show();
             }
         });
@@ -370,10 +494,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getDeviceLocation() {
-    /*
-     * Get the best and most recent location of the device, which may be null in rare
-     * cases when a location is not available.
-     */
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
         try {
             if (mLocationPermissionGranted) {
                 mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -403,11 +527,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getLocationPermission() {
-    /*
-     * Request location permission, so that we can get the location of the
-     * device. The result of the permission request is handled by a callback,
-     * onRequestPermissionsResult.
-     */
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -535,7 +659,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Parses entered info from fields and converts it into a JSON object, then issues a POST to the database
-    public void plantTree(View view) throws JSONException {
+    public void plantTree(View view) throws JSONException, InvalidInputException {
 
         TextView currentView = popupView.findViewById(R.id.tree_height);
         int height = Integer.parseInt(currentView.getText().toString());
@@ -555,16 +679,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         currentSpinner = popupView.findViewById(R.id.ownership_spinner);
         String ownership = currentSpinner.getSelectedItem().toString();
 
-        currentView = popupView.findViewById(R.id.tree_species);
-        String species = currentView.getText().toString();
+        currentSpinner = popupView.findViewById(R.id.tree_species);
+        String species = currentSpinner.getSelectedItem().toString();
 
-        currentView = popupView.findViewById(R.id.tree_municipality);
-        String municipality = currentView.getText().toString();
+        currentSpinner = popupView.findViewById(R.id.tree_municipality);
+        String municipality = currentSpinner.getSelectedItem().toString();
 
         currentView = popupView.findViewById(R.id.tree_coords);
-        String[] latlng = currentView.getText().toString().split(" ");
-        Double latitude = Double.parseDouble(latlng[0]);
-        Double longitude = Double.parseDouble(latlng[1]);
+        String[] latlng = currentView.getText().toString().split(",");
+        String[] lat = latlng[0].split(" ");
+        String[] lng = latlng[1].split(" ");
+        Double latitude = Double.parseDouble(lat[1]);
+        Double longitude = Double.parseDouble(lng[1]);
 
         String username = LoginActivity.loggedInUser.getString("username");
 
@@ -585,7 +711,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         plantObj.put("tree", treeObj);
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newtree/", plantObj, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "tree/new/", plantObj, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("PlantResponse: " + response.toString());
@@ -594,7 +720,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "PlantError: " + error.networkResponse.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "PlantError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
@@ -602,18 +729,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    //TODO: Change to updateTree and update status to cutDown instead of deleting
-    //Gets tree json from map and issues POST request to database
+    //Gets tree json from map and issues PATCH request to database to update status to "Cutdown"
     public void cutDownTree(Marker marker) throws JSONException {
 
-        int treeID = (int) trees.get(marker).get("treeId");
-        System.out.println("TREEID: " + treeID);
+        JSONObject oldTree = trees.get(marker);
 
-        JSONObject treeDelete = new JSONObject();
-        treeDelete.put("treeId", treeID);
-        treeDelete.put("user", LoginActivity.loggedInUser.getString("username"));
+        JSONObject treeCutDown = new JSONObject();
+        treeCutDown.put("user", LoginActivity.loggedInUser.getString("username"));
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "deletetree/", treeDelete, new Response.Listener<JSONObject>() {
+        JSONObject newTree = new JSONObject();
+        newTree.put("treeId", oldTree.getInt("treeId"));
+        newTree.put("height", oldTree.getInt("height"));
+        newTree.put("diameter", oldTree.getInt("diameter"));
+        newTree.put("land", oldTree.getString("land"));
+        newTree.put("ownership", oldTree.getString("ownership"));
+        newTree.put("species", oldTree.getJSONObject("species").getString("name"));
+        newTree.put("municipality", oldTree.getJSONObject("municipality").getString("name"));
+        newTree.put("status", "Cutdown");
+
+        treeCutDown.put("tree", newTree);
+
+        System.out.println(treeCutDown.toString());
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "trees/update/", treeCutDown, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("CutResponse: " + response.toString());
@@ -622,12 +760,163 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "CutError: " + error.networkResponse.toString());
+                String backendResponse = VolleyController.parseNetworkResponse(error);
+                Log.e(TAG, "CutError: " + backendResponse);
                 Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
             }
         });
 
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+    }
+
+    // Residents can update their own trees, Scientists can update any tree
+    public void updateTree(Marker marker) throws JSONException {
+
+        final JSONObject tree = trees.get(marker);
+        popupWindow.dismiss();
+
+        LinearLayout mapsLayout = findViewById(R.id.map_layout);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        assert inflater != null;
+        popupView = inflater.inflate(R.layout.update_tree_popup, null);
+
+        final Spinner landSpinner = popupView.findViewById(R.id.land_spinner);
+        final Spinner statusSpinner = popupView.findViewById(R.id.status_spinner);
+        final Spinner ownershipSpinner = popupView.findViewById(R.id.ownership_spinner);
+        final Spinner speciesSpinner = popupView.findViewById(R.id.tree_species);
+        final Spinner municipalitySpinner = popupView.findViewById(R.id.tree_municipality);
+        TextView treeId = popupView.findViewById(R.id.treeID);
+        final EditText treeHeight = popupView.findViewById(R.id.tree_height);
+        final EditText treeDiameter = popupView.findViewById(R.id.tree_diameter);
+
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        treeId.setText(Integer.toString(tree.getInt("treeId")));
+
+        ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.support_simple_spinner_dropdown_item);
+        landSpinner.setAdapter(landAdapter);
+        landSpinner.setSelection(0);
+
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.support_simple_spinner_dropdown_item);
+        statusSpinner.setAdapter(statusAdapter);
+        statusSpinner.setSelection(0);
+
+        ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.support_simple_spinner_dropdown_item);
+        ownershipSpinner.setAdapter(ownershipAdapter);
+        ownershipSpinner.setSelection(0);
+
+        getSpinnerData(speciesSpinner, VolleyController.DEFAULT_BASE_URL + "species/");
+        getSpinnerData(municipalitySpinner, VolleyController.DEFAULT_BASE_URL + "municipalities/");
+
+        Button updateTreeButton = popupView.findViewById(R.id.update_tree_button);
+
+        popupWindow = new PopupWindow(popupView, width, height, true);
+        popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
+
+        updateTreeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    JSONObject plantObj = new JSONObject();
+                    plantObj.put("user", LoginActivity.loggedInUser.getString("username"));
+
+                    JSONObject treeObj = new JSONObject();
+                    treeObj.put("treeId", tree.getInt("treeId"));
+                    treeObj.put("height", treeHeight.getText().toString());
+                    treeObj.put("diameter", treeDiameter.getText().toString());
+                    treeObj.put("land", landSpinner.getSelectedItem().toString());
+                    treeObj.put("status", statusSpinner.getSelectedItem().toString());
+                    treeObj.put("ownership", ownershipSpinner.getSelectedItem().toString());
+                    treeObj.put("species", speciesSpinner.getSelectedItem().toString());
+                    treeObj.put("municipality", municipalitySpinner.getSelectedItem().toString());
+
+                    plantObj.put("tree", treeObj);
+
+                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.PATCH, VolleyController.DEFAULT_BASE_URL + "tree/update/", plantObj, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e(TAG, "PlantResponse: " + response.toString());
+                            popupWindow.dismiss();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            String backendResponse = VolleyController.parseNetworkResponse(error);
+                            Log.e(TAG, "UpdateError: " + backendResponse);
+                            Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        //Refresh map if popup dismissed
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                populateMap();
+                refreshUser();
+            }
+        });
+    }
+
+    public void showSpeciesPopup() {
+
+        LinearLayout mapsLayout = findViewById(R.id.map_layout);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        assert inflater != null;
+        popupView = inflater.inflate(R.layout.species_popup, null);
+
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        final EditText speciesName = popupView.findViewById(R.id.species_name);
+        final EditText speciesGenus = popupView.findViewById(R.id.species_genus);
+        final EditText speciesSpecies = popupView.findViewById(R.id.species_species);
+        Button addSpeciesButton = popupView.findViewById(R.id.add_species_button);
+
+        popupWindow = new PopupWindow(popupView, width, height, true);
+        popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
+
+        addSpeciesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONObject speciesObj = new JSONObject();
+                try {
+                    speciesObj.put("name", speciesName.getText().toString());
+                    speciesObj.put("genus", speciesGenus.getText().toString());
+                    speciesObj.put("species", speciesSpecies.getText().toString());
+
+                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "species/new/", speciesObj, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.e(TAG, "SpeciesResponse: " + response.toString());
+                            popupWindow.dismiss();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            String backendResponse = VolleyController.parseNetworkResponse(error);
+                            Log.e(TAG, "SpeciesError: " + backendResponse);
+                            Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 }

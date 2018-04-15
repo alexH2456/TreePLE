@@ -1,0 +1,152 @@
+import React, {PureComponent} from 'react';
+import {compose, withProps} from 'recompose';
+import {GoogleMap, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
+import {Button, Divider, Header, Icon, Grid, Modal} from 'semantic-ui-react';
+import {getLatLngBorders, getMapBounds} from './Utils';
+import {gmapsKey} from '../constants';
+
+class MunicipalityModal extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: '',
+      update: false,
+      showBorders: true
+    }
+  }
+
+  componentWillMount() {
+    this.setState({user: localStorage.getItem('username')});
+  }
+
+  onMakeUpdate = () => {
+    this.setState({update: !this.state.update})
+  }
+
+  onShowBorders = () => {
+    this.setState({showBorders: !this.state.showBorders})
+  }
+
+  onUpdateMunicipality = () => {
+    this.setState({update: !this.state.update})
+  }
+
+  onGMapLoaded = () => {
+    let viewport = getMapBounds(props.municipality.borders);
+    this.refs.map.fitBounds(viewport);
+  }
+
+  render() {
+    const {municipality} = this.props;
+
+    return (
+      <Modal
+        open
+        size='small'
+        dimmer='blurring'
+      >
+        <Modal.Content>
+          <Modal.Header>
+            <Header as='h1' icon textAlign='center'>
+              <Icon name='map' circular/>
+              <Header.Content>Municipality</Header.Content>
+            </Header>
+          </Modal.Header>
+          <Modal.Description>
+            <Grid textAlign='center' columns={2}>
+              <Grid.Row>
+                <Grid.Column>
+                  <Header as='h3' content='Name'/>
+                </Grid.Column>
+                <Grid.Column>
+                  <Header as='h3' content='Total Trees'/>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column>
+                  {municipality.name}
+                </Grid.Column>
+                <Grid.Column>
+                  {municipality.totalTrees}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+
+            <Header as='h3' textAlign='center'>
+              <Header.Content>
+                <Icon name='point' onClick={this.onShowBorders}/>Borders
+              </Header.Content>
+            </Header>
+            {this.state.showBorders ? (
+              <div>
+                <Grid textAlign='center' columns={3}>
+                  <Grid.Column>
+                    <Header as='h4' content='Location ID'/>
+                  </Grid.Column>
+                  <Grid.Column>
+                    <Header as='h4' content='Latitude'/>
+                  </Grid.Column>
+                  <Grid.Column>
+                    <Header as='h4' content='Longitude'/>
+                  </Grid.Column>
+                </Grid>
+                <Divider/>
+                <Grid textAlign='center' columns={3}>
+                  {municipality.borders.map(({id, lat, lng}) => {
+                    return (
+                      <Grid.Row key={id}>
+                        <Grid.Column>
+                          {id}
+                        </Grid.Column>
+                        <Grid.Column>
+                          {lat}
+                        </Grid.Column>
+                        <Grid.Column>
+                          {lng}
+                        </Grid.Column>
+                      </Grid.Row>
+                    );
+                  })}
+                </Grid>
+              </div>
+            ) : null}
+
+            <Divider hidden/>
+            <GMap municipality={municipality}/>
+            <Divider hidden/>
+
+            <Grid centered>
+              <Grid.Row>
+                {!this.state.update ? (
+                  <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.onMakeUpdate}>Edit</Button>
+                ) : (
+                  <Button inverted color='green' size='small' onClick={this.onUpdateMunicipality}>Save</Button>
+                )}
+                <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, null)}>Close</Button>
+              </Grid.Row>
+            </Grid>
+          </Modal.Description>
+        </Modal.Content>
+      </Modal>
+    );
+  }
+}
+
+const GMap = compose(
+  withProps({
+    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
+    loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
+    containerElement: <div style={{height: '40vh'}}/>,
+    mapElement: <div style={{height: '40vh'}}/>,
+  }),
+  withScriptjs,
+  withGoogleMap
+)(({municipality}) => {
+  return (
+    <GoogleMap options={{scrollwheel: false}}>
+      <Polygon key={municipality.name} paths={municipality.borders}/>
+    </GoogleMap>
+  );
+});
+
+export default MunicipalityModal;

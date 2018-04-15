@@ -10,6 +10,7 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.*;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import ca.mcgill.ecse321.treeple.model.*;
@@ -21,8 +22,9 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 public class TreePLEService {
 
     private SQLiteJDBC sql;
-    private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
+    private final String gmapsKey = "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk";
     private final String sRoleKey = "i<3tr33s";
+    private final String dbKey = "ih8tr33s";
 
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
@@ -44,6 +46,33 @@ public class TreePLEService {
     // ==============================
     // CREATE API
     // ==============================
+
+    // Login
+    public User login(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+        String password = jsonParams.getString("password");
+
+        if (username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (password.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Password cannot be empty!");
+
+        User user = null;
+        if ((user = User.getWithUsername(username)) != null) {
+            if (BCrypt.checkpw(password, user.getPassword())) {
+                return user;
+            }
+        } else {
+            if ((user = sql.getUser(username)) == null)
+                throw new InvalidInputException("That username doesn't exist!");
+
+            if (BCrypt.checkpw(password, user.getPassword())) {
+                return user;
+            }
+        }
+
+        return user;
+    }
 
     // Create a new Tree
     public Tree createTree(JSONObject jsonParams) throws Exception {
@@ -80,7 +109,6 @@ public class TreePLEService {
             throw new InvalidInputException("That ownership doesn't exist!");
 
         String address = "";
-        String postalCode = "";
         try {
             String gmapsUrl = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%.8f,%.8f&key=%s",
                                             latitude, longitude, gmapsKey);
@@ -89,8 +117,7 @@ public class TreePLEService {
             if (statusCode >= 200 && statusCode < 300) {
                 JSONObject gmapsJSON = new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8"));
                 JSONArray addressInfo = gmapsJSON.getJSONArray("results").getJSONObject(0).getJSONArray("address_components");
-                address = gmapsJSON.getJSONArray("results").getJSONObject(0).getString("place_id");
-                postalCode = addressInfo.getJSONObject(addressInfo.length() - 1).getString("long_name").replaceAll("\\s", "");
+                address = addressInfo.getJSONObject(addressInfo.length() - 1).getString("long_name").replaceAll("\\s", "");
             } else if (statusCode >= 400) {
                 throw new InvalidInputException("Invalid Google Maps API request!");
             }
@@ -106,7 +133,7 @@ public class TreePLEService {
         Municipality municipalityObj;
         if ((userObj = sql.getUser(username)) == null)
             throw new InvalidInputException("User does not exist!");
-        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), postalCode))
+        if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), address))
             throw new InvalidInputException("You cannot plant on someone else's property!");
         if ((speciesObj = sql.getSpecies(species)) == null)
             throw new InvalidInputException("Species does not exist!");
@@ -148,14 +175,13 @@ public class TreePLEService {
         return treeObj;
     }
 
-    // TODO: Change myAddresses to JSONArray
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
-        String scientistKey = jsonParams.getString("scientistKey");
-    String myAddresses = jsonParams.getString("myAddresses");
+        String scientistKey = jsonParams.optString("scientistKey");
+        JSONArray myAddresses = jsonParams.getJSONArray("myAddresses");
         String myTrees = "";
 
         if (username.replaceAll("\\s", "").isEmpty())
@@ -166,24 +192,25 @@ public class TreePLEService {
             throw new InvalidInputException("Username is already taken!");
         if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
-        if (!password.matches("[a-zA-Z0-9]+"))
-            throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
         if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
+        password = BCrypt.hashpw(password, BCrypt.gensalt());
+
         User user = new User(username, password, UserRole.valueOf(role));
 
-        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
-            if (addressId != null && !addressId.isEmpty()) {
-                user.addMyAddress(addressId);
+        for (Object address : myAddresses) {
+            String postalCode = (String) address;
+            if (postalCode != null && !(postalCode = postalCode.replaceAll("\\s", "")).isEmpty()) {
+                user.addMyAddress(postalCode.toUpperCase());
             }
         }
 
-        if (!sql.insertUser(username, password, role, myAddresses, myTrees)) {
+        if (!sql.insertUser(username, password, role, myAddresses.toString().replaceAll("(\\[)|(\\])", ""), myTrees)) {
             user.delete();
             throw new SQLException("SQL User insert query failed!");
         }
@@ -194,18 +221,8 @@ public class TreePLEService {
     // Create a new Species
     public Species createSpecies(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name").trim();
-        String species;
-        String genus;
-        try {
-            species = jsonParams.getString("species").trim();
-        } catch (JSONException e) {
-            species = "";
-        }
-        try {
-            genus = jsonParams.getString("genus").trim();
-        } catch (JSONException e) {
-            genus = "";
-        }
+        String species = jsonParams.optString("species").trim();
+        String genus = jsonParams.optString("genus").trim();
 
         if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species name cannot be empty!");
@@ -356,33 +373,6 @@ public class TreePLEService {
     // GET API
     // ==============================
 
-    // Login
-    public User login(JSONObject jsonParams) throws Exception {
-        String username = jsonParams.getString("username");
-        String password = jsonParams.getString("password");
-
-        if (username == null || username.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Username cannot be empty!");
-        if (password == null || password.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Password cannot be empty!");
-
-        User user = null;
-        if ((user = User.getWithUsername(username)) != null) {
-            if (user.getPassword().equals(password)) {
-                return user;
-            }
-        } else {
-            if ((user = sql.getUser(username)) == null)
-                throw new InvalidInputException("That username doesn't exist!");
-
-            if (user.getPassword().equals(password)) {
-                return user;
-            }
-        }
-
-        return user;
-    }
-
     // Get a specific Tree
     public Tree getTreeById(int treeId) throws Exception {
         if (treeId <= 0)
@@ -479,12 +469,78 @@ public class TreePLEService {
         return forecast;
     }
 
+    // Get sustainability factors for a Tree
+    public Map<String, Map<String, Double>> getTreeSustainability(Tree tree) throws Exception {
+        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
+        Map<String, Double> stormwater = new HashMap<String, Double>();
+        Map<String, Double> co2Reduced = new HashMap<String, Double>();
+        Map<String, Double> biodiversity = new HashMap<String, Double>();
+        Map<String, Double> energyConserved = new HashMap<String, Double>();
+
+        double factor = 0;
+        stormwater.put("factor", (factor = getStormwaterIntercepted(tree)));
+        stormwater.put("worth", stormwaterWorth(factor));
+
+        co2Reduced.put("factor", (factor = getCO2Sequestered(tree)));
+        co2Reduced.put("worth", co2ReducedWorth(factor));
+
+        biodiversity.put("factor", 1.0);
+
+        energyConserved.put("factor", (factor = getEnergyConserved(tree)));
+        energyConserved.put("worth", energyConservedWorth(factor));
+
+        sustainabilityFactors.put("stormwater", stormwater);
+        sustainabilityFactors.put("co2Reduced", co2Reduced);
+        sustainabilityFactors.put("biodiversity", biodiversity);
+        sustainabilityFactors.put("energyConserved", energyConserved);
+
+        return sustainabilityFactors;
+    }
+
+    // Get sustainability factors for entire TreePLE system
+    public Map<String, Map<String, Double>> getGroupSustainability(List<Tree> allTrees) throws Exception {
+        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
+        Map<String, Double> stormwater = new HashMap<String, Double>();
+        Map<String, Double> co2Reduced = new HashMap<String, Double>();
+        Map<String, Double> biodiversity = new HashMap<String, Double>();
+        Map<String, Double> energyConserved = new HashMap<String, Double>();
+
+        double factor = 0;
+        stormwater.put("factor", (factor = forecastStormwaterIntercepted(allTrees)));
+        stormwater.put("worth", stormwaterWorth(factor));
+
+        co2Reduced.put("factor", (factor = forecastCO2Sequestered(allTrees)));
+        co2Reduced.put("worth", co2ReducedWorth(factor));
+
+        biodiversity.put("factor", forecastBiodiversityIndex(allTrees));
+
+        energyConserved.put("factor", (factor = forecastEnergyConserved(allTrees)));
+        energyConserved.put("worth", energyConservedWorth(factor));
+
+        sustainabilityFactors.put("stormwater", stormwater);
+        sustainabilityFactors.put("co2Reduced", co2Reduced);
+        sustainabilityFactors.put("biodiversity", biodiversity);
+        sustainabilityFactors.put("energyConserved", energyConserved);
+
+        return sustainabilityFactors;
+    }
+
 
     // ==============================
     // GET FILTERED API
     // ==============================
 
-    // Get trees owned by a user
+    // Get trees from a list of Tree ID's
+    public List<Tree> getTreesFromIdList(JSONArray treeIdList) throws Exception {
+        ArrayList<Tree> treeList = new ArrayList<Tree>();
+        for (Object treeId : treeIdList) {
+            treeList.add(getTreeById((int) treeId));
+        }
+
+        return treeList;
+    }
+
+    // Get trees owned by a specifc user
     public List<Tree> getTreesOfUser(String username) throws Exception {
         User user = getUserByUsername(username);
 
@@ -496,16 +552,24 @@ public class TreePLEService {
         return myTrees;
     }
 
-    // Get trees of a certain species
+    // Get trees of a specific species
     public List<Tree> getTreesOfSpecies(String name) throws Exception {
-        Species species = getSpeciesByName(name);
-        return sql.getAllTreesOfSpecies(species.getName());
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+        if (!Species.hasWithName(name) && sql.getSpecies(name) == null)
+            throw new InvalidInputException("No Species with that name exists!");
+
+        return Collections.unmodifiableList(sql.getAllTreesOfSpecies(name));
     }
 
-    // Get trees within a municipality
+    // Get trees of a specific municipality
     public List<Tree> getTreesOfMunicipality(String name) throws Exception {
-        Municipality municipality = getMunicipalityByName(name);
-        return sql.getAllTreesOfMunicipality(municipality.getName());
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+        if (!Municipality.hasWithName(name) && sql.getMunicipality(name) == null)
+            throw new InvalidInputException("No Municipality with that name exists!");
+
+        return Collections.unmodifiableList(sql.getAllTreesOfMunicipality(name));
     }
 
 
@@ -593,13 +657,13 @@ public class TreePLEService {
         return treeObj;
     }
 
-    // TODO: Change myAddresses to JSONArray
     // Update a User
     public User updateUser(JSONObject jsonParams) throws Exception {
         String username = jsonParams.getString("username");
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
-        String myAddresses = jsonParams.getString("myAddresses");
+        String scientistKey = jsonParams.optString("scientistKey");
+        JSONArray myAddresses = jsonParams.getJSONArray("myAddresses");
 
         User user;
         if (username.replaceAll("\\s", "").isEmpty())
@@ -610,24 +674,57 @@ public class TreePLEService {
             throw new InvalidInputException("Username does not exist!");
         if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
-        if (!password.matches("[a-zA-Z0-9]+"))
-            throw new InvalidInputException("Password must be alphanumeric!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && (myAddresses.replaceAll("\\s", "").isEmpty()))
+        if (role.equals("Resident") && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
+        if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
+            throw new InvalidInputException("Authorization key for Scientist role is invalid!");
+
+        password = BCrypt.hashpw(password, BCrypt.gensalt());
 
         user.setPassword(password);
         user.setRole(UserRole.valueOf(role));
         user.clearMyAddresses();
 
-        for (String addressId : myAddresses.replaceAll("\\s", "").toUpperCase().split(",")) {
-            if (addressId != null && !addressId.isEmpty()) {
-                user.addMyAddress(addressId);
+        for (Object address : myAddresses) {
+            String postalCode = (String) address;
+            if (postalCode != null && !(postalCode = postalCode.replaceAll("\\s", "")).isEmpty()) {
+                user.addMyAddress(postalCode.toUpperCase());
             }
         }
 
-        if (!sql.updateUser(username, password, role, myAddresses)) {
+        if (!sql.updateUser(username, password, role, myAddresses.toString().replaceAll("(\\[)|(\\])", ""))) {
+            user.delete();
+            throw new SQLException("SQL User update query failed!");
+        }
+
+        return user;
+    }
+
+    // Update a User Password
+    public User updateUserPassword(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+        String oldPass = jsonParams.getString("oldPass");
+        String newPass = jsonParams.getString("newPass");
+
+        User user;
+        if (username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (!username.matches("[a-zA-Z0-9]+"))
+            throw new InvalidInputException("Username must be alphanumeric!");
+        if ((user = sql.getUser(username)) == null)
+            throw new InvalidInputException("Username does not exist!");
+        if (newPass.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("New password cannot be empty!");
+
+
+        if (BCrypt.checkpw(oldPass, user.getPassword())) {
+            newPass = BCrypt.hashpw(newPass, BCrypt.gensalt());
+            user.setPassword(newPass);
+        }
+
+        if (!sql.updateUserPassword(username, newPass)) {
             user.delete();
             throw new SQLException("SQL User update query failed!");
         }
@@ -637,19 +734,9 @@ public class TreePLEService {
 
     // Update a Species
     public Species updateSpecies(JSONObject jsonParams) throws Exception {
-        String name = jsonParams.getString("name");
-        String species;
-        String genus;
-        try {
-            species = jsonParams.getString("species").trim();
-        } catch (JSONException e) {
-            species = "";
-        }
-        try {
-            genus = jsonParams.getString("genus").trim();
-        } catch (JSONException e) {
-            genus = "";
-        }
+        String name = jsonParams.getString("name").trim();
+        String species = jsonParams.optString("species").trim();
+        String genus = jsonParams.optString("genus").trim();
 
         Species speciesObj;
         if (name.replaceAll("\\s", "").isEmpty())
@@ -755,7 +842,6 @@ public class TreePLEService {
             throw new SQLException("SQL Tree delete query failed!");
 
         Municipality municipality = tree.getMunicipality();
-        Tree.setNextTreeId(Tree.getNextTreeId() - 1);
         municipality.setTotalTrees(municipality.getTotalTrees() - 1);
         sql.updateMunicipalityIncDecTotalTrees(municipality.getName(), -1);
 
@@ -815,8 +901,6 @@ public class TreePLEService {
         if (!sql.deleteLocation(locationId))
             throw new SQLException("SQL Location delete query failed!");
 
-        Location.setNextLocationId(Location.getNextLocationId() - 1);
-
         return location;
     }
 
@@ -862,8 +946,6 @@ public class TreePLEService {
         if (!sql.deleteForecast(forecastId))
             throw new SQLException("SQL Forecast delete query failed!");
 
-        Forecast.setNextForecastId(Forecast.getNextForecastId() - 1);
-
         return forecast;
     }
 
@@ -873,7 +955,12 @@ public class TreePLEService {
     // ==============================
 
     // Reset the database
-    public void resetDatabase() throws Exception {
+    public void resetDatabase(JSONObject jsonParams) throws Exception {
+        String dbAccessKey = jsonParams.getString("dbAccessKey");
+
+        if (!dbKey.equals(dbAccessKey))
+            throw new InvalidInputException("Authorization key for Reset Database is invalid!");
+
         if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to reset SQL database!");
 
@@ -884,7 +971,12 @@ public class TreePLEService {
     }
 
     // Delete the database
-    public void deleteDatabase() throws Exception {
+    public void deleteDatabase(JSONObject jsonParams) throws Exception {
+        String dbAccessKey = jsonParams.getString("dbAccessKey");
+
+        if (!dbKey.equals(dbAccessKey))
+            throw new InvalidInputException("Authorization key for Reset Database is invalid!");
+
         if (!User.clearUsers() || !Species.clearSpecies() || !Municipality.clearMunicipalities())
             throw new SQLException("Unable to delete SQL database!");
 
@@ -903,6 +995,10 @@ public class TreePLEService {
     public double forecastBiodiversityIndex(List<Tree> trees) {
         int totalTrees = trees.size();
         int totalSpecies = getUniqueSpecies(trees).size();
+
+        if (totalTrees == 0) {
+            return 0;
+        }
 
         return (double) totalSpecies/totalTrees;
     }
@@ -945,6 +1041,35 @@ public class TreePLEService {
     // SUSTAINABILITY ATTRIBUTES
     // ==============================
 
+    // Returns the amount of stormwater runoff by the tree (in L/yr)
+    public double getStormwaterIntercepted(Tree tree) throws Exception {
+        if (tree == null)
+            throw new InvalidInputException("Tree cannot be null!");
+
+        double curveNumber = 0;
+        double stormwaterCaptured = 0;
+        Land landType = tree.getLand();
+
+        if (landType == Land.Park) {
+            curveNumber = 73.5;
+        } else if (landType == Land.Residential) {
+            curveNumber = 83.2;
+        } else if (landType == Land.Institutional) {
+            curveNumber = 86.3;
+        } else if (landType == Land.Municipal) {
+            curveNumber = 91.6;
+        }
+
+        // Sorptivity of the tree (in inches)
+        double sorptivity = (1000/curveNumber) - 5;
+
+        // Estimation of the canopy area
+        double canopyArea = getCanopyArea(tree);
+        stormwaterCaptured = sorptivity * canopyArea;
+
+        return cubicFeetToLiters(stormwaterCaptured);
+    }
+
     // Returns the amount of CO2 sequestered by the tree (in kg/yr)
     public double getCO2Sequestered(Tree tree) throws Exception {
         if (tree == null)
@@ -956,8 +1081,8 @@ public class TreePLEService {
         // Survey was done at University of Nebraska showing avg dry weight 72.5%
         double dryWeight = 0.725 * weight;
 
-        // Percentage of Carbon in a tree is about 50% of the dry weight
-        double carbonWeight = 0.5 * dryWeight;
+        // Percentage of Carbon in a tree is about 68% of the dry weight
+        double carbonWeight = 0.68 * dryWeight;
 
         // CO2 to Carbon ratio in a CO2 molecule is 3.6663
         double co2Sequestered = 3.6663 * carbonWeight;
@@ -970,49 +1095,26 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
 
-        double averageEnergyConsumed = 22332.2; // In kWh/yr
+        // Average energy consumed per citizen (in kWh/yr)
+        double averageEnergyConsumed = 12332.2;
 
         double energyCoefficient = 0;
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-            energyCoefficient = 0.7145;
+            energyCoefficient = 0.9510;
         } else if (landType == Land.Residential) {
             energyCoefficient = 0.8874;
         } else if (landType == Land.Institutional) {
-            energyCoefficient = 0.9010;
+            energyCoefficient = 0.8005;
         } else if (landType == Land.Municipal) {
-            energyCoefficient = 0.8896;
+            energyCoefficient = 0.8894;
         }
 
-        double diameterCoefficient = tree.getDiameter()/50; // Average diameter of a tree is 50
+        // Average diameter of a tree is 50
+        double diameterCoefficient = tree.getDiameter()/50.0;
+
         return averageEnergyConsumed * (1 - energyCoefficient) * diameterCoefficient;
-    }
-
-    // Returns the amount of stormwater runoff by the tree (in L/yr)
-    public double getStormwaterIntercepted(Tree tree) throws Exception {
-        if (tree == null)
-            throw new InvalidInputException("Tree cannot be null!");
-
-        double curveNumber = 0;
-        double stormwaterCaptured = 0;
-        Land landType = tree.getLand();
-
-        if (landType == Land.Park) {
-            curveNumber = 83.5;
-        } else if (landType == Land.Residential) {
-            curveNumber = 93.2;
-        } else if (landType == Land.Institutional) {
-            curveNumber = 96.3;
-        } else if (landType == Land.Municipal) {
-            curveNumber = 100;
-        }
-
-        double sorptivity = (1000/curveNumber) - 10; // Sorptivity of the tree (in inches)
-        double canopyArea = getCanopyArea(tree); // Estimation of the canopy area
-        stormwaterCaptured = sorptivity * canopyArea/12;
-
-        return cubicFeetToLiters(stormwaterCaptured);
     }
 
 
@@ -1020,20 +1122,21 @@ public class TreePLEService {
     // SUSTAINABILITY MONETARY WORTH
     // ==============================
 
-    // Monetary worth of energy conserved (in CAD)
-    public double energyConservedWorth(double energyConserved) {
-        return 0.162861 * energyConserved;
-    }
-
-    // Monetary worth of CO2 reduced (in CAD)
-    public double co2ReducedWorth(double co2Reduced) {
-        return 0.009498572 * co2Reduced;
-    }
-
     // Monetary worth of stormwater intercepted (in CAD)
     public double stormwaterWorth(double stormwater) {
         return 0.0033732774 * stormwater;
     }
+
+    // Monetary worth of CO2 reduced (in CAD)
+    public double co2ReducedWorth(double co2Reduced) {
+        return 2 * 0.009498572 * co2Reduced;
+    }
+
+    // Monetary worth of energy conserved (in CAD)
+    public double energyConservedWorth(double energyConserved) {
+        return 0.142861 * energyConserved;
+    }
+
 
     // ==============================
     // TREE HELPER METHODS
@@ -1075,17 +1178,17 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("Tree cannot be null!");
 
-        int height = tree.getHeight();
-        int diameter = tree.getDiameter();
+        double height = cmToFeet(tree.getHeight());
+        double diameter = cmToInches(tree.getDiameter());
         double weight = 0;
 
         // A rough estimation of a weight for trees (in pounds)
-        // Times 0.25 or 0.15 depending on the species
+        // Times 0.45 or 0.35 depending on the species
         // Times 1.2 to account for the underground weight of the tree
         if (diameter < 11) {
-            weight = 0.25 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+            weight = 0.45 * 1.25 * Math.pow(diameter, 2) * height;
         } else {
-            weight = 0.15 * 1.2 * Math.pow(cmToInches(diameter), 2) * cmToFeet(height);
+            weight = 0.35 * 1.25 * Math.pow(diameter, 2) * height;
         }
 
         return poundsToKG(weight);

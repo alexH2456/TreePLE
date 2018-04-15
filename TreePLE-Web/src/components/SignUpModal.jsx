@@ -1,5 +1,7 @@
 import React, {PureComponent} from 'react';
-import {Button, Image, Modal, Form} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import sha512 from 'sha512';
+import {Button, Divider, Grid, Header, Icon, Modal, Form} from 'semantic-ui-react';
 import {createUser} from './Requests';
 import {roleSelectable} from '../constants';
 
@@ -7,93 +9,93 @@ class SignUpModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      modalOpen: false,
-      inputError: false,
       username: '',
       password1: '',
       password2: '',
       role: '',
       accessKey: '',
       postalCode: '',
-      errorMessage: ''
+      error: false,
+      errorMsg: ''
     };
   }
 
-  handleOpen = () => this.setState({modalOpen: true});
+  onUsernameChange = (e, {value}) => this.setState({username: value});
+  onPasswordChange1 = (e, {value}) => this.setState({password1: value});
+  onPasswordChange2 = (e, {value}) => this.setState({password2: value});
+  onRoleChange = (e, {value}) => this.setState({role: value});
+  onKeyChange = (e, {value}) => this.setState({accessKey: value});
+  onPostalChange = (e, {value}) => this.setState({postalCode: value.toUpperCase()});
 
-  handleClose = () => this.setState({modalOpen: false});
-
-  handleChangeU = (event, data) => this.setState({username: data.value});
-
-  handleChangeP1 = (event, data) => this.setState({password1: data.value});
-
-  handleChangeP2 = (event, data) => this.setState({password2: data.value});
-
-  handleRoleChange = (event, data) => this.setState({role: data.value});
-
-  handleKeyChange = (event, data) => this.setState({accessKey: data.value});
-
-  handlePostalChange = (event, data) => this.setState({postalCode: data.value.toUpperCase()});
-
-  handleSignUp = () => {
+  onSignUp = () => {
     if (this.state.password1 == this.state.password2) {
       const signupInfo = {
         username: this.state.username,
-        password: this.state.password2,
+        password: sha512(this.state.password1).toString('hex'),
         role: this.state.role,
         scientistKey: this.state.accessKey,
-        myAddresses: this.state.postalCode
+        myAddresses: [this.state.postalCode]
       };
 
       createUser(signupInfo)
-        .then(response => {
-          console.log(response);
-          this.setState({modalOpen: false});
+        .then(({data, status}) => {
+          if (status == 200) {
+            localStorage.setItem('username', data.username);
+            this.props.onClose();
+          }
         })
         .catch(error => {
-          console.log(error.message);
           this.setState({
-            inputError: true,
-            errorMessage: error.message
+            error: true,
+            errorMsg: error.message
           });
         });
     } else {
       this.setState({
-        inputError: true,
-        errorMessage:"Passwords are different"
+        error: true,
+        errorMsg: "Passwords do not match!"
       });
     }
   }
 
   render() {
     return (
-      <Modal
-        basic
-        size="small"
-        open={this.state.modalOpen}
-        onClose={this.handleClose}
-        trigger={<Button onClick={this.handleOpen}>Sign Up</Button>}
-      >
-        <Modal.Content image>
-          <div>
-            <Image src='../images/favicon.ico' size='small' spaced='right'/>
-          </div>
+      <Modal open size="mini" dimmer='blurring'>
+        <Modal.Content>
+          <Modal.Header>
+            <Header as='h1' icon textAlign='center'>
+              <Icon name='users' circular/>
+              <Header.Content>Sign Up</Header.Content>
+            </Header>
+          </Modal.Header>
           <Modal.Description>
             <Form>
-              <Form.Input fluid placeholder='Username' onChange={this.handleChangeU}/>
-              <Form.Input fluid type='password' placeholder='Password' onChange={this.handleChangeP1}/>
-              <Form.Input fluid type='password' placeholder='Confirm Password' onChange={this.handleChangeP2}/>
-              <Form.Select fluid options={roleSelectable} placeholder='Role' onChange={this.handleRoleChange}/>
-              <Form.Input fluid type='password' placeholder='Scientist Access Key' onChange={this.handleKeyChange}/>
-              <Form.Input fluid placeholder='PostalCode' onChange={this.handlePostalChange}/>
-              <Form.Button inverted color='green' size='small' onClick={this.handleSignUp}>Sign Up</Form.Button>
-              <Form.Button inverted color='red' size='small' onClick={this.handleClose}>Close</Form.Button>
+              <Form.Input fluid placeholder='Username' onChange={this.onUsernameChange}/>
+              <Form.Input fluid type='password' placeholder='Password' onChange={this.onPasswordChange1}/>
+              <Form.Input fluid type='password' placeholder='Confirm Password' onChange={this.onPasswordChange2}/>
+              <Form.Select fluid options={roleSelectable} placeholder='Role' onChange={this.onRoleChange}/>
+              {this.state.role == 'Scientist' ? (
+                <Form.Input fluid type='password' placeholder='Scientist Access Key' onChange={this.onKeyChange}/>
+              ) : null}
+              <Form.Input fluid placeholder='Postal Code' onChange={this.onPostalChange}/>
             </Form>
+            <Divider hidden/>
+            <Grid centered>
+              <Grid.Row>
+                <Form.Button inverted color='green' size='small' onClick={this.onSignUp}>Sign Up</Form.Button>
+                <Form.Button inverted color='blue' size='small' onClick={this.props.onRegister}>Sign In</Form.Button>
+                <Form.Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Form.Button>
+              </Grid.Row>
+            </Grid>
           </Modal.Description>
         </Modal.Content>
       </Modal>
     );
   }
+}
+
+SignUpModal.propTypes = {
+  onClose: PropTypes.func.isRequired
 }
 
 export default SignUpModal;

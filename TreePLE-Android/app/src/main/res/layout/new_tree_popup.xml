@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/new_tree_popup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="20dp"
     android:background="@drawable/popupborder"
     android:orientation="vertical">
 
@@ -62,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
         android:spinnerMode="dropdown" />
 
     <TextView
@@ -75,7 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
         android:spinnerMode="dropdown" />
 
     <TextView
@@ -88,7 +86,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
         android:spinnerMode="dropdown" />
 
     <TextView
@@ -96,32 +94,26 @@
         android:layout_height="wrap_content"
         android:text="@string/species" />
 
-    <android.support.design.widget.TextInputEditText
+    <Spinner
         android:id="@+id/tree_species"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:hint="@string/prompt_species"
-        android:inputType="text"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textSize="12sp" />
+        style="@style/Widget.AppCompat.Spinner.DropDown"
+        android:spinnerMode="dropdown"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/municipality" />
 
-    <android.support.design.widget.TextInputEditText
+    <Spinner
         android:id="@+id/tree_municipality"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:hint="@string/prompt_municipality"
-        android:inputType="text"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textSize="12sp" />
+        style="@style/Widget.AppCompat.Spinner.DropDown"
+        android:spinnerMode="dropdown"/>
 
     <TextView
         android:layout_width="wrap_content"

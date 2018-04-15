@@ -1,74 +1,76 @@
 import React, {PureComponent} from 'react';
-import {Button, Image, Modal, Form} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import sha512 from 'sha512';
+import {Button, Divider, Grid, Header, Icon, Modal, Form} from 'semantic-ui-react';
 import {login} from './Requests';
 
 class SignInModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      modalOpen: false,
-      inputError: false,
       username: '',
       password: '',
-      errorMessage: ''
+      error: false,
+      errorMsg: ''
     };
   }
 
-  handleOpen = () => this.setState({modalOpen: true});
+  onUsernameChange = (e, {value}) => this.setState({username: value});
+  onPasswordChange = (e, {value}) => this.setState({password: value});
 
-  handleClose = () => this.setState({modalOpen: false});
-
-  handleChangeU = (event) => {
-    this.setState({username: event.target.value});
-  }
-
-  handleChangeP = (event) => {
-    this.setState({password: event.target.value});
-  }
-
-  handleSignIn = () => {
+  onSignIn = () => {
     const loginInfo = {
       username: this.state.username,
-      password: this.state.password,
+      password: sha512(this.state.password).toString('hex')
     };
 
     login(loginInfo)
       .then(({data, status}) => {
         if (status == 200) {
-            localStorage.setItem("username", JSON.stringify(data.username));
-            localStorage.setItem("role", JSON.stringify(data.role));
-            localStorage.setItem("adresses", JSON.stringify(data.myAddresses[0]));
-            this.setState({modalOpen: false});
+          localStorage.setItem('username', data.username);
+          this.props.onClose();
         }
       })
       .catch(error => {
-        console.log(error.message);
-        this.setState({inputError: true,
-                       errorMessage:error.message
-                     });
+        this.setState({
+          error: true,
+          errorMsg: error.message
+        });
       });
   }
 
   render() {
     return (
-      <Modal basic size='small' open={this.state.modalOpen} onClose={this.handleClose} trigger={<Button onClick={this.handleOpen}>Sign In</Button>}
-      >
-        <Modal.Content image>
-          <div>
-            <Image src='../images/favicon.ico' size='small' spaced='right'/>
-          </div>
+      <Modal open size='mini' dimmer='blurring'>
+        <Modal.Content>
+          <Modal.Header>
+            <Header as='h1' icon textAlign='center'>
+              <Icon name='user' circular/>
+              <Header.Content>Sign In</Header.Content>
+            </Header>
+          </Modal.Header>
           <Modal.Description>
             <Form>
-              <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.handleChangeU}/>
-              <Form.Input fluid type='password' placeholder='Password' error={this.state.error} onChange={this.handleChangeP}/>
-              <Form.Button inverted color='green' size='small' onClick={this.handleSignIn}>Sign In</Form.Button>
-              <Form.Button inverted color='red' size='small' onClick={this.handleClose}>Close</Form.Button>
+              <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.onUsernameChange}/>
+              <Form.Input fluid type='password' placeholder='Password' error={this.state.error} onChange={this.onPasswordChange}/>
             </Form>
+            <Divider hidden/>
+            <Grid centered>
+              <Grid.Row>
+                <Form.Button inverted color='green' size='small' onClick={this.onSignIn}>Sign In</Form.Button>
+                <Form.Button inverted color='blue' size='small' onClick={this.props.onRegister}>Sign Up</Form.Button>
+                <Form.Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Form.Button>
+              </Grid.Row>
+            </Grid>
           </Modal.Description>
         </Modal.Content>
       </Modal>
     );
   }
+}
+
+SignInModal.propTypes = {
+  onClose: PropTypes.func.isRequired
 }
 
 export default SignInModal;

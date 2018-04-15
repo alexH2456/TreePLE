@@ -3,9 +3,6 @@
     <color name="colorPrimary">#66bb6a</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#a2b5b9</color>
-    <color name="Background">#ffffff</color>
     <color name="button">#e0e0e0</color>
-    <color name="ActivityBG">#ffffff</color>
     <color name="white">#ffffff</color>
-    <color name="black">#000000</color>
 </resources>

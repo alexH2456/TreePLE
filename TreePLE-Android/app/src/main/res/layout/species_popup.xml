@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popupborder"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/species_name"/>
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/species_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:hint="@string/species_name"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/species_genus"/>
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/species_genus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:hint="@string/species_genus"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/species_species"/>
+
+    <android.support.design.widget.TextInputEditText
+        android:id="@+id/species_species"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:hint="@string/species_species"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"/>
+
+    <Button
+        android:id="@+id/add_species_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_bg_rounded_corners"
+        android:text="@string/add_species_button"/>
+
+</LinearLayout>

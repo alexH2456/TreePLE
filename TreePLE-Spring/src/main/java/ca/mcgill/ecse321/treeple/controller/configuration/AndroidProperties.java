@@ -1,9 +1,6 @@
 package ca.mcgill.ecse321.treeple.controller.configuration;
 
 import org.springframework.stereotype.Component;
-
-import ca.mcgill.ecse321.treeple.TreePLESpringApplication;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Component
@@ -12,7 +9,6 @@ public class AndroidProperties {
 
     // The IP address of the Android client
     private String ip = "192.168.56.102";
-    // private String ip = (TreePLESpringApplication.env.acceptsProfiles("prod")) ? ("ecse321-11.ece.mcgill.ca") : ("192.168.56.102");
 
     // The port on which the Android client listens
     private int port = 8086;

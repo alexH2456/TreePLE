@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/marker_popup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="20dp"
     android:background="@drawable/popupborder"
     android:orientation="vertical">
 
@@ -133,12 +131,28 @@
         android:layout_gravity="end"
         android:text="@string/tree_coords" />
 
-    <Button
-        android:id="@+id/cutdown_tree"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_bg_rounded_corners"
-        android:text="@string/cut_down_button" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/cutdown_tree"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_bg_rounded_corners"
+            android:text="@string/cut_down_button" />
+
+        <Button
+            android:id="@+id/update_tree"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_bg_rounded_corners"
+            android:text="@string/update_tree_button"/>
+
+    </LinearLayout>
 
 </LinearLayout>

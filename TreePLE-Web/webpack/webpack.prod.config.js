@@ -1,7 +1,9 @@
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
-const CompressionPlugin = require("compression-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var parentDir = path.join(__dirname, '../');
 
@@ -10,7 +12,7 @@ module.exports = {
     path.join(parentDir, 'src/index.jsx')
   ],
   output: {
-    path: path.join(parentDir, '/dist'),
+    path: path.join(parentDir, 'dist'),
     filename: 'bundle.js',
   },
   module: {
@@ -33,7 +35,8 @@ module.exports = {
         test: /\.s[a|c]ss$/,
         loaders: ['sass-loader', 'style-loader', 'css-loader']
       }, {
-        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\.(png|jpg|gif|svg|ico|eot|ttf|woff|woff2)$/,
+        include: /images/,
         use: {
           loader: 'url-loader',
           options: {
@@ -46,8 +49,10 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
+      serverHost: JSON.stringify('ecse321-11.ece.mcgill.ca'),
+      serverPort: JSON.stringify('8080')
     }),
-    new ExtractTextPlugin("bundle.css", {allChunks: false}),
+    new ExtractTextPlugin('bundle.css', {allChunks: false}),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
@@ -67,8 +72,8 @@ module.exports = {
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
     new CompressionPlugin({
-      asset: "[path].gz[query]",
-      algorithm: "gzip",
+      asset: '[path].gz[query]',
+      algorithm: 'gzip',
       test: /\.js$|\.css$|\.html$/,
       threshold: 10240,
       minRatio: 0
@@ -79,19 +84,11 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    port: 8080,
+    port: 8087,
     host: 'ecse321-11.novalocal',
     public: 'ecse321-11.ece.mcgill.ca',
     contentBase: parentDir,
     historyApiFallback: true,
-    disableHostCheck: true,
-    proxy: {
-      '/api/*': {
-        target: 'http://ecse321-11.ece.mcgill.ca:8080/',
-        pathRewrite: {
-          '/api': ''
-        }
-      }
-    }
+    disableHostCheck: true
   }
 };

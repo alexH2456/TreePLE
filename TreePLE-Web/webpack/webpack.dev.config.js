@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -8,7 +9,7 @@ module.exports = {
     path.join(parentDir, 'src/index.jsx')
   ],
   output: {
-    path: path.join(parentDir + '/dist'),
+    path: path.join(parentDir + 'dist'),
     filename: 'bundle.js'
   },
   module: {
@@ -31,7 +32,11 @@ module.exports = {
         test: /\.s[a|c]ss$/,
         loaders: ['sass-loader', 'style-loader', 'css-loader']
       }, {
-        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /\.(html)$/,
+        loader: 'html-loader'
+      }, {
+        test: /\.(png|jpg|gif|svg|ico|eot|ttf|woff|woff2)$/,
+        include: /images/,
         use: {
           loader: 'url-loader',
           options: {
@@ -41,23 +46,29 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      serverHost: JSON.stringify('localhost'),
+      serverPort: JSON.stringify('8088')
+    // }),
+    // new HtmlWebpackPlugin({
+    //   title: 'TreePLE',
+    //   favicon: '/src/images/favicon.ico'
+    })
+  ],
   resolve: {
     extensions: ['.js', '.jsx', '.css']
   },
   devtool: 'eval-source-map',
   devServer: {
+    https: {
+      key: fs.readFileSync(path.join(parentDir + 'ssl/treeple.key')),
+      cert: fs.readFileSync(path.join(parentDir + 'ssl/treeple.crt'))
+    },
     port: 8087,
-    host: '127.0.0.1',
+    host: 'localhost',
     contentBase: parentDir,
     historyApiFallback: true,
-    disableHostCheck: true,
-    proxy: {
-      '/api/*': {
-        target: 'http://localhost:8088/',
-        pathRewrite: {
-          '/api': ''
-        }
-      }
-    }
+    disableHostCheck: true
   }
 };

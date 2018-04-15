@@ -2,7 +2,7 @@ package ca.mcgill.ecse321.treeple.controller;
 
 import java.util.*;
 
-import org.json.JSONObject;
+import org.json.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +11,7 @@ import ca.mcgill.ecse321.treeple.dto.*;
 import ca.mcgill.ecse321.treeple.model.*;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
+@CrossOrigin(maxAge = 3600)
 @RestController
 public class TreePLERestController {
 
@@ -152,6 +153,11 @@ public class TreePLERestController {
         return convertToDto(tree);
     }
 
+    @GetMapping(value = {"/trees/{treeId}/sustainability/"})
+    public Map<String, Map<String, Double>> getTreeSustainability(@PathVariable("treeId") int treeId) throws Exception {
+        return service.getTreeSustainability(service.getTreeById(treeId));
+    }
+
     @GetMapping(value = {"/users/{username}/"})
     public UserDto getUserByUsername(@PathVariable("username") String username) throws Exception {
         User user = service.getUserByUsername(username);
@@ -176,6 +182,11 @@ public class TreePLERestController {
         return convertToDto(municipality);
     }
 
+    @GetMapping(value = {"/municipalities/{name}/sustainability/"})
+    public Map<String, Map<String, Double>> getMunicipalitySustainability(@PathVariable("name") String name) throws Exception {
+        return service.getGroupSustainability(service.getTreesOfMunicipality(name));
+    }
+
     @GetMapping(value = {"/reports/{reportid}/"})
     public SurveyReportDto getSurveyReportById(@PathVariable("reportid") int reportId) throws Exception {
         SurveyReport report = service.getSurveyReportById(reportId);
@@ -186,6 +197,16 @@ public class TreePLERestController {
     public ForecastDto getForecastById(@PathVariable("forecastid") int forecastId) throws Exception {
         Forecast forecast = service.getForecastById(forecastId);
         return convertToDto(forecast);
+    }
+
+    @PostMapping(value = {"/sustainability/"})
+    public Map<String, Map<String, Double>> getGroupSustainability(@RequestBody String jsonBody) throws Exception {
+        return service.getGroupSustainability(service.getTreesFromIdList(new JSONArray(jsonBody)));
+    }
+
+    @GetMapping(value = {"/sustainability/treeple/"})
+    public Map<String, Map<String, Double>> getTreePLESustainability() throws Exception {
+        return service.getGroupSustainability(service.getAllTrees());
     }
 
 
@@ -199,31 +220,31 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
-    @PostMapping(value = {"/newtree/"})
+    @PostMapping(value = {"/tree/new/"})
     public TreeDto createTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.createTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
-    @PostMapping(value = {"/newuser/"})
+    @PostMapping(value = {"/user/new/"})
     public UserDto createUser(@RequestBody String jsonBody) throws Exception {
         User user = service.createUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
-    @PostMapping(value = {"/newspecies/"})
+    @PostMapping(value = {"/species/new/"})
     public SpeciesDto createSpecies(@RequestBody String jsonBody) throws Exception {
         Species species = service.createSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
-    @PostMapping(value = {"/newmunicipality/"})
+    @PostMapping(value = {"/municipality/new/"})
     public MunicipalityDto createMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.createMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
 
-    @PostMapping(value = {"/newforecast/"})
+    @PostMapping(value = {"/forecast/new/"})
     public ForecastDto createForecast(@RequestBody String jsonBody) throws Exception {
         Forecast forecast = service.createForecast(new JSONObject(jsonBody));
         return convertToDto(forecast);
@@ -234,26 +255,32 @@ public class TreePLERestController {
     // PATCH MAPPING API
     // ==============================
 
-    @PatchMapping(value = {"/trees/update/"})
+    @PatchMapping(value = {"/tree/update/"})
     public TreeDto updateTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.updateTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
-    @PatchMapping(value = {"/users/update/"})
-    public UserDto patchDto(@RequestBody String jsonBody) throws Exception {
+    @PatchMapping(value = {"/user/update/"})
+    public UserDto updateUser(@RequestBody String jsonBody) throws Exception {
         User user = service.updateUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
+    @PatchMapping(value = {"/user/update/password/"})
+    public UserDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
+        User user = service.updateUserPassword(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
+
     @PatchMapping(value = {"/species/update/"})
-    public SpeciesDto updateUserPoints(@RequestBody String jsonBody) throws Exception {
+    public SpeciesDto updateSpecies(@RequestBody String jsonBody) throws Exception {
         Species species = service.updateSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
-    @PatchMapping(value = {"/municipalities/update/"})
-    public MunicipalityDto updateUserPassword(@RequestBody String jsonBody) throws Exception {
+    @PatchMapping(value = {"/municipality/update/"})
+    public MunicipalityDto updateMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.updateMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
@@ -263,49 +290,49 @@ public class TreePLERestController {
     // DELETE MAPPING API
     // ==============================
 
-    @PostMapping(value = {"/deletetree/"})
+    @PostMapping(value = {"/tree/delete/"})
     public TreeDto deleteTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.deleteTree(new JSONObject(jsonBody));
         return convertToDto(tree);
     }
 
-    @PostMapping(value = {"/deleteuser/"})
+    @PostMapping(value = {"/user/delete/"})
     public UserDto deleteUser(@RequestBody String jsonBody) throws Exception {
         User user = service.deleteUser(new JSONObject(jsonBody));
         return convertToDto(user);
     }
 
-    @PostMapping(value = {"/deletespecies/"})
+    @PostMapping(value = {"/species/delete/"})
     public SpeciesDto deleteSpecies(@RequestBody String jsonBody) throws Exception {
         Species species = service.deleteSpecies(new JSONObject(jsonBody));
         return convertToDto(species);
     }
 
-    @PostMapping(value = {"/deletelocation/"})
+    @PostMapping(value = {"/location/delete/"})
     public LocationDto deleteLocation(@RequestBody String jsonBody) throws Exception {
         Location location = service.deleteLocation(new JSONObject(jsonBody));
         return convertToDto(location);
     }
 
-    @PostMapping(value = {"/deletemunicipality/"})
+    @PostMapping(value = {"/municipality/delete/"})
     public MunicipalityDto deleteMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.deleteMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
 
-    @PostMapping(value = {"/deleteforecast/"})
+    @PostMapping(value = {"/forecast/delete/"})
     public ForecastDto deleteForecast(@RequestBody String jsonBody) throws Exception {
         Forecast forecast = service.deleteForecast(new JSONObject(jsonBody));
         return convertToDto(forecast);
     }
 
-    @DeleteMapping(value = {"/reset/"})
-    public void resetDatabase() throws Exception {
-        service.resetDatabase();
+    @PostMapping(value = {"/reset/"})
+    public void resetDatabase(@RequestBody String jsonBody) throws Exception {
+        service.resetDatabase(new JSONObject(jsonBody));
     }
 
-    @DeleteMapping(value = {"/delete/"})
-    public void deleteDatabase() throws Exception {
-        service.deleteDatabase();
+    @PostMapping(value = {"/delete/"})
+    public void deleteDatabase(@RequestBody String jsonBody) throws Exception {
+        service.deleteDatabase(new JSONObject(jsonBody));
     }
 }
