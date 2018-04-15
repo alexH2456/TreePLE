@@ -28,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -264,7 +265,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 5;
+        return password.length() > 4;
     }
 
     private boolean isPasswordSame(String password, String reenter) {
@@ -364,7 +365,9 @@ public class RegisterActivity extends AppCompatActivity {
                 user.put("username", mUsername);
                 user.put("password", mPassword);
                 user.put("role", mRole);
-                user.put("myAddresses", mPostalCode);
+                JSONArray addresses = new JSONArray();
+                addresses.put(0, mPostalCode);
+                user.put("myAddresses", addresses);
                 user.put("scientistKey", mRolePass);
             } catch (JSONException e) {
                 e.printStackTrace();
