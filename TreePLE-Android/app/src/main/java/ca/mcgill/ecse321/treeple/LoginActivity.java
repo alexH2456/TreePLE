@@ -349,11 +349,9 @@ public class LoginActivity extends AppCompatActivity {
                     VolleyError volleyError = (VolleyError) e.getCause();
                     String backendResponse = VolleyController.parseNetworkResponse(volleyError);
                     Log.e(TAG, "Backend error: " + backendResponse);
-                    Toast.makeText(getApplicationContext(), "Login Error", Toast.LENGTH_SHORT).show();
                 }
             } catch (TimeoutException e) {
                 Log.e(TAG, "Timeout occurred when waiting for response");
-                Toast.makeText(getApplicationContext(), "Network Error", Toast.LENGTH_LONG).show();
             }
             return loggedIn;
         }
