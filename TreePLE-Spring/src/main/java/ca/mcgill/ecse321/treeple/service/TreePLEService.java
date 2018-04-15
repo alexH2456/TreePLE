@@ -43,6 +43,7 @@ public class TreePLEService {
                SurveyReport.setNextReportId(SurveyReport.getNextReportId() - 1);
     }
 
+
     // ==============================
     // CREATE API
     // ==============================
@@ -565,6 +566,16 @@ public class TreePLEService {
             throw new InvalidInputException("No Municipality with that name exists!");
 
         return Collections.unmodifiableList(sql.getAllTreesOfMunicipality(name));
+    }
+
+    // Get forecasts created by a specific user
+    public List<Forecast> getForecastsOfUser(String username) throws Exception {
+        if (username == null || username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+        if (!User.hasWithUsername(username) && sql.getUser(username) == null)
+            throw new InvalidInputException("That username doesn't exist!");
+
+        return Collections.unmodifiableList(sql.getAllForecastsOfUser(username));
     }
 
 

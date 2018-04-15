@@ -94,11 +94,14 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMapClick = (e) => {
+  onMapClick = (e, success) => {
+    if (success) {
+      this.loadTrees()
+    }
     this.setState({createTreeModal: !!e ? e.latLng : null});
   }
 
-  onMunicipalityDblClick = (e, municipality) => {
+  onMunicipalityClick = (e, municipality) => {
     getMunicipalitySustainability(municipality.name)
       .then(({data}) => {
         return {
@@ -118,7 +121,7 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMunicipalityRightClick = (e, municipality) => this.setState({municipalityModal: municipality});
+  onMunicipalityDblClick = (e, municipality) => this.setState({municipalityModal: municipality});
 
   onTreeHover = (e, tree) => {
     if (!this.state.treeInfo) {
@@ -153,7 +156,7 @@ export class TreeMap extends PureComponent {
     }
   }
 
-  onTreeRightClick = (e, tree) => this.setState({treeModal: tree});
+  onTreeDblClick = (e, tree) => this.setState({treeModal: tree});
 
   render() {
     return (Object.keys(this.state.center).length !== 0) ? (<div>
@@ -162,14 +165,18 @@ export class TreeMap extends PureComponent {
         zoom={this.state.zoom}
         center={this.state.center}
         options={{scrollwheel: true}}
-        onClick={e => this.onMapClick(e)}
+        onRightClick={e => this.onMapClick(e, false)}
       >
         {this.state.municipalities.map(municipality => {
-          return <Polygon key={municipality.name}
-                          paths={municipality.borders}
-                          onClick={e => this.onMapClick(e)}
-                          onDblClick={e => this.onMunicipalityDblClick(e, municipality)}
-                          onRightClick={e => this.onMunicipalityRightClick(e, municipality)}/>;
+          return (
+            <Polygon
+              key={municipality.name}
+              paths={municipality.borders}
+              onClick={e => this.onMunicipalityClick(e, municipality)}
+              onDblClick={e => this.onMunicipalityDblClick(e, municipality)}
+              onRightClick={e => this.onMapClick(e, false)}
+            />
+          );
         })}
         {this.state.trees.map(tree => {
           let icons = getTreeIcons(tree);
@@ -181,7 +188,7 @@ export class TreeMap extends PureComponent {
               onMouseOver={e => this.onTreeHover(e, tree)}
               onMouseOut={e => this.onTreeHover(e, null)}
               onClick={e => this.onTreeClick(e, tree)}
-              onRightClick={e => this.onTreeRightClick(e, tree)}
+              onDblClick={e => this.onTreeDblClick(e, tree)}
             >
               {((!!this.state.treeHover || this.state.treeInfo) && this.state.treeHover == tree) ? (
                 <InfoWindow  onCloseClick={e => this.onTreeClick(e, null)}>
@@ -211,13 +218,13 @@ export class TreeMap extends PureComponent {
           );
         })}
         {!!this.state.treeModal ? (
-          <TreeModal tree={this.state.treeModal} onClose={this.onTreeRightClick}/>
+          <TreeModal tree={this.state.treeModal} onClose={this.onTreeDblClick}/>
         ) : null}
         {!!this.state.createTreeModal ? (
           <CreateTreeModal location={this.state.createTreeModal} onClose={this.onMapClick}/>
         ) : null}
         {!!this.state.municipalityModal ? (
-          <MunicipalityModal municipality={this.state.municipalityModal} onClose={this.onMunicipalityRightClick}/>
+          <MunicipalityModal municipality={this.state.municipalityModal} onClose={this.onMunicipalityDblClick}/>
         ) : null}
       </GoogleMap></div>
     ) : (

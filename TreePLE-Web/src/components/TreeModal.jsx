@@ -165,7 +165,9 @@ class TreeModal extends PureComponent {
                         <Header as='h4' content='Date Modified'/>
                       </Grid.Column>
                     </Grid>
+
                     <Divider/>
+
                     <Grid textAlign='center' columns={3}>
                       {tree.reports.map(({reportId, reportUser, reportDate}) => {
                         return (

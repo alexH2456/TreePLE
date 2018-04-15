@@ -28,7 +28,7 @@ class CreateTreeModal extends PureComponent {
       language: 'en',
       speciesSelectable: [],
       municipalitySelectable: []
-    }
+    };
   }
 
   componentWillMount() {
@@ -46,15 +46,15 @@ class CreateTreeModal extends PureComponent {
         ...this.state.tree,
         datePlanted: formatDate(this.state.tree.datePlanted)
       }
-    }
+    };
 
     createTree(newTree)
       .then(({data}) => {
-        this.props.onClose(null);
+        this.props.onClose(null, true);
       })
       .catch(error => {
         console.log(error);
-      })
+      });
   }
 
   onHeightChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, height: value}}));

@@ -68,6 +68,16 @@ function getUser(username) {
   return getRequest(url);
 }
 
+function getUserTrees(username) {
+  const url = `/users/${username}/trees/`;
+  return getRequest(url);
+}
+
+function getUserForecasts(username) {
+  const url = `/users/${username}/forecasts/`;
+  return getRequest(url);
+}
+
 function getSustainability(params) {
   const url = `/sustainability/`;
   return postRequestWithParams(url, params);
@@ -136,7 +146,7 @@ function patchRequestWithParams(url, params) {
 
 export {
   getAllTrees, getTree, createTree, updateTree,
-  getAllUsers, getUser, createUser,
+  getAllUsers, getUser, getUserTrees, getUserForecasts, createUser,
   getAllSpecies,
   getAllLocations,
   getAllMunicipalities,

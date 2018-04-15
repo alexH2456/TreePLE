@@ -164,6 +164,16 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
+    @GetMapping(value = {"/users/{username}/trees/"})
+    public List<Tree> getUserTrees(@PathVariable("username") String username) throws Exception {
+        return service.getTreesOfUser(username);
+    }
+
+    @GetMapping(value = {"/users/{username}/forecasts/"})
+    public List<Forecast> getUserForecasts(@PathVariable("username") String username) throws Exception {
+        return service.getForecastsOfUser(username);
+    }
+
     @GetMapping(value = {"/species/{name}/"})
     public SpeciesDto getSpeciesByName(@PathVariable("name") String name) throws Exception {
         Species species = service.getSpeciesByName(name);

@@ -4,6 +4,7 @@ import {Sidebar, Segment, Button, Menu, Image, Icon, Header} from 'semantic-ui-r
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
 import TreeMap from './TreeMap';
+import MyForecastsModal from './MyForecastsModal';
 
 class IconMenu extends PureComponent {
   constructor(props) {
@@ -12,7 +13,8 @@ class IconMenu extends PureComponent {
       user: localStorage.getItem('username'),
       showMenu: false,
       showSignIn: false,
-      showSignUp: false
+      showSignUp: false,
+      showMyForecasts: false
     };
   }
 
@@ -25,6 +27,7 @@ class IconMenu extends PureComponent {
   toggleSignIn = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
   toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
   toggleRegister = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
+  toggleMyForecasts = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts}));
 
   onLogOut = () => {
     localStorage.clear();
@@ -38,23 +41,30 @@ class IconMenu extends PureComponent {
           <Sidebar as={Menu} animation='push' width='thin' visible={this.state.showMenu} icon='labeled' size='tiny' vertical>
             {!this.state.user ? (
               <div>
-              <Menu.Item link name='signin'>
-                <Button basic color='black' name='signin' onClick={this.toggleSignIn}>
-                  Sign In
-                </Button>
-              </Menu.Item>
-              <Menu.Item link name='signup'>
-                <Button basic color='black' name='signup' onClick={this.toggleSignUp}>
-                  Sign Up
-                </Button>
-              </Menu.Item>
+                <Menu.Item link name='signin'>
+                  <Button basic color='black' name='signin' onClick={this.toggleSignIn}>
+                    Sign In
+                  </Button>
+                </Menu.Item>
+                <Menu.Item link name='signup'>
+                  <Button basic color='black' name='signup' onClick={this.toggleSignUp}>
+                    Sign Up
+                  </Button>
+                </Menu.Item>
               </div>
             ) : (
-              <Menu.Item link name='logout'>
-                <Button basic color='black' name='logout' onClick={this.onLogOut}>
-                  Log Out
-                </Button>
-              </Menu.Item>
+              <div>
+                <Menu.Item link name='myforecasts'>
+                  <Button basic color='black' name='myforecasts' onClick={this.toggleMyForecasts}>
+                    Forecasts
+                  </Button>
+                </Menu.Item>
+                <Menu.Item link name='logout'>
+                  <Button basic color='black' name='logout' onClick={this.onLogOut}>
+                    Log Out
+                  </Button>
+                </Menu.Item>
+              </div>
             )}
           </Sidebar>
           <Sidebar.Pusher>
@@ -69,6 +79,9 @@ class IconMenu extends PureComponent {
         ) : null}
         {this.state.showSignUp ? (
           <SignUpModal onClose={this.toggleSignUp} onRegister={this.toggleRegister}/>
+        ) : null}
+        {this.state.showMyForecasts ? (
+          <MyForecastsModal onClose={this.toggleMyForecasts}/>
         ) : null}
       </div>
     )
