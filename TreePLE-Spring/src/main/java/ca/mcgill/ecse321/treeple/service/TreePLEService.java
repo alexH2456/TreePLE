@@ -338,15 +338,6 @@ public class TreePLEService {
         return Collections.unmodifiableList(sql.getAllTrees());
     }
 
-    public List<Tree> getAllTreesOfMunicipality(String name) throws Exception {
-        if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Name cannot be empty!");
-        if (!Municipality.hasWithName(name) && sql.getMunicipality(name) == null)
-            throw new InvalidInputException("No Municipality with that name exists!");
-
-        return Collections.unmodifiableList(sql.getAllTreesOfMunicipality(name));
-    }
-
     // Get a list of all Users
     public List<User> getAllUsers() {
         return Collections.unmodifiableList(sql.getAllUsers());
@@ -375,34 +366,6 @@ public class TreePLEService {
     // Get a list of all Forecasts
     public List<Forecast> getAllForecasts() {
         return Collections.unmodifiableList(sql.getAllForecasts());
-    }
-
-    // Get sustainability factors for entire TreePLE system
-    public Map<String, Map<String, Double>> getGroupSustainability(List<Tree> allTrees) throws Exception {
-        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
-        Map<String, Double> stormwater = new HashMap<String, Double>();
-        Map<String, Double> co2Reduced = new HashMap<String, Double>();
-        Map<String, Double> biodiversity = new HashMap<String, Double>();
-        Map<String, Double> energyConserved = new HashMap<String, Double>();
-
-        double factor = 0;
-        stormwater.put("factor", (factor = forecastStormwaterIntercepted(allTrees)));
-        stormwater.put("worth", stormwaterWorth(factor));
-
-        co2Reduced.put("factor", (factor = forecastCO2Sequestered(allTrees)));
-        co2Reduced.put("worth", co2ReducedWorth(factor));
-
-        biodiversity.put("factor", forecastBiodiversityIndex(allTrees));
-
-        energyConserved.put("factor", (factor = forecastEnergyConserved(allTrees)));
-        energyConserved.put("worth", energyConservedWorth(factor));
-
-        sustainabilityFactors.put("stormwater", stormwater);
-        sustainabilityFactors.put("co2Reduced", co2Reduced);
-        sustainabilityFactors.put("biodiversity", biodiversity);
-        sustainabilityFactors.put("energyConserved", energyConserved);
-
-        return sustainabilityFactors;
     }
 
 
@@ -506,12 +469,78 @@ public class TreePLEService {
         return forecast;
     }
 
+    // Get sustainability factors for a Tree
+    public Map<String, Map<String, Double>> getTreeSustainability(Tree tree) throws Exception {
+        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
+        Map<String, Double> stormwater = new HashMap<String, Double>();
+        Map<String, Double> co2Reduced = new HashMap<String, Double>();
+        Map<String, Double> biodiversity = new HashMap<String, Double>();
+        Map<String, Double> energyConserved = new HashMap<String, Double>();
+
+        double factor = 0;
+        stormwater.put("factor", (factor = getStormwaterIntercepted(tree)));
+        stormwater.put("worth", stormwaterWorth(factor));
+
+        co2Reduced.put("factor", (factor = getCO2Sequestered(tree)));
+        co2Reduced.put("worth", co2ReducedWorth(factor));
+
+        biodiversity.put("factor", 1.0);
+
+        energyConserved.put("factor", (factor = getEnergyConserved(tree)));
+        energyConserved.put("worth", energyConservedWorth(factor));
+
+        sustainabilityFactors.put("stormwater", stormwater);
+        sustainabilityFactors.put("co2Reduced", co2Reduced);
+        sustainabilityFactors.put("biodiversity", biodiversity);
+        sustainabilityFactors.put("energyConserved", energyConserved);
+
+        return sustainabilityFactors;
+    }
+
+    // Get sustainability factors for entire TreePLE system
+    public Map<String, Map<String, Double>> getGroupSustainability(List<Tree> allTrees) throws Exception {
+        Map<String, Map<String, Double>> sustainabilityFactors = new HashMap<String, Map<String, Double>>();
+        Map<String, Double> stormwater = new HashMap<String, Double>();
+        Map<String, Double> co2Reduced = new HashMap<String, Double>();
+        Map<String, Double> biodiversity = new HashMap<String, Double>();
+        Map<String, Double> energyConserved = new HashMap<String, Double>();
+
+        double factor = 0;
+        stormwater.put("factor", (factor = forecastStormwaterIntercepted(allTrees)));
+        stormwater.put("worth", stormwaterWorth(factor));
+
+        co2Reduced.put("factor", (factor = forecastCO2Sequestered(allTrees)));
+        co2Reduced.put("worth", co2ReducedWorth(factor));
+
+        biodiversity.put("factor", forecastBiodiversityIndex(allTrees));
+
+        energyConserved.put("factor", (factor = forecastEnergyConserved(allTrees)));
+        energyConserved.put("worth", energyConservedWorth(factor));
+
+        sustainabilityFactors.put("stormwater", stormwater);
+        sustainabilityFactors.put("co2Reduced", co2Reduced);
+        sustainabilityFactors.put("biodiversity", biodiversity);
+        sustainabilityFactors.put("energyConserved", energyConserved);
+
+        return sustainabilityFactors;
+    }
+
 
     // ==============================
     // GET FILTERED API
     // ==============================
 
-    // Get trees owned by a user
+    // Get trees from a list of Tree ID's
+    public List<Tree> getTreesFromIdList(JSONArray treeIdList) throws Exception {
+        ArrayList<Tree> treeList = new ArrayList<Tree>();
+        for (Object treeId : treeIdList) {
+            treeList.add(getTreeById((int) treeId));
+        }
+
+        return treeList;
+    }
+
+    // Get trees owned by a specifc user
     public List<Tree> getTreesOfUser(String username) throws Exception {
         User user = getUserByUsername(username);
 
@@ -523,16 +552,24 @@ public class TreePLEService {
         return myTrees;
     }
 
-    // Get trees of a certain species
+    // Get trees of a specific species
     public List<Tree> getTreesOfSpecies(String name) throws Exception {
-        Species species = getSpeciesByName(name);
-        return sql.getAllTreesOfSpecies(species.getName());
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+        if (!Species.hasWithName(name) && sql.getSpecies(name) == null)
+            throw new InvalidInputException("No Species with that name exists!");
+
+        return Collections.unmodifiableList(sql.getAllTreesOfSpecies(name));
     }
 
-    // Get trees within a municipality
+    // Get trees of a specific municipality
     public List<Tree> getTreesOfMunicipality(String name) throws Exception {
-        Municipality municipality = getMunicipalityByName(name);
-        return sql.getAllTreesOfMunicipality(municipality.getName());
+        if (name == null || name.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Name cannot be empty!");
+        if (!Municipality.hasWithName(name) && sql.getMunicipality(name) == null)
+            throw new InvalidInputException("No Municipality with that name exists!");
+
+        return Collections.unmodifiableList(sql.getAllTreesOfMunicipality(name));
     }
 
 
@@ -1065,13 +1102,13 @@ public class TreePLEService {
         Land landType = tree.getLand();
 
         if (landType == Land.Park) {
-            energyCoefficient = 0.9010;
+            energyCoefficient = 0.9510;
         } else if (landType == Land.Residential) {
-            energyCoefficient = 0.8374;
+            energyCoefficient = 0.8874;
         } else if (landType == Land.Institutional) {
-            energyCoefficient = 0.7505;
+            energyCoefficient = 0.8005;
         } else if (landType == Land.Municipal) {
-            energyCoefficient = 0.8394;
+            energyCoefficient = 0.8894;
         }
 
         // Average diameter of a tree is 50
