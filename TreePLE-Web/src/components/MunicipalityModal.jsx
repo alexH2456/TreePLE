@@ -2,8 +2,8 @@ import React, {PureComponent} from 'react';
 import {compose, withProps} from 'recompose';
 import {GoogleMap, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {Button, Divider, Header, Icon, Grid, Modal} from 'semantic-ui-react';
-import {gmapsKey} from '../constants';
 import {getLatLngBorders, getMapBounds} from './Utils';
+import {gmapsKey} from '../constants';
 
 class MunicipalityModal extends PureComponent {
   constructor(props) {

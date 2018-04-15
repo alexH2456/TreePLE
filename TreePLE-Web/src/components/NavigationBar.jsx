@@ -1,8 +1,8 @@
 import React, {PureComponent} from 'react';
-import {Menu, Divider, Image, Segment, Statistic} from 'semantic-ui-react';
-import Logo from "../images/treeple_logo.png";
+import {Divider, Image, Menu, Segment, Statistic} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
+import Logo from "../images/treeple_logo.png";
 
 class NavigationBar extends PureComponent {
   constructor(props) {
@@ -54,22 +54,16 @@ class NavigationBar extends PureComponent {
             <Image circular size='small' src={Logo}/>
           </Menu.Item>
 
-          <Menu.Item
-            name='biodiversity'
-            fitted='vertically'
-          >
+          <Menu.Item name='biodiversity' fitted='vertically'>
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
               <Segment>
-                <Statistic horizontal size='mini' label='' value={biodiversity.factor.toFixed(5)}/>
+                <Statistic horizontal size='mini' value={biodiversity.factor.toFixed(5)}/>
               </Segment>
             </Segment.Group>
           </Menu.Item>
 
-          <Menu.Item
-            name='stormwater'
-            fitted='vertically'
-          >
+          <Menu.Item name='stormwater' fitted='vertically'>
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Stormwater Intercepted</Segment>
               <Segment>
@@ -80,10 +74,7 @@ class NavigationBar extends PureComponent {
             </Segment.Group>
           </Menu.Item>
 
-          <Menu.Item
-            name='co2Reduced'
-            fitted='vertically'
-          >
+          <Menu.Item name='co2Reduced' fitted='vertically'>
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>CO2 Reduced</Segment>
               <Segment>
@@ -94,10 +85,7 @@ class NavigationBar extends PureComponent {
             </Segment.Group>
           </Menu.Item>
 
-          <Menu.Item
-            name='energyConserved'
-            fitted='vertically'
-          >
+          <Menu.Item name='energyConserved' fitted='vertically'>
             <Segment.Group horizontal size='mini'>
               <Segment style={{display: 'flex', alignItems: 'center'}}>Energy Conserved</Segment>
               <Segment>

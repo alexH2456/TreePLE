@@ -1,4 +1,5 @@
 import {getAllSpecies, getAllMunicipalities} from "./Requests";
+import {roles, lands, statuses, ownerships} from '../constants';
 
 function getSpeciesSelectable() {
   let speciesSelectable = [];
@@ -73,9 +74,61 @@ function getMapBounds(locations) {
   return bounds;
 }
 
+function getTreeIcons(tree) {
+  let icons = {};
+
+  switch (tree.land) {
+    case lands.park.enum:
+      icons.land = lands.park.icon;
+      break;
+    case lands.residential.enum:
+      icons.land = lands.residential.icon;
+      break;
+    case lands.institutional.enum:
+      icons.land = lands.institutional.icon;
+      break;
+    case lands.municipal.enum:
+      icons.land = lands.municipal.icon;
+      break;
+    default:
+      icons.land = 'question';
+  }
+
+  switch (tree.ownership) {
+    case ownerships.public.enum:
+      icons.ownership = ownerships.public.icon;
+      break;
+    case ownerships.private.enum:
+      icons.ownership = ownerships.private.icon;
+      break;
+    default:
+      icons.ownership = 'question';
+  }
+
+  switch (tree.status) {
+    case statuses.planted.enum:
+      icons.color = statuses.planted.color;
+      break;
+    case statuses.diseased.enum:
+      icons.color = statuses.color;
+      break;
+    case statuses.markedForCutdown.enum:
+      icons.color = statuses.color;
+      break;
+    case statuses.cutdown.enum:
+      icons.color = statuses.color;
+      break;
+    default:
+      icons.color = 'black';
+  }
+
+  return icons;
+}
+
 export {
   getSpeciesSelectable,
   getMunicipalitySelectable,
   getLatLngBorders,
-  getMapBounds
+  getMapBounds,
+  getTreeIcons
 };

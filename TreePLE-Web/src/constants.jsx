@@ -1,5 +1,29 @@
 export const gmapsKey = 'AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk';
 
+export const roles = {
+  resident: {enum: 'Resident', icon: 'user'},
+  scientist: {enum: 'Scientist', icon: 'leaf'}
+};
+
+export const lands = {
+  park: {enum: 'Park', icon: 'paw'},
+  residential: {enum: 'Residential', icon: 'home'},
+  institutional: {enum: 'Institutional', icon: 'building'},
+  municipal: {enum: 'Municipal', icon: 'map'}
+};
+
+export const statuses = {
+  planted: {enum: 'Planted', color: 'green'},
+  diseased: {enum: 'Diseased', color: 'yellow'},
+  markedForCutdown: {enum: 'Marked For Cutdown', color: 'pink'},
+  cutdown: {enum: 'Cutdown', color: 'red'}
+};
+
+export const ownerships = {
+  public: {enum: 'Public', icon: 'users'},
+  private: {enum: 'Private', icon: 'privacy'}
+};
+
 export const roleSelectable = [
   {key: 'R', text: 'Resident', value: 'Resident'},
   {key: 'S', text: 'Scientist', value: 'Scientist'},

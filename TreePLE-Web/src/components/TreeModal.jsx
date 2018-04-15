@@ -2,9 +2,9 @@ import React, {PureComponent} from 'react';
 import {compose, withProps} from 'recompose';
 import {Button, Divider, Header, Icon, Form, Grid, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
-import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 import {updateTree} from "./Requests";
 import {getSpeciesSelectable, getMunicipalitySelectable, getLatLngBorders} from './Utils';
+import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 
 class TreeModal extends PureComponent {
   constructor(props) {
@@ -13,13 +13,13 @@ class TreeModal extends PureComponent {
       user: '',
       updatedTree: {
         treeId: props.tree.treeId,
-        height: 0,
-        diameter: 0,
-        land: '',
-        status: '',
-        ownership: '',
-        species: '',
-        municipality: ''
+        height: props.tree.height,
+        diameter: props.tree.diameter,
+        land: props.tree.land,
+        status: props.tree.status,
+        ownership: props.tree.ownership,
+        species: props.tree.species.name,
+        municipality: props.tree.municipality.name
       },
       update: false,
       showReports: false
@@ -53,11 +53,16 @@ class TreeModal extends PureComponent {
   }
 
   onUpdateTree = () => {
-    console.log(this.state.updatedTree);
+    const updateObj = {tree: this.state.updatedTree, user: this.state.user}
+    console.log(updateObj);
 
-    updateTree(this.state.updatedTree)
+    updateTree(updateObj)
       .then(({data}) => {
         console.log(data);
+
+      })
+      .catch(error => {
+        console.error(error);
 
       })
     this.setState({update: false})
@@ -76,6 +81,7 @@ class TreeModal extends PureComponent {
 
   render() {
     const {tree} = this.props;
+    const {updatedTree} = this.state;
 
     return (
       <Modal open size='small' dimmer='blurring'>
@@ -99,12 +105,8 @@ class TreeModal extends PureComponent {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row columns={2}>
-                    <Grid.Column>
-                      {tree.treeId}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.datePlanted}
-                    </Grid.Column>
+                    <Grid.Column>{tree.treeId}</Grid.Column>
+                    <Grid.Column>{tree.datePlanted}</Grid.Column>
                   </Grid.Row>
 
                   <Grid.Row columns={3}>
@@ -119,15 +121,9 @@ class TreeModal extends PureComponent {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row columns={3}>
-                    <Grid.Column>
-                      {tree.species.name}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.height}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.diameter}
-                    </Grid.Column>
+                    <Grid.Column>{tree.species.name}</Grid.Column>
+                    <Grid.Column>{tree.height}</Grid.Column>
+                    <Grid.Column>{tree.diameter}</Grid.Column>
                   </Grid.Row>
 
                   <Grid.Row columns={3}>
@@ -142,15 +138,9 @@ class TreeModal extends PureComponent {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row columns={3}>
-                    <Grid.Column>
-                      {tree.status}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.ownership}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.land}
-                    </Grid.Column>
+                    <Grid.Column>{tree.status}</Grid.Column>
+                    <Grid.Column>{tree.ownership}</Grid.Column>
+                    <Grid.Column>{tree.land}</Grid.Column>
                   </Grid.Row>
 
                   <Grid.Row columns={3}>
@@ -165,15 +155,9 @@ class TreeModal extends PureComponent {
                     </Grid.Column>
                   </Grid.Row>
                   <Grid.Row columns={3}>
-                    <Grid.Column>
-                      {tree.species.name}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.location.latitude}
-                    </Grid.Column>
-                    <Grid.Column>
-                      {tree.location.longitude}
-                    </Grid.Column>
+                    <Grid.Column>{tree.municipality.name}</Grid.Column>
+                    <Grid.Column>{tree.location.latitude}</Grid.Column>
+                    <Grid.Column>{tree.location.longitude}</Grid.Column>
                   </Grid.Row>
                 </Grid>
 
@@ -200,15 +184,9 @@ class TreeModal extends PureComponent {
                       {tree.reports.map(({reportId, reportUser, reportDate}) => {
                         return (
                           <Grid.Row key={reportId}>
-                            <Grid.Column>
-                              {reportId}
-                            </Grid.Column>
-                            <Grid.Column>
-                              {reportUser}
-                            </Grid.Column>
-                            <Grid.Column>
-                              {reportDate}
-                            </Grid.Column>
+                            <Grid.Column>{reportId}</Grid.Column>
+                            <Grid.Column>{reportUser}</Grid.Column>
+                            <Grid.Column>{reportDate}</Grid.Column>
                           </Grid.Row>
                         );
                       })}
@@ -223,17 +201,17 @@ class TreeModal extends PureComponent {
                   <Form.Input readOnly fluid label='Date Planted' value={tree.datePlanted}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' onChange={this.onHeightChange}/>
-                  <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' onChange={this.onDiameterChange}/>
+                  <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' value={updatedTree.height} onChange={this.onHeightChange}/>
+                  <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' value={updatedTree.diameter} onChange={this.onDiameterChange}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' onChange={this.onSpeciesChange}/>
-                  <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' onChange={this.onStatusChange}/>
+                  <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' value={updatedTree.species} onChange={this.onSpeciesChange}/>
+                  <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' value={updatedTree.status} onChange={this.onStatusChange}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' onChange={this.onMunicipalityChange}/>
-                  <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' onChange={this.onOwnershipChange}/>
-                  <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' onChange={this.onLandChange} />
+                  <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' value={updatedTree.municipality} onChange={this.onMunicipalityChange}/>
+                  <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' value={updatedTree.ownership} onChange={this.onOwnershipChange}/>
+                  <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' value={updatedTree.land} onChange={this.onLandChange} />
                 </Form.Group>
               </Form>
             )}

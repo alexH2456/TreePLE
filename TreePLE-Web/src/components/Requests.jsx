@@ -1,21 +1,17 @@
 import axios from 'axios';
 
-// const backendUrl = 'http://localhost:8088/';
-// const frontendUrl = 'http://localhost:8087/';
-// const backendUrl = 'http://ecse321-11.ece.mcgill.ca:8080/';
-// const frontendUrl = 'http://ecse321-11.ece.mcgill.ca:8087/';
 const backendUrl = 'http://' + serverHost + ':' + serverPort + '/';
 const frontendUrl = 'http://' +  serverHost + ':8087/';
 
 
 const AXIOS = axios.create({
   baseURL: backendUrl,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH',
-    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Authorization'
-  },
-  timeout: 10000
+  // headers: {
+    // 'Access-Control-Allow-Origin': frontendUrl,
+    // 'Access-Control-Allow-Methods': 'GET, POST, PATCH',
+    // 'Access-Control-Allow-Headers': 'Origin, Content-Type'
+  // },
+  timeout: 15000
 });
 
 
@@ -26,12 +22,12 @@ const AXIOS = axios.create({
 function getAllTrees() {
   const url = `/trees/`;
   return getRequest(url);
-};
+}
 
 function getAllUsers() {
   const url = `/users/`;
   return getRequest(url);
-};
+}
 
 function getAllSpecies() {
   const url = `/species/`;
@@ -53,12 +49,6 @@ function getAllForecasts() {
   return getRequest(url);
 }
 
-function getTreePLESustainability() {
-  const url = `/sustainability/treeple/`;
-  return getRequest(url);
-}
-
-
 // ==============================
 // GET API
 // ==============================
@@ -66,20 +56,35 @@ function getTreePLESustainability() {
 function login(params) {
   const url = `/login/`;
   return postRequestWithParams(url, params);
-};
+}
 
 function getTree(treeId) {
   const url = `/trees/${treeId}/`;
   return getRequest(url);
-};
+}
 
 function getUser(username) {
   const url = `/users/${username}/`;
   return getRequest(url);
-};
+}
+
+function getSustainability(params) {
+  const url = `/sustainability/`;
+  return postRequestWithParams(url, params);
+}
+
+function getTreePLESustainability() {
+  const url = `/sustainability/treeple/`;
+  return getRequest(url);
+}
+
+function getTreeSustainability(treeId) {
+  const url = `/trees/${treeId}/sustainability/`;
+  return getRequest(url);
+}
 
 function getMunicipalitySustainability(municipality) {
-  const url = `/sustainability/${municipality}/`;
+  const url = `/municipalities/${municipality}/sustainability/`;
   return getRequest(url);
 }
 
@@ -93,14 +98,19 @@ function createTree(params) {
   return postRequestWithParams(url, params);
 }
 
-function updateTree(params) {
-  const url = `/tree/update/`;
-  return patchRequestWithParams(url, params);
-}
-
 function createUser(params) {
   const url = `/newuser/`;
   return postRequestWithParams(url, params);
+}
+
+
+// ==============================
+// PATCH API
+// ==============================
+
+function updateTree(params) {
+  const url = `/tree/update/`;
+  return patchRequestWithParams(url, params);
 }
 
 
@@ -110,15 +120,15 @@ function createUser(params) {
 
 function getRequest(url) {
   return AXIOS.get(url);
-};
+}
 
 function postRequest(url) {
   return AXIOS.post(url);
-};
+}
 
 function postRequestWithParams(url, params) {
   return AXIOS.post(url, params);
-};
+}
 
 function patchRequestWithParams(url, params) {
   return AXIOS.patch(url, params);
@@ -131,6 +141,6 @@ export {
   getAllLocations,
   getAllMunicipalities,
   getAllForecasts,
-  getTreePLESustainability, getMunicipalitySustainability,
+  getSustainability, getTreePLESustainability, getTreeSustainability, getMunicipalitySustainability,
   login
 };

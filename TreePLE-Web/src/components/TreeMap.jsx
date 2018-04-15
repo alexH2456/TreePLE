@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Dimmer, Image, Loader, Segment} from 'semantic-ui-react';
-import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
-import Logo from '../images/favicon.ico';
-import {gmapsKey} from '../constants';
+import {Dimmer, Grid, Divider, Icon, Loader, Container, List, Statistic} from 'semantic-ui-react';
+import {GoogleMap, InfoWindow, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import TreeModal from './TreeModal';
 import MunicipalityModal from './MunicipalityModal';
-import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability} from './Requests';
-import {getLatLngBorders, getMapBounds} from './Utils';
+import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability, getTreeSustainability} from './Requests';
+import {getLatLngBorders, getMapBounds, getTreeColor, getTreeIcons} from './Utils';
+import {gmapsKey} from '../constants';
+import Logo from '../images/favicon.ico';
 
 export class TreeMap extends PureComponent {
   constructor(props) {
@@ -16,12 +16,12 @@ export class TreeMap extends PureComponent {
     this.state = {
       zoom: 14,
       center: {},
-      tree: null,
-      municipality: null,
       trees: [],
       municipalities: [],
-      treeModal: false,
-      municipalityModal: false
+      treeModal: null,
+      treeHover: null,
+      treeInfo: false,
+      municipalityModal: null
     };
   }
 
@@ -50,7 +50,7 @@ export class TreeMap extends PureComponent {
           });
           alert('Unable to find your location.');
         }, {
-          timeout: 7500,
+          timeout: 5000,
           enableHighAccuracy: true
         }
       );
@@ -92,22 +92,15 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMoveMap = (mapProps, map) => {
-    console.log(mapProps);
-    console.log(map);
-  }
-
   onMunicipalityClick = (e, municipality) => {
-
     getMunicipalitySustainability(municipality.name)
       .then(({data}) => {
-        const sustainability = {
+        return {
           stormwater: data.stormwater,
           co2Reduced: data.co2Reduced,
           biodiversity: data.biodiversity,
           energyConserved: data.energyConserved
         };
-        return sustainability;
       })
       .then(sustainability => {
         let viewport = getMapBounds(municipality.borders);
@@ -119,19 +112,42 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMunicipalityRightClick = (e, municipality) => {
-    this.setState({
-      municipality: municipality,
-      municipalityModal: !this.state.municipalityModal
-    });
+  onMunicipalityRightClick = (e, municipality) => this.setState({municipalityModal: municipality});
+
+  onTreeHover = (e, tree) => {
+    if (!this.state.treeInfo) {
+      this.setState({treeHover: tree});
+    }
   }
 
-  onTreeRightClick = (e, tree) => {
-    this.setState({
-      tree: tree,
-      treeModal: !this.state.treeModal
-    });
+  onTreeClick = (e, tree) => {
+      this.setState(prevState => {
+        return {
+          treeHover: tree,
+          treeInfo: tree == prevState.treeHover ? !prevState.treeInfo : tree !== null ? prevState.treeInfo : false
+        }
+      });
+
+    if (tree !== null) {
+      getTreeSustainability(tree.treeId)
+        .then(({data}) => {
+          return {
+            stormwater: data.stormwater,
+            co2Reduced: data.co2Reduced,
+            biodiversity: data.biodiversity,
+            energyConserved: data.energyConserved
+          };
+        })
+        .then(sustainability => {
+          this.props.onSustainabilityChange(sustainability);
+        })
+        .catch(error => {
+          console.error(error);
+        })
+    }
   }
+
+  onTreeRightClick = (e, tree) => this.setState({treeModal: tree});
 
   render() {
     const style = {
@@ -153,27 +169,66 @@ export class TreeMap extends PureComponent {
                           onRightClick={e => this.onMunicipalityRightClick(e, municipality)}/>;
         })}
         {this.state.trees.map(tree => {
-          return <Marker key={tree.treeId}
-                         position={{
-                           lat: tree.location.latitude,
-                           lng: tree.location.longitude
-                         }}
-                         onRightClick={e => this.onTreeRightClick(e, tree)} />;
+          let icons = getTreeIcons(tree);
+
+          return (
+            <Marker
+              key={tree.treeId}
+              position={{lat: tree.location.latitude, lng: tree.location.longitude}}
+              onMouseOver={e => this.onTreeHover(e, tree)}
+              onMouseOut={e => this.onTreeHover(e, null)}
+              onClick={e => this.onTreeClick(e, tree)}
+              onRightClick={e => this.onTreeRightClick(e, tree)}
+            >
+              {((!!this.state.treeHover || this.state.treeInfo) && this.state.treeHover == tree) ? (
+                <InfoWindow  onCloseClick={e => this.onTreeClick(e, null)}>
+                  <Container fluid style={{overflow: 'hidden'}}>
+                    {/* <List horizontal>
+                      <List.Item><Icon name='tree' color={icons.color}/></List.Item>
+                      <List.Item>{tree.treeId}</List.Item>
+                      <List.Item><Icon name={icons.land} color={icons.color}/></List.Item>
+                      <List.Item><Icon name={icons.ownership} color={icons.color}/></List.Item>
+                    </List>
+                    <br/>
+                    <List horizontal>
+                      <List.Item><Icon name='resize vertical' color={icons.color}/></List.Item>
+                      <List.Item>{tree.height} cm</List.Item>
+                      <List.Item><Icon name='resize horizontal' color={icons.color}/></List.Item>
+                      <List.Item>{tree.diameter} cm</List.Item>
+                    </List> */}
+                    <Grid columns={4} divided relaxed>
+                      <Grid.Column stretched>
+                        <Grid.Row><Icon name='tree' color={icons.color}/></Grid.Row>
+                        <Grid.Row><b>{tree.treeId}</b></Grid.Row>
+                      </Grid.Column>
+                      <Grid.Column stretched>
+                        <Grid.Row><Icon name='resize vertical' color={icons.color}/></Grid.Row>
+                        <Grid.Row><b>{tree.height}</b></Grid.Row>
+                      </Grid.Column>
+                      <Grid.Column stretched>
+                        <Grid.Row><Icon name='resize horizontal' color={icons.color}/></Grid.Row>
+                        <Grid.Row><b>{tree.diameter}</b></Grid.Row>
+                      </Grid.Column>
+                      <Grid.Column stretched>
+                        <Grid.Row><Icon name={icons.land} color={icons.color}/></Grid.Row>
+                        <Grid.Row><Icon name={icons.ownership} color={icons.color}/></Grid.Row>
+                      </Grid.Column>
+                    </Grid>
+                  </Container>
+                </InfoWindow>
+              ) : null}
+            </Marker>
+          );
         })}
-        {this.state.treeModal ? (
-          <TreeModal tree={this.state.tree} onClose={this.onTreeRightClick}/>
+        {!!this.state.treeModal ? (
+          <TreeModal tree={this.state.treeModal} onClose={this.onTreeRightClick}/>
         ) : null}
-        {this.state.municipalityModal ? (
-          <MunicipalityModal municipality={this.state.municipality} onClose={this.onMunicipalityRightClick}/>
+        {!!this.state.municipalityModal ? (
+          <MunicipalityModal municipality={this.state.municipalityModal} onClose={this.onMunicipalityRightClick}/>
         ) : null}
       </GoogleMap>
     ) : (
-      <Segment style={{...style, display: 'table-cell', verticalAlign: 'middle'}}>
-        <Dimmer active>
-          <Loader size='huge'/>
-        </Dimmer>
-        <Image centered size='medium' src={Logo}/>
-      </Segment>
+      <Loader size='huge'/>
     );
   }
 }
