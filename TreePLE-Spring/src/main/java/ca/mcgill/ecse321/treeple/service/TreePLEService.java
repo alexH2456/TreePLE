@@ -58,20 +58,15 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
 
         User user = null;
-        if ((user = User.getWithUsername(username)) != null) {
+        if ((user = User.getWithUsername(username)) != null || (user = sql.getUser(username)) != null) {
             if (BCrypt.checkpw(password, user.getPassword())) {
                 return user;
+            } else {
+                throw new InvalidInputException("Entered password is incorrect!");
             }
         } else {
-            if ((user = sql.getUser(username)) == null)
-                throw new InvalidInputException("That username doesn't exist!");
-
-            if (BCrypt.checkpw(password, user.getPassword())) {
-                return user;
-            }
+            throw new InvalidInputException("That username doesn't exist!");
         }
-
-        return user;
     }
 
     // Create a new Tree

@@ -1,14 +1,9 @@
 package ca.mcgill.ecse321.treeple.controller;
 
-import static org.junit.Assert.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.sql.Date;
-import java.util.List;
-
-import org.json.JSONObject;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,10 +14,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ca.mcgill.ecse321.treeple.dto.*;
-import ca.mcgill.ecse321.treeple.model.*;
-import ca.mcgill.ecse321.treeple.model.Tree.*;
-import ca.mcgill.ecse321.treeple.service.TestTreePLEService;
 import ca.mcgill.ecse321.treeple.service.TreePLEService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,11 +22,6 @@ import ca.mcgill.ecse321.treeple.service.TreePLEService;
 public class TestTreePLERestController {
 
     private MockMvc mockMvc;
-    private static JSONObject testTree;
-    private static JSONObject testUser;
-    private static JSONObject testSpecies;
-    private static JSONObject testLocation;
-    private static JSONObject testMunicipality;
 
     @Mock
     TreePLEService mockService;
