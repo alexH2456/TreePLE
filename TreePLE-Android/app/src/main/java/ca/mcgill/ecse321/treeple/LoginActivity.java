@@ -111,14 +111,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button bypass = findViewById(R.id.bypass_login);
-        bypass.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                byPassLogin();
-            }
-        });
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -139,16 +131,6 @@ public class LoginActivity extends AppCompatActivity {
         Intent mapsIntent = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(mapsIntent);
         finish();
-    }
-
-    public void byPassLogin() {
-        loggedInUser = new JSONObject();
-        try {
-            loggedInUser.put("username", "test");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        switchToMap();
     }
 
     @Override
