@@ -69,7 +69,6 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    //TODO: Move popups for adding new trees/updating tree info to activities
     //TODO: Remove debug methods before submission(getUser)
 
     private GoogleMap mMap;
