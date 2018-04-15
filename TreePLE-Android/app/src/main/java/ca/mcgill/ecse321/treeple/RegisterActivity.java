@@ -373,7 +373,7 @@ public class RegisterActivity extends AppCompatActivity {
             System.out.println(user.toString());
 
             RequestFuture<JSONObject> newAccountReq = RequestFuture.newFuture();
-            JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newuser/", user, newAccountReq, newAccountReq);
+            JsonObjectRequest accountReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "user/new/", user, newAccountReq, newAccountReq);
             VolleyController.getInstance(getApplicationContext()).addToRequestQueue(accountReq);
 
             try {

@@ -712,7 +712,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         plantObj.put("tree", treeObj);
 
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newtree/", plantObj, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "tree/new/", plantObj, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("PlantResponse: " + response.toString());
@@ -896,7 +896,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     speciesObj.put("genus", speciesGenus.getText().toString());
                     speciesObj.put("species", speciesSpecies.getText().toString());
 
-                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "newspecies/", speciesObj, new Response.Listener<JSONObject>() {
+                    JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, VolleyController.DEFAULT_BASE_URL + "species/new/", speciesObj, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.e(TAG, "SpeciesResponse: " + response.toString());
