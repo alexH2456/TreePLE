@@ -58,12 +58,18 @@ public class TreePLERestController {
         return modelMapper.map(report, SurveyReportDto.class);
     }
 
-    private ArrayList<SurveyReportDto> createSurveyReportDtos(List<SurveyReport> reports) {
-        ArrayList<SurveyReportDto> reportDtos = new ArrayList<SurveyReportDto>();
-        for (SurveyReport report : reports) {
-            reportDtos.add(convertToDto(report));
+    private ForecastDto convertToDto(Forecast forecast) {
+        return new ForecastDto(forecast.getForecastId(), forecast.getFcDate(), forecast.getFcUser(),
+                               forecast.getStormwater(), forecast.getCo2Reduced(), forecast.getBiodiversity(),
+                               forecast.getEnergyConserved(), createTreeDtos(forecast.getFcTrees()));
+    }
+
+    private ArrayList<TreeDto> createTreeDtos(List<Tree> trees) {
+        ArrayList<TreeDto> treesDto = new ArrayList<TreeDto>();
+        for (Tree tree : trees) {
+            treesDto.add(convertToDto(tree));
         }
-        return reportDtos;
+        return treesDto;
     }
 
     private ArrayList<LocationDto> createLocationDtos(List<Location> locations) {
@@ -72,6 +78,14 @@ public class TreePLERestController {
             locationDtos.add(convertToDto(location));
         }
         return locationDtos;
+    }
+
+    private ArrayList<SurveyReportDto> createSurveyReportDtos(List<SurveyReport> reports) {
+        ArrayList<SurveyReportDto> reportDtos = new ArrayList<SurveyReportDto>();
+        for (SurveyReport report : reports) {
+            reportDtos.add(convertToDto(report));
+        }
+        return reportDtos;
     }
 
 
@@ -119,6 +133,14 @@ public class TreePLERestController {
         return municipalities;
     }
 
+    @GetMapping(value = {"/forecasts/"})
+    public List<ForecastDto> getAllForecasts() {
+        List<ForecastDto> forecasts = new ArrayList<ForecastDto>();
+        for (Forecast forecast : service.getAllForecasts())
+            forecasts.add(convertToDto(forecast));
+        return forecasts;
+    }
+
 
     // ==============================
     // GET ONE MAPPING API
@@ -160,10 +182,22 @@ public class TreePLERestController {
         return convertToDto(report);
     }
 
+    @GetMapping(value = {"/forecasts/{forecastid}/"})
+    public ForecastDto getForecastById(@PathVariable("forecastid") int forecastId) throws Exception {
+        Forecast forecast = service.getForecastById(forecastId);
+        return convertToDto(forecast);
+    }
+
 
     // ==============================
     // POST MAPPING API
     // ==============================
+
+    @PostMapping(value = {"/login/"})
+    public UserDto login(@RequestBody String jsonBody) throws Exception {
+        User user = service.login(new JSONObject(jsonBody));
+        return convertToDto(user);
+    }
 
     @PostMapping(value = {"/newtree/"})
     public TreeDto createTree(@RequestBody String jsonBody) throws Exception {
@@ -187,6 +221,12 @@ public class TreePLERestController {
     public MunicipalityDto createMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.createMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
+    }
+
+    @PostMapping(value = {"/newforecast/"})
+    public ForecastDto createForecast(@RequestBody String jsonBody) throws Exception {
+        Forecast forecast = service.createForecast(new JSONObject(jsonBody));
+        return convertToDto(forecast);
     }
 
 
@@ -251,6 +291,12 @@ public class TreePLERestController {
     public MunicipalityDto deleteMunicipality(@RequestBody String jsonBody) throws Exception {
         Municipality municipality = service.deleteMunicipality(new JSONObject(jsonBody));
         return convertToDto(municipality);
+    }
+
+    @PostMapping(value = {"/deleteforecast/"})
+    public ForecastDto deleteForecast(@RequestBody String jsonBody) throws Exception {
+        Forecast forecast = service.deleteForecast(new JSONObject(jsonBody));
+        return convertToDto(forecast);
     }
 
     @DeleteMapping(value = {"/reset/"})

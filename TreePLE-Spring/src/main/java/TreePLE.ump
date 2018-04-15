@@ -36,7 +36,7 @@ class Tree
 
   public Tree(int aHeight, int aDiameter, String aAddress, Date aDatePlanted, Land aLand,
               Status aStatus, Ownership aOwnership, Species aSpecies, Location aLocation,
-              Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aSurveyReports) {
+              Municipality aMunicipality, int aTreeId, ArrayList<SurveyReport> aReports) {
     height = aHeight;
     diameter = aDiameter;
     address = aAddress;
@@ -45,7 +45,7 @@ class Tree
     status = aStatus;
     ownership = aOwnership;
     treeId = aTreeId;
-    reports = aSurveyReports;
+    reports = aReports;
     if (!setSpecies(aSpecies)) {
       throw new RuntimeException("Unable to create Tree due to aSpecies");
     }
@@ -82,6 +82,14 @@ class User
     Scientist
   }
 
+  public void clearMyAddresses() {
+    myAddresses.clear();
+  }
+
+  public void clearMyTrees() {
+    myTrees.clear();
+  }
+
   public static boolean clearUsers() {
     usersByUsername.clear();
     return usersByUsername.isEmpty();
@@ -103,8 +111,8 @@ class Species
 class Location
 {
   autounique locationId;
-  Double latitude;
-  Double longitude;
+  double latitude;
+  double longitude;
 
   public Location(double aLatitude, double aLongitude, int aLocationId) {
     latitude = aLatitude;
@@ -129,6 +137,10 @@ class Municipality
   unique String name;
   int totalTrees;
   * -> * Location borders;
+
+  public void clearBorders() {
+    borders.clear();
+  }
 
   public void deleteKeepBorders() {
     municipalitysByName.remove(getName());
@@ -161,5 +173,40 @@ class SurveyReport
 
   public static int getNextReportId() {
     return nextReportId;
+  }
+}
+
+class Forecast
+{
+  autounique forecastId;
+  Date fcDate;
+  String fcUser;
+  double stormwater;
+  double co2Reduced;
+  double biodiversity;
+  double energyConserved;
+  * -> * Tree fcTrees;
+
+  public Forecast(Date aFcDate, String aFcUser, double aStormwater, double aCo2Reduced,
+                  double aBiodiversity, double aEnergyConserved, int aForecastId, ArrayList<Tree> aFcTrees) {
+    fcDate = aFcDate;
+    fcUser = aFcUser;
+    stormwater = aStormwater;
+    co2Reduced = aCo2Reduced;
+    biodiversity = aBiodiversity;
+    energyConserved = aEnergyConserved;
+    forecastId = aForecastId;
+    fcTrees = aFcTrees;
+  }
+
+  public static boolean setNextForecastId(int minForecastId) {
+    boolean wasSet = false;
+    nextForecastId = minForecastId;
+    wasSet = true;
+    return wasSet;
+  }
+
+  public static int getNextForecastId() {
+    return nextForecastId;
   }
 }

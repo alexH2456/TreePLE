@@ -1,14 +1,32 @@
 import React, {PureComponent} from 'react';
-import {Link} from 'react-router-dom';
+import {Button, Input, Image, Modal, Label, Form} from 'semantic-ui-react';
+import SignInModal from './SignInModal';
+import SignUpModal from './SignUpModal';
+import UpdateTreeModal from './UpdateTreeModal';
 
 class About extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      modalOpen: false,
+      inputError: false
+    };
+  }
+
   render () {
     return (
       <div>
-        About
-        <Link to="/">
-          <button>Go Home</button>
-        </Link>
+        <div>
+          <SignInModal/>
+        </div>
+        <div>
+          <SignUpModal/>
+        </div>
+        <div>
+          <UpdateTreeModal/>
+        </div>
       </div>
     );
   };

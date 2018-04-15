@@ -3,7 +3,7 @@
 
 package ca.mcgill.ecse321.treeple.model;
 
-// line 103 "../../../../../TreePLE.ump"
+// line 111 "../../../../../TreePLE.ump"
 public class Location
 {
 
@@ -73,14 +73,14 @@ public class Location
   public void delete()
   {}
 
-  // line 110 "../../../../../TreePLE.ump"
+  // line 118 "../../../../../TreePLE.ump"
    public  Location(double aLatitude, double aLongitude, int aLocationId){
     latitude = aLatitude;
     longitude = aLongitude;
     locationId = aLocationId;
   }
 
-  // line 116 "../../../../../TreePLE.ump"
+  // line 124 "../../../../../TreePLE.ump"
    public static  boolean setNextLocationId(int minLocationId){
     boolean wasSet = false;
     nextLocationId = minLocationId;
@@ -88,7 +88,7 @@ public class Location
     return wasSet;
   }
 
-  // line 123 "../../../../../TreePLE.ump"
+  // line 131 "../../../../../TreePLE.ump"
    public static  int getNextLocationId(){
     return nextLocationId;
   }

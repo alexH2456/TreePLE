@@ -5,7 +5,9 @@
   "main": "index.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js"
+    "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
+    "prod": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.prod.config.js",
+    "build": "./node_modules/.bin/webpack --config ./webpack/webpack.prod.config.js"
   },
   "repository": {
     "type": "git",
@@ -34,11 +36,6 @@
     "google-maps-react": "^1.1.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-redux": "^5.0.6",
-    "react-router-dom": "^4.2.2",
-    "react-router-redux": "^4.0.8",
-    "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
     "selfsigned": "^1.10.2",
     "semantic-ui-css": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
@@ -53,6 +50,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
+    "compression-webpack-plugin": "^1.1.11",
     "css-loader": "^0.28.10",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",

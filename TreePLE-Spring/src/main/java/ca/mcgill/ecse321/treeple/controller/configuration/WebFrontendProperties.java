@@ -1,31 +1,35 @@
 package ca.mcgill.ecse321.treeple.controller.configuration;
 
 import org.springframework.stereotype.Component;
+
+import ca.mcgill.ecse321.treeple.TreePLESpringApplication;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Component
 @ConfigurationProperties(prefix = "client.web")
 public class WebFrontendProperties {
-	
-	// The IP adress of the web frontend client
-	private String ip = "192.168.56.50";
-	
-	// The port on which the web frontend listens
-	private int port = 8087;
 
-	public String getIp() {
-		return ip;
-	}
+    // The IP address of the web frontend client
+    private String ip = "192.168.56.50";
+    // private String ip = (TreePLESpringApplication.env.acceptsProfiles("prod")) ? ("ecse321-11.ece.mcgill.ca") : ("192.168.56.50");
 
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+    // The port on which the web frontend listens
+    private int port = 8087;
 
-	public int getPort() {
-		return port;
-	}
+    public String getIp() {
+        return ip;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

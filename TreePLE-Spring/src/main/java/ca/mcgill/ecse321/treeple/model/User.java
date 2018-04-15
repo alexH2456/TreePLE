@@ -202,6 +202,16 @@ public class User
   }
 
   // line 86 "../../../../../TreePLE.ump"
+   public void clearMyAddresses(){
+    myAddresses.clear();
+  }
+
+  // line 90 "../../../../../TreePLE.ump"
+   public void clearMyTrees(){
+    myTrees.clear();
+  }
+
+  // line 94 "../../../../../TreePLE.ump"
    public static  boolean clearUsers(){
     usersByUsername.clear();
     return usersByUsername.isEmpty();

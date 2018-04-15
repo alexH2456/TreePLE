@@ -25,21 +25,21 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/email_login_form"
+            android:id="@+id/user_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <AutoCompleteTextView
-                android:id="@+id/email"
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_email"
-                android:inputType="textEmailAddress"
+                android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true" />
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:maxLines="1"
                 android:singleLine="true" />
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/password_reentry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,35 +63,30 @@
                 android:maxLines="1"
                 android:singleLine="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/prompt_role" />
-
             <Spinner
                 android:id="@+id/role_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:spinnerMode="dialog" />
-
-            <EditText
-                android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_address"
+                android:layout_gravity="end"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:spinnerMode="dropdown" />
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/postal_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_postal_code"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true" />
 
             <Button
-                android:id="@+id/email_sign_in_button"
+                android:id="@+id/sign_in_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/button_bg_rounded_corners"
-                android:text="@string/action_sign_up"
-                android:textStyle="bold" />
+                android:text="@string/action_sign_up" />
 
             <Button
                 android:id="@+id/backto_signin_button"
@@ -99,8 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/button_bg_rounded_corners"
-                android:text="@string/backto_signin_button"
-                android:textStyle="bold" />
+                android:text="@string/backto_signin_button" />
 
         </LinearLayout>
     </ScrollView>
