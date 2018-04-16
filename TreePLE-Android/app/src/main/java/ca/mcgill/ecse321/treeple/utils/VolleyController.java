@@ -42,6 +42,7 @@ public class VolleyController {
         return mRequestQueue;
     }
 
+    //Parses response from backend in the case of an error
     public static String parseNetworkResponse(VolleyError volleyError) {
         String backendResponse = "";
         NetworkResponse networkResponse = volleyError.networkResponse;

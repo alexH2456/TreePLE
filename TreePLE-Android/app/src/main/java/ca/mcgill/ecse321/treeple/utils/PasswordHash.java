@@ -3,7 +3,7 @@ package ca.mcgill.ecse321.treeple.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-// Hashes passwords before sending them to the backend.
+//Hashes passwords using SHA-512 before sending them to the backend.
 public class PasswordHash {
 
     public static String generatePasswordHash(String password) throws NoSuchAlgorithmException {

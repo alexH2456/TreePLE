@@ -164,6 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap = map;
 
+        //Location tasks
         getLocationPermission();
         updateLocationUI();
         startLocationUpdates();
@@ -175,7 +176,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Create marker and show popup for entering new tree info
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 
-            @SuppressLint("InflateParams")
             @Override
             public void onMapLongClick(LatLng latLng) {
 
@@ -195,7 +195,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Spinner speciesSpinner = popupView.findViewById(R.id.tree_species);
                 Spinner municipalitySpinner = popupView.findViewById(R.id.tree_municipality);
 
-                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
 
                 TextView coords = popupView.findViewById(R.id.tree_coords);
@@ -209,15 +209,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 popupWindow = new PopupWindow(popupView, width, height, true);
                 popupWindow.showAtLocation(mapsLayout, Gravity.CENTER, 0, 0);
 
-                ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.support_simple_spinner_dropdown_item);
+                ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.spinner_dialog);
                 landSpinner.setAdapter(landAdapter);
                 landSpinner.setSelection(0);
 
-                ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.support_simple_spinner_dropdown_item);
+                ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.spinner_dialog);
                 statusSpinner.setAdapter(statusAdapter);
                 statusSpinner.setSelection(0);
 
-                ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.support_simple_spinner_dropdown_item);
+                ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.spinner_dialog);
                 ownershipSpinner.setAdapter(ownershipAdapter);
                 ownershipSpinner.setSelection(0);
 
@@ -266,7 +266,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 assert inflater != null;
                 popupView = inflater.inflate(R.layout.marker_popup, null);
 
-                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
 
                 TextView treeHeight = popupView.findViewById(R.id.tree_height);
@@ -350,6 +350,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Gets data for populating spinners from backend
     private void getSpinnerData(final Spinner spinner, String url) {
         final ArrayList<String> spinnerData = new ArrayList<>();
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -363,7 +364,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         e.printStackTrace();
                     }
                 }
-                spinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, spinnerData));
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_dialog, spinnerData);
+                spinner.setAdapter(adapter);
                 spinner.setSelection(0);
             }
         }, new Response.ErrorListener() {
@@ -377,6 +379,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
+    //Get user role to determine permissions for current user
     private boolean getTreePermissions(Marker marker) {
         JSONObject tree = trees.get(marker);
         try {
@@ -427,8 +430,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         e.printStackTrace();
                     }
                 }
-
-                Toast.makeText(getApplicationContext(), "Refreshed trees", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -443,6 +444,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //Change marker color based on tree status
     private float getMarkerColor(String status) {
         if (status.equals("Planted")) {
             return BitmapDescriptorFactory.HUE_GREEN;
@@ -763,7 +765,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    // Residents can update their own trees, Scientists can update any tree
+    //Residents can update their own trees, Scientists can update any tree.
     public void updateTree(Marker marker) throws JSONException {
 
         final JSONObject tree = trees.get(marker);
@@ -784,20 +786,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         final EditText treeHeight = popupView.findViewById(R.id.tree_height);
         final EditText treeDiameter = popupView.findViewById(R.id.tree_diameter);
 
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
 
         treeId.setText(Integer.toString(tree.getInt("treeId")));
 
-        ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.support_simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> landAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.land_enum, R.layout.spinner_dialog);
         landSpinner.setAdapter(landAdapter);
         landSpinner.setSelection(0);
 
-        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.support_simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.status_enum, R.layout.spinner_dialog);
         statusSpinner.setAdapter(statusAdapter);
         statusSpinner.setSelection(0);
 
-        ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.support_simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> ownershipAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.ownership_enum, R.layout.spinner_dialog);
         ownershipSpinner.setAdapter(ownershipAdapter);
         ownershipSpinner.setSelection(0);
 
@@ -861,7 +863,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    // Creates popup for adding a new species
+    //Creates popup for adding a new species
     public void showSpeciesPopup() {
 
         LinearLayout mapsLayout = findViewById(R.id.map_layout);
@@ -870,7 +872,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         assert inflater != null;
         popupView = inflater.inflate(R.layout.species_popup, null);
 
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
 
         final EditText speciesName = popupView.findViewById(R.id.species_name);

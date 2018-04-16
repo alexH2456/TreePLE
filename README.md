@@ -2,7 +2,7 @@
 ## TreePLE
 
 As the core functionality, the TreePLE system allows to manage trees in an urban environment.
-TreePLE enables forecasting to analyze sustainability attributes in what-if scenarios to help implement a plan for urban forest management by scientists and urban foresters.
+TreePLE enables forecasting to analyze sustainability attributes in what-if scenarios to help implement a plan for urban forest management by scientists and urban foresters. See the [wiki](https://github.mcgill.ca/ECSE321-2018-Winter/Project-11/wiki) for additional info.
 
 ## Contributors
 
@@ -12,20 +12,6 @@ TreePLE enables forecasting to analyze sustainability attributes in what-if scen
 * Yunus Can Cukran - 260669715
 * Gareth Peters - 260678626
 
-## TODO
+## Notes on creating users
 
-* Update Tree (Android, Backend)
-* Update user info (Backend, Android)
-* Update species (Backend, Android)
-* Update municipality (Backend)
-* Autocomplete address (Android)
-* Location matching when planting (Backend)
-* Finish forecasting (Backend)
-* Filters (Backend, Frontend)
-* Create species (Android)
-* Different icons (Android)
-* Forecast - Create sustainability report
-
-## Questions
-
-* Print vs Throw exception in SQL -> Turn into error code
+In order to create a user with the role of Scientist, we require an extra password for security purposes. For testing purposes, this password is "i<3tr33s".
