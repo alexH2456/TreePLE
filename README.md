@@ -2,7 +2,7 @@
 ## TreePLE
 
 As the core functionality, the TreePLE system allows to manage trees in an urban environment.
-TreePLE enables forecasting to analyze sustainability attributes in what-if scenarios to help implement a plan for urban forest management by scientists and urban foresters.
+TreePLE enables forecasting to analyze sustainability attributes in what-if scenarios to help implement a plan for urban forest management by scientists and urban foresters. See the [wiki](https://github.mcgill.ca/ECSE321-2018-Winter/Project-11/wiki) for additional info.
 
 ## Contributors
 
