@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {Button, Divider, Header, Icon, Input, Form, Grid, Modal, Flag, Segment, Dropdown} from 'semantic-ui-react';
 import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
@@ -126,7 +127,7 @@ class CreateTreeModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onCreateTree}>Create</Button>
-                <Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Button>
+                <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, false)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
@@ -152,5 +153,10 @@ const GMap = compose(
     </GoogleMap>
   );
 });
+
+CreateTreeModal.propTypes = {
+  location: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired
+}
 
 export default CreateTreeModal;

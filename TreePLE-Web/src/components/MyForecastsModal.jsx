@@ -1,9 +1,10 @@
 import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {Button, Divider, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {getUserForecasts, deleteForecast} from "./Requests";
 
-class CreateForecastModal extends PureComponent {
+class MyForecastsModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -133,4 +134,9 @@ class CreateForecastModal extends PureComponent {
   }
 }
 
-export default CreateForecastModal;
+MyForecastsModal.propTypes = {
+  onForecast: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+}
+
+export default MyForecastsModal;

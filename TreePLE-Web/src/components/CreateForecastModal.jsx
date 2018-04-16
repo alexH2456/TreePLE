@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Button, Divider, Dropdown, Header, Flag, Form, Grid, Icon, Modal} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Header, Flag, Form, Grid, Icon, Modal, List} from 'semantic-ui-react';
 import {GoogleMap, InfoWindow, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {getAllTrees, createForecast} from "./Requests";
@@ -108,7 +109,7 @@ class CreateTreeModal extends PureComponent {
             <Divider/>
             <Grid centered>
               <Grid.Row>
-                <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.props.toggleForecast}>Edit</Button>
+                <Button inverted color='blue' size='small' disabled={!this.state.user} onClick={this.props.onForecast}>Edit</Button>
                 <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onCreateForecast}>Save</Button>
                 {/* <Dropdown inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Dropdown> */}
               </Grid.Row>
@@ -135,16 +136,16 @@ class CreateTreeModal extends PureComponent {
 const GMap = compose(
   withProps({
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
-    loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
-    containerElement: <div style={{height: '40vh'}}/>,
-    mapElement: <div style={{height: '40vh'}}/>,
+    loadingElement: <div style={{width: '100vw', height: '60vh'}}/>,
+    containerElement: <div style={{height: '60vh'}}/>,
+    mapElement: <div style={{height: '60vh'}}/>,
   }),
   withScriptjs,
   withGoogleMap
 )(({trees, hover, onTreeClick, onTreeRightClick}) => {
 
   return (
-    <GoogleMap zoom={14} center={mtlCenter}>
+    <GoogleMap zoom={14} center={mtlCenter} options={{scrollwheel: true}}>
       {trees.map(tree => {
         return (
           <Marker
@@ -154,7 +155,12 @@ const GMap = compose(
             onRightClick={() => onTreeRightClick(tree)}
           >
             {(!!hover && hover == tree) ? (
-              <InfoWindow>Gang</InfoWindow>
+              <InfoWindow onCloseClick={() => onTreeRightClick(null)}>
+                <List horizontal>
+                  <List.Item icon='tree'/>
+                  <List.Item content={tree.treeId}/>
+                </List>
+              </InfoWindow>
             ) : null}
           </Marker>
         );
@@ -162,5 +168,10 @@ const GMap = compose(
     </GoogleMap>
   );
 });
+
+CreateTreeModal.propTypes = {
+  onForecast: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+}
 
 export default CreateTreeModal;

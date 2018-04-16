@@ -93,7 +93,8 @@ export class TreeMap extends PureComponent {
     if (success) {
       this.loadTrees()
     }
-    this.setState({createTreeModal: !!e ? e.latLng : null});
+
+    this.setState({createTreeModal: 'latLng' in e ? e.latLng : null});
   }
 
   onMunicipalityClick = (municipality) => {
@@ -230,6 +231,10 @@ export class TreeMap extends PureComponent {
       <Loader size='huge'/>
     );
   }
+}
+
+TreeMap.propTypes = {
+  onSustainabilityChange: PropTypes.func.isRequired
 }
 
 export default compose(

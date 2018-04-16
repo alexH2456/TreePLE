@@ -24,12 +24,17 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 public class TreePLEService {
 
     private SQLiteJDBC sql;
-    private final String gmapsKey = "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk";
+    private String gmapsKey;
+    private final String[] gmapsKeyList = new String[]{
+        "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g",
+        "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk"
+    };
     private final String sRoleKey = "i<3tr33s";
     private final String dbKey = "ih8tr33s";
 
     public TreePLEService(SQLiteJDBC sql) {
         this.sql = sql;
+        this.gmapsKey = gmapsKeyList[(new Random()).nextInt(gmapsKeyList.length)];
     }
 
     public boolean setMaxId() {

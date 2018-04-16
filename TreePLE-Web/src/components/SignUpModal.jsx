@@ -95,6 +95,7 @@ class SignUpModal extends PureComponent {
 }
 
 SignUpModal.propTypes = {
+  onRegister: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 }
 

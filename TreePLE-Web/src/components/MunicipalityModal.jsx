@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {GoogleMap, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {Button, Divider, Header, Icon, Grid, Modal} from 'semantic-ui-react';
@@ -30,7 +31,7 @@ class MunicipalityModal extends PureComponent {
   }
 
   onGMapLoaded = () => {
-    let viewport = getMapBounds(props.municipality.borders);
+    let viewport = getMapBounds(this.props.municipality.borders);
     this.refs.map.fitBounds(viewport);
   }
 
@@ -123,7 +124,7 @@ class MunicipalityModal extends PureComponent {
                     <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
                   </div>
                 )}
-                <Button inverted color='red' size='small' onClick={e => this.props.onClose(null)}>Close</Button>
+                <Button inverted color='red' size='small' onClick={() => this.props.onClose(null)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
@@ -149,5 +150,10 @@ const GMap = compose(
     </GoogleMap>
   );
 });
+
+MunicipalityModal.propTypes = {
+  municipality: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired
+}
 
 export default MunicipalityModal;

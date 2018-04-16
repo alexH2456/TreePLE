@@ -70,6 +70,7 @@ class SignInModal extends PureComponent {
 }
 
 SignInModal.propTypes = {
+  onRegister: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 }
 

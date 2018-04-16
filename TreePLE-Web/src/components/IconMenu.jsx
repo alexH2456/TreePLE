@@ -96,7 +96,8 @@ class IconMenu extends PureComponent {
 }
 
 IconMenu.propTypes = {
-  show: PropTypes.bool.isRequired
+  show: PropTypes.bool.isRequired,
+  onSustainabilityChange: PropTypes.func.isRequired
 }
 
 export default IconMenu;
