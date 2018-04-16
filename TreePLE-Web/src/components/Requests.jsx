@@ -115,12 +115,12 @@ function createUser(params) {
 
 function createForecast(params) {
   const url = `/forecast/new/`;
-  return postRequestWithParams(url, params)
+  return postRequestWithParams(url, params);
 }
 
 function deleteForecast(params) {
   const url = `/forecast/delete/`;
-  return postRequestWithParams(url, params)
+  return postRequestWithParams(url, params);
 }
 
 

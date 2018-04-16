@@ -64,8 +64,8 @@ export class TreeMap extends PureComponent {
       .then(({data}) => {
         this.setState({trees: data});
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 
@@ -84,8 +84,8 @@ export class TreeMap extends PureComponent {
 
         this.setState({municipalities: municipalities});
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 
@@ -112,8 +112,8 @@ export class TreeMap extends PureComponent {
         this.refs.map.fitBounds(viewport);
         this.props.onSustainabilityChange(sustainability);
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 
@@ -146,8 +146,8 @@ export class TreeMap extends PureComponent {
         .then(sustainability => {
           this.props.onSustainabilityChange(sustainability);
         })
-        .catch(error => {
-          console.log(error);
+        .catch(({response: {data}}) => {
+          console.log(data);
         })
     }
   }

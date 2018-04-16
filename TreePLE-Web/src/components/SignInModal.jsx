@@ -31,10 +31,10 @@ class SignInModal extends PureComponent {
           this.props.onClose();
         }
       })
-      .catch(error => {
+      .catch(({response: {data}}) => {
         this.setState({
           error: true,
-          errorMsg: error.message
+          errorMsg: data.message
         });
       });
   }

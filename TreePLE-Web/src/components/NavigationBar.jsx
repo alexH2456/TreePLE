@@ -29,8 +29,8 @@ class NavigationBar extends PureComponent {
           energyConserved: data.energyConserved
         }});
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 

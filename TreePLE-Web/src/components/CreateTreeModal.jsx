@@ -53,8 +53,8 @@ class CreateTreeModal extends PureComponent {
       .then(({data}) => {
         this.props.onClose(null, true);
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 

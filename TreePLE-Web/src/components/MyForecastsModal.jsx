@@ -23,13 +23,13 @@ class MyForecastsModal extends PureComponent {
           forecasts: data
         });
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
-    }
+  }
 
   onAnalysisForecast = (forecastId) => {
-
+    const x = forecastId;
   }
 
   onDeleteForecast = (fcId) => {
@@ -52,8 +52,8 @@ class MyForecastsModal extends PureComponent {
           })
         }
       })
-      .catch(error => {
-        console.log(error);
+      .catch(({response: {data}}) => {
+        console.log(data);
       });
   }
 

@@ -1,5 +1,5 @@
 import {getAllSpecies, getAllMunicipalities} from "./Requests";
-import {roles, lands, statuses, ownerships} from '../constants';
+import {lands, statuses, ownerships} from '../constants';
 
 function getSpeciesSelectable() {
   let speciesSelectable = [];
@@ -14,8 +14,8 @@ function getSpeciesSelectable() {
         });
       });
     })
-    .catch(error => {
-      console.log(error);
+    .catch(({response: {data}}) => {
+      console.log(data);
     });
 
   return speciesSelectable;
@@ -34,8 +34,8 @@ function getMunicipalitySelectable() {
         });
       });
     })
-    .catch(error => {
-      console.log(error);
+    .catch(({response: {data}}) => {
+      console.log(data);
     });
 
   return municipalitySelectable;
@@ -69,7 +69,7 @@ function getMapBounds(locations) {
     north: Math.max(...lat),
     west: Math.min(...lng),
     east: Math.max(...lng)
-  }
+  };
 
   return bounds;
 }
@@ -126,7 +126,7 @@ function getTreeIcons(tree) {
 }
 
 function formatDate(date) {
-  return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+  return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 }
 
 export {

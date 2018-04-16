@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.dev.config.js",
     "prod": "./node_modules/.bin/webpack-dev-server --config ./webpack/webpack.prod.config.js",
-    "build": "./node_modules/.bin/webpack --config ./webpack/webpack.prod.config.js"
+    "build": "./node_modules/.bin/webpack --config ./webpack/webpack.prod.config.js",
+    "lint": "./node_modules/.bin/eslint ./src/**/*.js*; exit 0"
   },
   "repository": {
     "type": "git",
@@ -55,6 +56,8 @@
     "babel-register": "^6.26.0",
     "compression-webpack-plugin": "^1.1.11",
     "css-loader": "^0.28.10",
+    "eslint": "^4.19.1",
+    "eslint-plugin-react": "^7.7.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
