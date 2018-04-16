@@ -3,6 +3,8 @@ package ca.mcgill.ecse321.treeple.service;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.apache.commons.lang3.*;
@@ -22,7 +24,7 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 public class TreePLEService {
 
     private SQLiteJDBC sql;
-    private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
+    private final String gmapsKey = "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk";
     private final String sRoleKey = "i<3tr33s";
     private final String dbKey = "ih8tr33s";
 
@@ -1161,11 +1163,11 @@ public class TreePLEService {
 
     // Returns the tree with updated height and diameter for the given date
     public Tree getFutureTree(Tree tree, Date futureDate) throws Exception {
-        long currentTime = Calendar.getInstance().getTimeInMillis();
+        long currentTime = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond()*1000;
         long futureTime = futureDate.getTime();
 
-        if (currentTime > futureTime)
-            throw new InvalidInputException("Future date cannot be before the current date!");
+        if (currentTime >= futureTime)
+            throw new InvalidInputException("Forecast date cannot be before the current date!");
 
         double yearsDiff = (futureTime - currentTime) / (1000*60*60*24*365.25);
 

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {compose, withProps} from 'recompose';
 import {Button, Divider, Dropdown, Header, Flag, Form, Grid, Icon, Modal} from 'semantic-ui-react';
-import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
+import {GoogleMap, InfoWindow, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {getAllTrees, createForecast} from "./Requests";
 import {formatDate} from './Utils';
@@ -13,13 +13,11 @@ class CreateTreeModal extends PureComponent {
     super(props);
     this.state = {
       user: localStorage.getItem('username'),
-      forecast: {
-        fcDate: new Date(),
-        fcTrees: []
-      },
+      fcDate: new Date(),
+      fcTrees: [],
       hover: null,
+      language: 'en',
       trees: [],
-      treesSelected: []
     };
   }
 
@@ -36,8 +34,8 @@ class CreateTreeModal extends PureComponent {
   onCreateForecast = () => {
     const fcParams = {
       fcUser: this.state.user,
-      fcDate: formatDate(this.state.forecast.fcDate),
-      fcTrees: this.state.forecast.fcTrees
+      fcDate: formatDate(this.state.fcDate),
+      fcTrees: this.state.fcTrees
     };
 
     createForecast(fcParams)
@@ -54,22 +52,23 @@ class CreateTreeModal extends PureComponent {
   }
 
   onTreeClick = ({treeId}) => {
-    let treesSelected = this.state.treesSelected.slice();
-    if (!treesSelected.includes(treeId)) {
-      treesSelected.push(treeId);
-      this.setState({treesSelected: treesSelected});
+    let fcTrees = this.state.fcTrees.slice();
+    if (!fcTrees.includes(treeId)) {
+      fcTrees.push(treeId);
+      this.setState({fcTrees: fcTrees});
     }
   }
 
   onTreeRightClick = (tree) => {
-
+    const hover = tree == this.state.hover ? null : tree;
+    this.setState({hover: hover});
   }
 
-  onDateChange = (day, {selected}) => this.setState(prevState => ({tree: {...prevState.tree, datePlanted: day}}));
+  onDateChange = (day, {selected}) => this.setState({fcDate: day});
   onFlagChange = (e, {value}) => this.setState({language: value});
 
   render() {
-    const {trees, treesSelected} = this.state;
+    const {trees, fcTrees} = this.state;
 
     const flags = [
       {key: 'en', value: 'en', text: <Flag name='ca'/>},
@@ -97,9 +96,9 @@ class CreateTreeModal extends PureComponent {
               <Form.Group widths='equal'>
                 <Form.Input label='Date Planted'>
                   <Dropdown compact selection options={flags} defaultValue={flags[0].key} onChange={this.onFlagChange}/>
-                  <DayPickerInput placeholder='YYYY-MM-DD' format='YYYY-M-D' value={this.state.forecast.fcDate} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
+                  <DayPickerInput placeholder='YYYY-MM-DD' format='YYYY-M-D' value={this.state.fcDate} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
                 </Form.Input>
-                <Form.Input fluid readOnly label='Total Trees' placeholder='Number of Trees' type='number' min='0' value={treesSelected.length}/>
+                <Form.Input fluid readOnly label='Total Trees' placeholder='Number of Trees' type='number' min='0' value={fcTrees.length}/>
               </Form.Group>
             </Form>
 
@@ -155,7 +154,7 @@ const GMap = compose(
             onRightClick={() => onTreeRightClick(tree)}
           >
             {(!!hover && hover == tree) ? (
-              <InfoWindow></InfoWindow>
+              <InfoWindow>Gang</InfoWindow>
             ) : null}
           </Marker>
         );
