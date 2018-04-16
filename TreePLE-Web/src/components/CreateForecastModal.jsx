@@ -4,7 +4,9 @@ import {Button, Divider, Dropdown, Header, Flag, Form, Grid, Icon, Modal} from '
 import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {getAllTrees, createForecast} from "./Requests";
+import {formatDate} from './Utils';
 import {gmapsKey, mtlCenter, huDates} from '../constants';
+
 
 class CreateTreeModal extends PureComponent {
   constructor(props) {
@@ -32,22 +34,31 @@ class CreateTreeModal extends PureComponent {
   }
 
   onCreateForecast = () => {
-    const treeParams = {
-      user: this.state.user,
-      tree: this.state.updatedTree
+    const fcParams = {
+      fcUser: this.state.user,
+      fcDate: formatDate(this.state.forecast.fcDate),
+      fcTrees: this.state.updatedTree
     };
 
     createForecast(fcParams)
       .then(({data}) => {
-        this.props.onClose(null);
+        this.props.onClose();
       })
       .catch(error => {
         console.log(error);
       })
   }
 
-  onTreeClick = (tree) => {
+  onRemoveSelectedTree = (tree) => {
 
+  }
+
+  onTreeClick = ({treeId}) => {
+    let treesSelected = this.state.treesSelected.slice();
+    if (!treesSelected.includes(treeId)) {
+      treesSelected.push(treeId);
+      this.setState({treesSelected: treesSelected});
+    }
   }
 
   onTreeRightClick = (tree) => {
@@ -134,7 +145,7 @@ const GMap = compose(
 )(({trees, hover, onTreeClick, onTreeRightClick}) => {
 
   return (
-    <GoogleMap zoom={15} center={mtlCenter} options={{scrollwheel: false}}>
+    <GoogleMap zoom={14} center={mtlCenter}>
       {trees.map(tree => {
         return (
           <Marker
