@@ -37,7 +37,7 @@ class CreateTreeModal extends PureComponent {
     const fcParams = {
       fcUser: this.state.user,
       fcDate: formatDate(this.state.forecast.fcDate),
-      fcTrees: this.state.updatedTree
+      fcTrees: this.state.forecast.fcTrees
     };
 
     createForecast(fcParams)
