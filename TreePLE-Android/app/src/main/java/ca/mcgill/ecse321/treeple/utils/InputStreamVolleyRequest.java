@@ -8,7 +8,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import java.util.HashMap;
 import java.util.Map;
 
-// Implementation of Volley for downloading large files
+//Implementation of Volley for downloading large files
 public class InputStreamVolleyRequest extends Request<byte[]> {
     private final Response.Listener<byte[]> mListener;
     private Map<String, String> mParams;

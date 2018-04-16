@@ -132,6 +132,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         return password.length() > 5;
     }
 
+    //Resets users password by sending old and new password to backend
     private void resetPassword(String user, String oldPass, String newPass) {
 
         JSONObject updatedUser = new JSONObject();

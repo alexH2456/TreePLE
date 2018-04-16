@@ -164,6 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap = map;
 
+        //Location tasks
         getLocationPermission();
         updateLocationUI();
         startLocationUpdates();
@@ -349,6 +350,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Gets data for populating spinners from backend
     private void getSpinnerData(final Spinner spinner, String url) {
         final ArrayList<String> spinnerData = new ArrayList<>();
         JsonArrayRequest jsonReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -377,6 +379,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
+    //Get user role to determine permissions for current user
     private boolean getTreePermissions(Marker marker) {
         JSONObject tree = trees.get(marker);
         try {
@@ -441,6 +444,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //Change marker color based on tree status
     private float getMarkerColor(String status) {
         if (status.equals("Planted")) {
             return BitmapDescriptorFactory.HUE_GREEN;
@@ -761,7 +765,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         VolleyController.getInstance(getApplicationContext()).addToRequestQueue(jsonReq);
     }
 
-    // Residents can update their own trees, Scientists can update any tree
+    //Residents can update their own trees, Scientists can update any tree.
     public void updateTree(Marker marker) throws JSONException {
 
         final JSONObject tree = trees.get(marker);
@@ -859,7 +863,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    // Creates popup for adding a new species
+    //Creates popup for adding a new species
     public void showSpeciesPopup() {
 
         LinearLayout mapsLayout = findViewById(R.id.map_layout);
