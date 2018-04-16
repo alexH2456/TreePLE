@@ -5,7 +5,7 @@ import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps'
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {createTree} from "./Requests";
 import {getSpeciesSelectable, getMunicipalitySelectable, getLatLngBorders, formatDate} from './Utils';
-import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
+import {gmapsKey, huDates, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 
 class CreateTreeModal extends PureComponent {
   constructor(props) {
@@ -77,16 +77,12 @@ class CreateTreeModal extends PureComponent {
       {key: 'en', value: 'en', text: <Flag name='ca'/>},
       {key: 'hu', value: 'hu', text: <Flag name='hu'/>}
     ];
-    const hu = {
-      weekShort: ['Vas', 'H', 'K', 'Sze', 'Csüt', 'P', 'Szo'],
-      weekLong: ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombaton'],
-      months: ['Január', 'Február', 'Március', 'Április', 'Május', 'Junius', 'Julius', 'Augusztus', 'Szeptember', 'Október', 'November', 'December']
-    };
+
     const dayPickerProps = {
       locale: this.state.language,
-      weekdaysShort: this.state.language == 'hu' ? hu.weekShort : undefined,
-      weekdaysLong: this.state.language == 'hu' ? hu.weekLong : undefined,
-      months: this.state.language == 'hu' ? hu.months : undefined
+      weekdaysShort: this.state.language == 'hu' ? huDates.weekShort : undefined,
+      weekdaysLong: this.state.language == 'hu' ? huDates.weekLong : undefined,
+      months: this.state.language == 'hu' ? huDates.months : undefined
     };
 
     return (

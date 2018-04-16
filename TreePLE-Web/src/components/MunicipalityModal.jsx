@@ -123,7 +123,7 @@ class MunicipalityModal extends PureComponent {
                     <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
                   </div>
                 )}
-                <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, null)}>Close</Button>
+                <Button inverted color='red' size='small' onClick={e => this.props.onClose(null)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>

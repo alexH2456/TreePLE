@@ -5,6 +5,7 @@ import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
 import TreeMap from './TreeMap';
 import MyForecastsModal from './MyForecastsModal';
+import CreateForecastModal from './CreateForecastModal';
 
 class IconMenu extends PureComponent {
   constructor(props) {
@@ -14,7 +15,8 @@ class IconMenu extends PureComponent {
       showMenu: false,
       showSignIn: false,
       showSignUp: false,
-      showMyForecasts: false
+      showMyForecasts: false,
+      showCreateForecast: false
     };
   }
 
@@ -28,6 +30,8 @@ class IconMenu extends PureComponent {
   toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
   toggleRegister = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
   toggleMyForecasts = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts}));
+  toggleCreateForecast = () => this.setState(prevState => ({showCreateForecast: !prevState.showCreateForecast}));
+  toggleForecast = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
 
   onLogOut = () => {
     localStorage.clear();
@@ -81,7 +85,10 @@ class IconMenu extends PureComponent {
           <SignUpModal onClose={this.toggleSignUp} onRegister={this.toggleRegister}/>
         ) : null}
         {this.state.showMyForecasts ? (
-          <MyForecastsModal onClose={this.toggleMyForecasts}/>
+          <MyForecastsModal onClose={this.toggleMyForecasts} onForecast={this.toggleForecast}/>
+        ) : null}
+        {this.state.showCreateForecast ? (
+          <CreateForecastModal onClose={this.toggleCreateForecast} onForecast={this.toggleForecast}/>
         ) : null}
       </div>
     )

@@ -22,7 +22,7 @@ import ca.mcgill.ecse321.treeple.sqlite.SQLiteJDBC;
 public class TreePLEService {
 
     private SQLiteJDBC sql;
-    private final String gmapsKey = "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk";
+    private final String gmapsKey = "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g";
     private final String sRoleKey = "i<3tr33s";
     private final String dbKey = "ih8tr33s";
 

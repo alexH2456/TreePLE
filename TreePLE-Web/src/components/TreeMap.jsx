@@ -8,7 +8,7 @@ import CreateTreeModal from './CreateTreeModal';
 import MunicipalityModal from './MunicipalityModal';
 import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability, getTreeSustainability} from './Requests';
 import {getLatLngBorders, getMapBounds, getTreeIcons} from './Utils';
-import {gmapsKey} from '../constants';
+import {gmapsKey, mtlCenter} from '../constants';
 import Logo from '../images/favicon.ico';
 
 export class TreeMap extends PureComponent {
@@ -44,12 +44,7 @@ export class TreeMap extends PureComponent {
           });
         },
         error => {
-          this.setState({
-            center: {
-              lat: 45.503265,
-              lng: -73.591593
-            }
-          });
+          this.setState({center: mtlCenter});
           alert('Unable to find your location.');
         }, {
           timeout: 5000,
@@ -101,7 +96,7 @@ export class TreeMap extends PureComponent {
     this.setState({createTreeModal: !!e ? e.latLng : null});
   }
 
-  onMunicipalityClick = (e, municipality) => {
+  onMunicipalityClick = (municipality) => {
     getMunicipalitySustainability(municipality.name)
       .then(({data}) => {
         return {
@@ -121,15 +116,15 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMunicipalityDblClick = (e, municipality) => this.setState({municipalityModal: municipality});
+  onMunicipalityDblClick = (municipality) => this.setState({municipalityModal: municipality});
 
-  onTreeHover = (e, tree) => {
+  onTreeHover = (tree) => {
     if (!this.state.treeInfo) {
       this.setState({treeHover: tree});
     }
   }
 
-  onTreeClick = (e, tree) => {
+  onTreeClick = (tree) => {
     this.setState(prevState => {
       return {
         treeHover: tree,
@@ -156,9 +151,34 @@ export class TreeMap extends PureComponent {
     }
   }
 
-  onTreeDblClick = (e, tree) => this.setState({treeModal: tree});
+  onTreeDblClick = (tree) => this.setState({treeModal: tree});
 
   render() {
+    const TreeInfoWindow = ({tree, icons}) => (
+      <InfoWindow onCloseClick={() => this.onTreeClick(null)}>
+        <Container fluid style={{overflow: 'hidden'}}>
+          <Grid columns={4} divided relaxed>
+            <Grid.Column stretched>
+              <Grid.Row><Icon name='tree' color={icons.color}/></Grid.Row>
+              <Grid.Row><b>{tree.treeId}</b></Grid.Row>
+            </Grid.Column>
+            <Grid.Column stretched>
+              <Grid.Row><Icon name='resize vertical' color={icons.color}/></Grid.Row>
+              <Grid.Row><b>{tree.height}</b></Grid.Row>
+            </Grid.Column>
+            <Grid.Column stretched>
+              <Grid.Row><Icon name='resize horizontal' color={icons.color}/></Grid.Row>
+              <Grid.Row><b>{tree.diameter}</b></Grid.Row>
+            </Grid.Column>
+            <Grid.Column stretched>
+              <Grid.Row><Icon name={icons.land} color={icons.color}/></Grid.Row>
+              <Grid.Row><Icon name={icons.ownership} color={icons.color}/></Grid.Row>
+            </Grid.Column>
+          </Grid>
+        </Container>
+      </InfoWindow>
+    );
+
     return (Object.keys(this.state.center).length !== 0) ? (<div>
       <GoogleMap
         ref='map'
@@ -172,8 +192,8 @@ export class TreeMap extends PureComponent {
             <Polygon
               key={municipality.name}
               paths={municipality.borders}
-              onClick={e => this.onMunicipalityClick(e, municipality)}
-              onDblClick={e => this.onMunicipalityDblClick(e, municipality)}
+              onClick={() => this.onMunicipalityClick(municipality)}
+              onDblClick={() => this.onMunicipalityDblClick(municipality)}
               onRightClick={e => this.onMapClick(e, false)}
             />
           );
@@ -185,34 +205,13 @@ export class TreeMap extends PureComponent {
             <Marker
               key={tree.treeId}
               position={{lat: tree.location.latitude, lng: tree.location.longitude}}
-              onMouseOver={e => this.onTreeHover(e, tree)}
-              onMouseOut={e => this.onTreeHover(e, null)}
-              onClick={e => this.onTreeClick(e, tree)}
-              onDblClick={e => this.onTreeDblClick(e, tree)}
+              onMouseOver={() => this.onTreeHover(tree)}
+              onMouseOut={() => this.onTreeHover(null)}
+              onClick={() => this.onTreeClick(tree)}
+              onDblClick={() => this.onTreeDblClick(tree)}
             >
               {((!!this.state.treeHover || this.state.treeInfo) && this.state.treeHover == tree) ? (
-                <InfoWindow  onCloseClick={e => this.onTreeClick(e, null)}>
-                  <Container fluid style={{overflow: 'hidden'}}>
-                    <Grid columns={4} divided relaxed>
-                      <Grid.Column stretched>
-                        <Grid.Row><Icon name='tree' color={icons.color}/></Grid.Row>
-                        <Grid.Row><b>{tree.treeId}</b></Grid.Row>
-                      </Grid.Column>
-                      <Grid.Column stretched>
-                        <Grid.Row><Icon name='resize vertical' color={icons.color}/></Grid.Row>
-                        <Grid.Row><b>{tree.height}</b></Grid.Row>
-                      </Grid.Column>
-                      <Grid.Column stretched>
-                        <Grid.Row><Icon name='resize horizontal' color={icons.color}/></Grid.Row>
-                        <Grid.Row><b>{tree.diameter}</b></Grid.Row>
-                      </Grid.Column>
-                      <Grid.Column stretched>
-                        <Grid.Row><Icon name={icons.land} color={icons.color}/></Grid.Row>
-                        <Grid.Row><Icon name={icons.ownership} color={icons.color}/></Grid.Row>
-                      </Grid.Column>
-                    </Grid>
-                  </Container>
-                </InfoWindow>
+                <TreeInfoWindow tree={tree} icons={icons}/>
               ) : null}
             </Marker>
           );

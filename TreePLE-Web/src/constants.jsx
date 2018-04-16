@@ -1,5 +1,16 @@
 export const gmapsKey = 'AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk';
 
+export const mtlCenter = {
+  lat: 45.503265,
+  lng: -73.591593
+};
+
+export const huDates = {
+  weekShort: ['Vas', 'H', 'K', 'Sze', 'Csüt', 'P', 'Szo'],
+  weekLong: ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombaton'],
+  months: ['Január', 'Február', 'Március', 'Április', 'Május', 'Junius', 'Julius', 'Augusztus', 'Szeptember', 'Október', 'November', 'December']
+};
+
 export const roles = {
   resident: {enum: 'Resident', icon: 'user'},
   scientist: {enum: 'Scientist', icon: 'leaf'}

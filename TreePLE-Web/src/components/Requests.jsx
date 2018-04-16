@@ -113,6 +113,16 @@ function createUser(params) {
   return postRequestWithParams(url, params);
 }
 
+function createForecast(params) {
+  const url = `/forecast/new/`;
+  return postRequestWithParams(url, params)
+}
+
+function deleteForecast(params) {
+  const url = `/forecast/delete/`;
+  return postRequestWithParams(url, params)
+}
+
 
 // ==============================
 // PATCH API
@@ -150,7 +160,7 @@ export {
   getAllSpecies,
   getAllLocations,
   getAllMunicipalities,
-  getAllForecasts,
+  getAllForecasts, createForecast, deleteForecast,
   getSustainability, getTreePLESustainability, getTreeSustainability, getMunicipalitySustainability,
   login
 };
