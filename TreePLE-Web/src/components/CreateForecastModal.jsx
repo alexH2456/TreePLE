@@ -149,25 +149,23 @@ const GMap = compose(
 
   return (
     <GoogleMap zoom={14} center={mtlCenter} options={{scrollwheel: true}}>
-      {trees.map(tree => {
-        return (
-          <Marker
-            key={tree.treeId}
-            position={{lat: tree.location.latitude, lng: tree.location.longitude}}
-            onClick={() => onTreeClick(tree)}
-            onRightClick={() => onTreeRightClick(tree)}
-          >
-            {(hover && hover == tree.treeId) ? (
-              <InfoWindow onCloseClick={() => onTreeRightClick(null)}>
-                <List horizontal>
-                  <List.Item icon='tree'/>
-                  <List.Item content={treeId}/>
-                </List>
-              </InfoWindow>
-            ) : null}
-          </Marker>
-        );
-      })}
+      {trees.map(tree => (
+        <Marker
+          key={tree.treeId}
+          position={{lat: tree.location.latitude, lng: tree.location.longitude}}
+          onClick={() => onTreeClick(tree)}
+          onRightClick={() => onTreeRightClick(tree)}
+        >
+          {(hover && hover == tree.treeId) ? (
+            <InfoWindow onCloseClick={() => onTreeRightClick(null)}>
+              <List horizontal>
+                <List.Item icon='tree'/>
+                <List.Item content={treeId}/>
+              </List>
+            </InfoWindow>
+          ) : null}
+        </Marker>
+      ))}
     </GoogleMap>
   );
 });

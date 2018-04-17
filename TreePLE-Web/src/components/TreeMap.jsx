@@ -152,7 +152,11 @@ export class TreeMap extends PureComponent {
     if (success) {
       this.loadTrees()
     }
-    this.setState({treeModal: tree});
+    this.setState({
+      treeHover: null,
+      treeInfo: null,
+      treeModal: tree
+    });
   }
 
   render() {
@@ -185,7 +189,7 @@ export class TreeMap extends PureComponent {
       </InfoWindow>
     );
 
-    return (Object.keys(this.state.center).length !== 0) ? (<div>
+    return (Object.keys(this.state.center).length !== 0) ? (
       <GoogleMap
         ref='map'
         defaultZoom={14}
@@ -193,19 +197,16 @@ export class TreeMap extends PureComponent {
         options={{scrollwheel: true}}
         onRightClick={e => this.onMapClick(e, false)}
       >
-        {this.state.municipalities.map(municipality => {
-          return (
-            <Polygon
-              key={municipality.name}
-              paths={municipality.borders}
-              onClick={() => this.onMunicipalityClick(municipality)}
-              onDblClick={() => this.onMunicipalityDblClick(municipality)}
-              onRightClick={e => this.onMapClick(e, false)}
-            />
-          );
-        })}
-        {this.state.trees.map(tree => {
-          return (
+        {this.state.municipalities.map(municipality => (
+          <Polygon
+            key={municipality.name}
+            paths={municipality.borders}
+            onClick={() => this.onMunicipalityClick(municipality)}
+            onDblClick={() => this.onMunicipalityDblClick(municipality)}
+            onRightClick={e => this.onMapClick(e, false)}
+          />
+        ))}
+        {this.state.trees.map(tree => (
             <Marker
               key={tree.treeId}
               position={{lat: tree.location.latitude, lng: tree.location.longitude}}
@@ -218,8 +219,7 @@ export class TreeMap extends PureComponent {
                 <TreeInfoWindow tree={tree} icons={getTreeIcons(tree)}/>
               ) : null}
             </Marker>
-          );
-        })}
+        ))}
         {!!this.state.treeModal ? (
           <TreeModal tree={this.state.treeModal} onClose={this.onTreeDblClick}/>
         ) : null}
@@ -229,7 +229,7 @@ export class TreeMap extends PureComponent {
         {!!this.state.municipalityModal ? (
           <MunicipalityModal municipality={this.state.municipalityModal} onClose={this.onMunicipalityDblClick}/>
         ) : null}
-      </GoogleMap></div>
+      </GoogleMap>
     ) : (
       <Loader size='huge'/>
     );

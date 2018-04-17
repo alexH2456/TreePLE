@@ -93,22 +93,20 @@ class MyForecastsModal extends PureComponent {
 
             {this.state.forecasts.length !== 0 ? (
               <Grid textAlign='center' columns={7}>
-                {this.state.forecasts.map(({forecastId, fcDate, biodiversity, stormwater, co2Reduced, energyConserved}) => {
-                  return (
-                    <Grid.Row key={forecastId}>
-                      <Grid.Column>{forecastId}</Grid.Column>
-                      <Grid.Column>{fcDate}</Grid.Column>
-                      <Grid.Column>{biodiversity.toFixed(5)}</Grid.Column>
-                      <Grid.Column>{stormwater.toFixed(2)}</Grid.Column>
-                      <Grid.Column>{co2Reduced.toFixed(2)}</Grid.Column>
-                      <Grid.Column>{energyConserved.toFixed(2)}</Grid.Column>
-                      <Grid.Column>
-                        <Button inverted circular size='mini' content='Analysis' color='blue' onClick={() => this.onAnalysisForecast(forecastId)}/>
-                        <Button inverted circular size='mini' icon='delete' color='red' disabled={!this.state.user} onClick={() => this.onDeleteForecast(forecastId)}/>
-                      </Grid.Column>
-                    </Grid.Row>
-                  );
-                })}
+                {this.state.forecasts.map(({forecastId, fcDate, biodiversity, stormwater, co2Reduced, energyConserved}) => (
+                  <Grid.Row key={forecastId}>
+                    <Grid.Column>{forecastId}</Grid.Column>
+                    <Grid.Column>{fcDate}</Grid.Column>
+                    <Grid.Column>{biodiversity.toFixed(5)}</Grid.Column>
+                    <Grid.Column>{stormwater.toFixed(2)}</Grid.Column>
+                    <Grid.Column>{co2Reduced.toFixed(2)}</Grid.Column>
+                    <Grid.Column>{energyConserved.toFixed(2)}</Grid.Column>
+                    <Grid.Column>
+                      <Button inverted circular size='mini' content='Analysis' color='blue' onClick={() => this.onAnalysisForecast(forecastId)}/>
+                      <Button inverted circular size='mini' icon='delete' color='red' disabled={!this.state.user} onClick={() => this.onDeleteForecast(forecastId)}/>
+                    </Grid.Column>
+                  </Grid.Row>
+                ))}
               </Grid>
             ) : (
               this.state.error ? (

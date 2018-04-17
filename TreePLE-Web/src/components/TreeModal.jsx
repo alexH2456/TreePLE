@@ -180,15 +180,13 @@ class TreeModal extends PureComponent {
                     <Divider/>
 
                     <Grid textAlign='center' columns={3}>
-                      {tree.reports.map(({reportId, reportUser, reportDate}) => {
-                        return (
-                          <Grid.Row key={reportId}>
-                            <Grid.Column>{reportId}</Grid.Column>
-                            <Grid.Column>{reportUser}</Grid.Column>
-                            <Grid.Column>{reportDate}</Grid.Column>
-                          </Grid.Row>
-                        );
-                      })}
+                      {tree.reports.map(({reportId, reportUser, reportDate}) => (
+                        <Grid.Row key={reportId}>
+                          <Grid.Column>{reportId}</Grid.Column>
+                          <Grid.Column>{reportUser}</Grid.Column>
+                          <Grid.Column>{reportDate}</Grid.Column>
+                        </Grid.Row>
+                      ))}
                     </Grid>
                   </div>
                 ) : null}
