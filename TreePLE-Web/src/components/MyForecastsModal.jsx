@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import {compose, withProps} from 'recompose';
 import {Button, Divider, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {getUserForecasts, deleteForecast} from "./Requests";
 

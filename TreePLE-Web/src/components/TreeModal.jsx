@@ -42,7 +42,7 @@ class TreeModal extends PureComponent {
         })
       })
       .catch(() => {
-        this.setState({error: 'Unable to retrieve list of Species/Municipalities!'});
+        this.setState({error: 'Unable to retrieve Species/Municipality list!'});
       });
   }
 

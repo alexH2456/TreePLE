@@ -6,6 +6,7 @@ import SignUpModal from './SignUpModal';
 import TreeMap from './TreeMap';
 import MyForecastsModal from './MyForecastsModal';
 import CreateForecastModal from './CreateForecastModal';
+import HelpModal from './HelpModal';
 
 class IconMenu extends PureComponent {
   constructor(props) {
@@ -16,7 +17,8 @@ class IconMenu extends PureComponent {
       showSignIn: false,
       showSignUp: false,
       showMyForecasts: false,
-      showCreateForecast: false
+      showCreateForecast: false,
+      showHelp: false
     };
   }
 
@@ -33,6 +35,8 @@ class IconMenu extends PureComponent {
   toggleMyForecasts = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts}));
   toggleCreateForecast = () => this.setState(prevState => ({showCreateForecast: !prevState.showCreateForecast}));
   toggleForecast = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
+
+  toggleHelp = () => this.setState(prevState => ({showHelp: !prevState.showHelp}));
 
   onLogOut = () => {
     localStorage.clear();
@@ -71,6 +75,11 @@ class IconMenu extends PureComponent {
                 </Menu.Item>
               </div>
             )}
+            <Menu.Item link name='help'>
+              <Button basic color='black' name='help' onClick={this.toggleHelp}>
+                Help
+              </Button>
+            </Menu.Item>
           </Sidebar>
           <Sidebar.Pusher>
             <Segment basic>
@@ -90,6 +99,9 @@ class IconMenu extends PureComponent {
         ) : null}
         {this.state.showCreateForecast ? (
           <CreateForecastModal onClose={this.toggleCreateForecast} onForecast={this.toggleForecast}/>
+        ) : null}
+        {this.state.showHelp ? (
+          <HelpModal onClose={this.toggleHelp}/>
         ) : null}
       </div>
     )

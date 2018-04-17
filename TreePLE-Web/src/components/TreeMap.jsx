@@ -159,7 +159,7 @@ export class TreeMap extends PureComponent {
     const TreeInfoWindow = ({tree, icons}) => (
       <InfoWindow onCloseClick={() => this.onTreeClick(null)}>
         <Container fluid style={{overflow: 'hidden'}}>
-          <Grid columns={4} divided relaxed>
+          <Grid columns={5} divided relaxed>
             <Grid.Column stretched>
               <Grid.Row><Icon name='tree' color={icons.color}/></Grid.Row>
               <Grid.Row><b>{tree.treeId}</b></Grid.Row>
@@ -171,6 +171,10 @@ export class TreeMap extends PureComponent {
             <Grid.Column stretched>
               <Grid.Row><Icon name='resize horizontal' color={icons.color}/></Grid.Row>
               <Grid.Row><b>{tree.diameter}</b></Grid.Row>
+            </Grid.Column>
+            <Grid.Column stretched>
+              <Grid.Row><Icon name='wpforms' color={icons.color}/></Grid.Row>
+              <Grid.Row><b>{tree.reports.length}</b></Grid.Row>
             </Grid.Column>
             <Grid.Column stretched>
               <Grid.Row><Icon name={icons.land} color={icons.color}/></Grid.Row>
