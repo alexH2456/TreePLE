@@ -446,14 +446,14 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
         try {
             Forecast forecast = service.createForecast(testForecast);
 
-            assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
+            assertEquals(Date.valueOf("2020-04-16"), forecast.getFcDate());
             assertEquals("Abbas", forecast.getFcUser());
 
             for (int i = 0; i < trees.length(); i++) {
@@ -495,7 +495,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", (String) null);
         testForecast.put("fcTrees", trees);
 
@@ -517,7 +517,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "             ");
         testForecast.put("fcTrees", trees);
 
@@ -566,7 +566,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018/04/16");
+        testForecast.put("fcDate", "2020/04/16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -590,7 +590,7 @@ public class TestTreePLEService {
         service.createMunicipality(testMunicipality);
 
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -618,7 +618,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Gareth");
         testForecast.put("fcTrees", trees);
 
@@ -752,7 +752,7 @@ public class TestTreePLEService {
     public void testCreateTreeWrongDateFormat() throws Exception {
         try {
             JSONObject tree = new JSONObject(testTree.toString());
-            tree.getJSONObject("tree").put("datePlanted", "18-03-2018");
+            tree.getJSONObject("tree").put("datePlanted", "18-03-2020");
 
             service.createTree(tree);
         } catch (InvalidInputException e) {
@@ -1127,7 +1127,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -1312,7 +1312,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 20);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1358,7 +1358,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", -1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1393,7 +1393,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", -420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1428,7 +1428,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", -40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1463,7 +1463,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1496,7 +1496,7 @@ public class TestTreePLEService {
         testTreeObj.put("treeId", 1);
         testTreeObj.put("height", 420);
         testTreeObj.put("diameter", 40);
-        testTreeObj.put("datePlanted", "2018-03-16");
+        testTreeObj.put("datePlanted", "2020-03-16");
         testTreeObj.put("land", "Residential");
         testTreeObj.put("status", "Planted");
         testTreeObj.put("ownership", "Private");
@@ -1527,7 +1527,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "NonExistant");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1562,7 +1562,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Nonexistant");
             testTreeObj.put("ownership", "Private");
@@ -1597,7 +1597,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "NonExistant");
@@ -1631,7 +1631,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1666,7 +1666,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1701,7 +1701,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -1736,7 +1736,7 @@ public class TestTreePLEService {
             testTreeObj.put("treeId", 1);
             testTreeObj.put("height", 420);
             testTreeObj.put("diameter", 40);
-            testTreeObj.put("datePlanted", "2018-03-16");
+            testTreeObj.put("datePlanted", "2020-03-16");
             testTreeObj.put("land", "Residential");
             testTreeObj.put("status", "Planted");
             testTreeObj.put("ownership", "Private");
@@ -2494,7 +2494,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -2507,7 +2507,7 @@ public class TestTreePLEService {
 
             Forecast forecast = service.deleteForecast(forecastObj);
 
-            assertEquals(Date.valueOf("2018-04-16"), forecast.getFcDate());
+            assertEquals(Date.valueOf("2020-04-16"), forecast.getFcDate());
             assertEquals("Abbas", forecast.getFcUser());
 
             for (int i = 0; i < trees.length(); i++) {
@@ -2550,7 +2550,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -2578,7 +2578,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
 
@@ -2611,7 +2611,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
         service.createForecast(testForecast);
@@ -2644,7 +2644,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
         service.createForecast(testForecast);
@@ -2693,7 +2693,7 @@ public class TestTreePLEService {
             trees.put(tree.getTreeId());
         }
 
-        testForecast.put("fcDate", "2018-04-16");
+        testForecast.put("fcDate", "2020-04-16");
         testForecast.put("fcUser", "Abbas");
         testForecast.put("fcTrees", trees);
         service.createForecast(testForecast);
@@ -2732,7 +2732,7 @@ public class TestTreePLEService {
         tree.put("treeId", 1);
         tree.put("height", 420);
         tree.put("diameter", 40);
-        tree.put("datePlanted", "2018-03-16");
+        tree.put("datePlanted", "2020-03-16");
         tree.put("land", "Residential");
         tree.put("status", "Planted");
         tree.put("ownership", "Private");
