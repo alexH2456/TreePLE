@@ -654,6 +654,7 @@ public class TreePLEService {
                 reportIdList.add(report.getReportId());
             }
         }
+        reportIdList.add(surveyReportObj.getReportId());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (!sql.insertSurveyReport(surveyReportObj.getReportId(), dateFormat.format(surveyReportObj.getReportDate()), username)) {
