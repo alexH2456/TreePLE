@@ -51,12 +51,12 @@ class IconMenu extends PureComponent {
             {!this.state.user ? (
               <div>
                 <Menu.Item link name='signin'>
-                  <Button basic color='black' name='signin' onClick={this.toggleSignIn}>
+                  <Button basic fluid color='black' name='signin' onClick={this.toggleSignIn}>
                     Sign In
                   </Button>
                 </Menu.Item>
                 <Menu.Item link name='signup'>
-                  <Button basic color='black' name='signup' onClick={this.toggleSignUp}>
+                  <Button basic fluid color='black' name='signup' onClick={this.toggleSignUp}>
                     Sign Up
                   </Button>
                 </Menu.Item>
@@ -64,19 +64,19 @@ class IconMenu extends PureComponent {
             ) : (
               <div>
                 <Menu.Item link name='myforecasts'>
-                  <Button basic color='black' name='myforecasts' onClick={this.toggleMyForecasts}>
+                  <Button basic fluid color='black' name='myforecasts' onClick={this.toggleMyForecasts}>
                     Forecasts
                   </Button>
                 </Menu.Item>
                 <Menu.Item link name='logout'>
-                  <Button basic color='black' name='logout' onClick={this.onLogOut}>
+                  <Button basic fluid color='black' name='logout' onClick={this.onLogOut}>
                     Log Out
                   </Button>
                 </Menu.Item>
               </div>
             )}
             <Menu.Item link name='help'>
-              <Button basic color='black' name='help' onClick={this.toggleHelp}>
+              <Button basic fluid color='black' name='help' onClick={this.toggleHelp}>
                 Help
               </Button>
             </Menu.Item>
