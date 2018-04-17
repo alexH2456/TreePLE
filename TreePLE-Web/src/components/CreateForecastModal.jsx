@@ -1,24 +1,25 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Button, Divider, Dropdown, Header, Flag, Form, Grid, Icon, Modal, List} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Flag, Form, Grid, Header, Icon, List, Message, Modal} from 'semantic-ui-react';
 import {GoogleMap, InfoWindow, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {getAllTrees, createForecast} from "./Requests";
-import {formatDate} from './Utils';
-import {gmapsKey, mtlCenter, huDates} from '../constants';
+import {getError, formatDate} from './Utils';
+import {gmapsKey, mtlCenter, huDates, flags} from '../constants';
 
 
-class CreateTreeModal extends PureComponent {
+class CreateForecastModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       user: localStorage.getItem('username'),
       fcDate: new Date(),
       fcTrees: [],
+      trees: [],
       hover: null,
       language: 'en',
-      trees: [],
+      error: ''
     };
   }
 
@@ -28,7 +29,7 @@ class CreateTreeModal extends PureComponent {
         this.setState({trees: data});
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       });
   }
 
@@ -44,11 +45,11 @@ class CreateTreeModal extends PureComponent {
         this.props.onClose();
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       })
   }
 
-  onRemoveSelectedTree = (tree) => {
+  onRemoveTree = (tree) => {
 
   }
 
@@ -60,8 +61,8 @@ class CreateTreeModal extends PureComponent {
     }
   }
 
-  onTreeRightClick = (tree) => {
-    const hover = tree == this.state.hover ? null : tree;
+  onTreeRightClick = ({treeId}) => {
+    const hover = treeId == this.state.hover ? null : treeId;
     this.setState({hover: hover});
   }
 
@@ -70,11 +71,7 @@ class CreateTreeModal extends PureComponent {
 
   render() {
     const {trees, fcTrees} = this.state;
-
-    const flags = [
-      {key: 'en', value: 'en', text: <Flag name='ca'/>},
-      {key: 'hu', value: 'hu', text: <Flag name='hu'/>}
-    ];
+    const errors = getError(this.state.error);
 
     const dayPickerProps = {
       locale: this.state.language,
@@ -95,7 +92,7 @@ class CreateTreeModal extends PureComponent {
           <Modal.Description>
             <Form>
               <Form.Group widths='equal'>
-                <Form.Input label='Date Planted'>
+                <Form.Input label='Date Planted' error={errors.date}>
                   <Dropdown compact selection options={flags} defaultValue={flags[0].key} onChange={this.onFlagChange}/>
                   <DayPickerInput placeholder='YYYY-MM-DD' format='YYYY-M-D' value={this.state.fcDate} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
                 </Form.Input>
@@ -118,6 +115,12 @@ class CreateTreeModal extends PureComponent {
             <Divider hidden/>
             <GMap trees={trees} hover={this.state.hover} onTreeClick={this.onTreeClick} onTreeRightClick={this.onTreeRightClick}/>
             <Divider hidden/>
+
+            {this.state.error ? (
+              <Message error>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
+            ) : null}
 
             <Grid centered>
               <Grid.Row>
@@ -154,11 +157,11 @@ const GMap = compose(
             onClick={() => onTreeClick(tree)}
             onRightClick={() => onTreeRightClick(tree)}
           >
-            {(!!hover && hover == tree) ? (
+            {(hover && hover == tree.treeId) ? (
               <InfoWindow onCloseClick={() => onTreeRightClick(null)}>
                 <List horizontal>
                   <List.Item icon='tree'/>
-                  <List.Item content={tree.treeId}/>
+                  <List.Item content={treeId}/>
                 </List>
               </InfoWindow>
             ) : null}
@@ -169,9 +172,9 @@ const GMap = compose(
   );
 });
 
-CreateTreeModal.propTypes = {
+CreateForecastModal.propTypes = {
   onForecast: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 }
 
-export default CreateTreeModal;
+export default CreateForecastModal;

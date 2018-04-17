@@ -1,3 +1,6 @@
+import React from 'react';
+import {Flag} from 'semantic-ui-react';
+
 export const gmapsKey = 'AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk';
 
 export const mtlCenter = {
@@ -57,4 +60,9 @@ export const statusSelectable = [
 export const ownershipSelectable = [
   {key: 'Pu', text: 'Public', value: 'Public'},
   {key: 'Pr', text: 'Private', value: 'Private'}
+];
+
+export const flags = [
+  {key: 'en', value: 'en', text: <Flag name='ca'/>},
+  {key: 'hu', value: 'hu', text: <Flag name='hu'/>}
 ];

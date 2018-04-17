@@ -9,7 +9,8 @@ class MyForecastsModal extends PureComponent {
     super(props);
     this.state = {
       user: '',
-      forecasts: []
+      forecasts: [],
+      error: ''
     };
   }
 
@@ -24,36 +25,33 @@ class MyForecastsModal extends PureComponent {
         });
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message})
       });
   }
 
   onAnalysisForecast = (forecastId) => {
-    const x = forecastId;
   }
 
   onDeleteForecast = (fcId) => {
-    const deleteFc = {
+    const fcParams = {
       user: this.state.user,
       forecastId: fcId
     };
 
-    deleteForecast(deleteFc)
-      .then(({data, status}) => {
-        if (status == 200) {
-          let forecasts = this.state.forecasts.slice();
+    deleteForecast(fcParams)
+      .then(({data}) => {
+        let forecasts = this.state.forecasts.slice();
 
-          forecasts.some(({forecastId}, idx) => {
-            if (fcId == forecastId) {
-              forecasts.splice(idx, 1);
-              this.setState({forecasts: forecasts});
-              return true;
-            }
-          })
-        }
+        forecasts.some(({forecastId}, idx) => {
+          if (fcId == forecastId) {
+            forecasts.splice(idx, 1);
+            this.setState({forecasts: forecasts});
+            return true;
+          }
+        })
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message})
       });
   }
 
@@ -114,9 +112,15 @@ class MyForecastsModal extends PureComponent {
                 })}
               </Grid>
             ) : (
-              <Message info>
-                <Message.Header style={{textAlign: 'center'}}>Looks like you haven't created any forecasts yet!</Message.Header>
-              </Message>
+              this.state.error ? (
+                <Message error>
+                  <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+                </Message>
+              ) : (
+                <Message info>
+                  <Message.Header style={{textAlign: 'center'}}>Looks like you haven't created any forecasts yet!</Message.Header>
+                </Message>
+              )
             )}
 
             <Divider hidden/>

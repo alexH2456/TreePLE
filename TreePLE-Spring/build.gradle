@@ -35,7 +35,6 @@ configurations {
 }
 
 dependencies {
-    compile('org.json:json:20180130')
     compile('com.google.guava:guava:23.5-jre')
     compile('org.apache.commons:commons-lang3:3.7')
     compile('org.apache.httpcomponents:httpclient:4.5.5')
@@ -46,6 +45,7 @@ dependencies {
     compile('com.thoughtworks.xstream:xstream:1.4.7')
     compile('org.xerial:sqlite-jdbc:3.21.0')
     compile('org.mindrot:jbcrypt:0.4')
+    compile('org.json:json:20180130')
 
     providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
 

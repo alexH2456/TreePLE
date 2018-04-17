@@ -10,14 +10,11 @@ class MunicipalityModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      user: '',
+      user: localStorage.getItem('username'),
       update: false,
-      showBorders: true
+      showBorders: true,
+      error: ''
     }
-  }
-
-  componentWillMount() {
-    this.setState({user: localStorage.getItem('username')});
   }
 
   onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
@@ -39,16 +36,12 @@ class MunicipalityModal extends PureComponent {
     const {municipality} = this.props;
 
     return (
-      <Modal
-        open
-        size='small'
-        dimmer='blurring'
-      >
+      <Modal open size='small' dimmer='blurring'>
         <Modal.Content>
           <Modal.Header>
             <Header as='h1' icon textAlign='center'>
               <Icon name='map' circular/>
-              <Header.Content>Municipality</Header.Content>
+              <Header.Content>{!this.state.update ? 'View' : 'Update'} Municipality</Header.Content>
             </Header>
           </Modal.Header>
           <Modal.Description>
@@ -62,12 +55,8 @@ class MunicipalityModal extends PureComponent {
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
-                <Grid.Column>
-                  {municipality.name}
-                </Grid.Column>
-                <Grid.Column>
-                  {municipality.totalTrees}
-                </Grid.Column>
+                <Grid.Column>{municipality.name}</Grid.Column>
+                <Grid.Column>{municipality.totalTrees}</Grid.Column>
               </Grid.Row>
             </Grid>
 
@@ -94,15 +83,9 @@ class MunicipalityModal extends PureComponent {
                   {municipality.borders.map(({id, lat, lng}) => {
                     return (
                       <Grid.Row key={id}>
-                        <Grid.Column>
-                          {id}
-                        </Grid.Column>
-                        <Grid.Column>
-                          {lat}
-                        </Grid.Column>
-                        <Grid.Column>
-                          {lng}
-                        </Grid.Column>
+                        <Grid.Column>{id}</Grid.Column>
+                        <Grid.Column>{lat}</Grid.Column>
+                        <Grid.Column>{lng}</Grid.Column>
                       </Grid.Row>
                     );
                   })}
@@ -113,6 +96,12 @@ class MunicipalityModal extends PureComponent {
             <Divider hidden/>
             <GMap municipality={municipality}/>
             <Divider hidden/>
+
+            {this.state.error ? (
+              <Message error>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
+            ) : null}
 
             <Grid centered>
               <Grid.Row>

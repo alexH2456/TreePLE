@@ -628,7 +628,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "User does not exist!");
+        assertEquals(error, "No User with that username exists!");
     }
 
     // ==============================
@@ -790,7 +790,7 @@ public class TestTreePLEService {
         try {
             service.createTree(testTree);
         } catch (InvalidInputException e) {
-            assertEquals("User does not exist!", e.getMessage());
+            assertEquals("No User with that username exists!", e.getMessage());
         }
     }
 
@@ -801,7 +801,7 @@ public class TestTreePLEService {
         try {
             service.createTree(testTree);
         } catch (InvalidInputException e) {
-            assertEquals("Species does not exist!", e.getMessage());
+            assertEquals("No Species with that name exists!", e.getMessage());
         }
     }
 
@@ -813,7 +813,7 @@ public class TestTreePLEService {
         try {
             service.createTree(testTree);
         } catch (InvalidInputException e) {
-            assertEquals("Municipality does not exist!", e.getMessage());
+            assertEquals("No Municipality with that name exists!", e.getMessage());
         }
     }
 
@@ -897,7 +897,7 @@ public class TestTreePLEService {
         try {
             service.getMunicipalityByName(name);
         } catch (InvalidInputException e) {
-            assertEquals("Name cannot be empty!", e.getMessage());
+            assertEquals("Municipality name cannot be empty!", e.getMessage());
         }
     }
 
@@ -908,7 +908,7 @@ public class TestTreePLEService {
         try {
             service.getMunicipalityByName(name);
         } catch (InvalidInputException e) {
-            assertEquals("Name cannot be empty!", e.getMessage());
+            assertEquals("Municipality name cannot be empty!", e.getMessage());
         }
     }
 
@@ -991,7 +991,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "Name cannot be empty!");
+        assertEquals(error, "Species name cannot be empty!");
     }
 
     @Test
@@ -1005,7 +1005,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "Name cannot be empty!");
+        assertEquals(error, "Species name cannot be empty!");
     }
 
     @Test
@@ -1684,7 +1684,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "User does not exist!");
+        assertEquals(error, "No User with that username exists!");
     }
 
     @Test
@@ -1719,7 +1719,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "Species does not exist!");
+        assertEquals(error, "No Species with that name exists!");
     }
 
     @Test
@@ -1754,7 +1754,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "Municipality does not exist!");
+        assertEquals(error, "No Municipality with that name exists!");
     }
 
     // ==============================
@@ -1854,7 +1854,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals("Username does not exist!", error);
+        assertEquals("No User with that username exists!", error);
     }
 
     @Test
@@ -2045,7 +2045,7 @@ public class TestTreePLEService {
         try {
             service.updateSpecies(newSpecies);
         } catch (Exception e) {
-            assertEquals(e.getMessage(), "Species does not exist!");
+            assertEquals(e.getMessage(), "No Species with that name exists!");
         }
     }
 
@@ -2134,7 +2134,7 @@ public class TestTreePLEService {
             try {
                 service.getUserByUsername(testUser.getString("username"));
             } catch (InvalidInputException e) {
-                assertEquals("That username doesn't exist!", e.getMessage());
+                assertEquals("No User with that username exists!", e.getMessage());
             }
         } catch (Exception e) {
             fail();
@@ -2169,7 +2169,7 @@ public class TestTreePLEService {
         try {
             service.deleteUser(deleteUser);
         } catch (InvalidInputException e) {
-            assertEquals("That username doesn't exist!", e.getMessage());
+            assertEquals("No User with that username exists!", e.getMessage());
         }
     }
 
@@ -2210,7 +2210,7 @@ public class TestTreePLEService {
         try {
             service.deleteSpecies(deleteSpecies);
         } catch (InvalidInputException e) {
-            assertEquals("Species' name is missing!", e.getMessage());
+            assertEquals("Species name cannot be empty!", e.getMessage());
         }
     }
 
@@ -2325,7 +2325,7 @@ public class TestTreePLEService {
         try {
             service.deleteMunicipality(deleteMunicipality);
         } catch (InvalidInputException e) {
-            assertEquals("Municipality's name is missing!", e.getMessage());
+            assertEquals("Municipality name cannot be empty!", e.getMessage());
         }
     }
 
@@ -2450,7 +2450,7 @@ public class TestTreePLEService {
         try {
             service.deleteTree(deleteTree);
         } catch (InvalidInputException e) {
-            assertEquals("That username doesn't exist!", e.getMessage());
+            assertEquals("No User with that username exists!", e.getMessage());
         }
     }
 
@@ -2626,7 +2626,7 @@ public class TestTreePLEService {
             error = e.getMessage();
         }
 
-        assertEquals(error, "That username doesn't exist!");
+        assertEquals(error, "No User with that username exists!");
     }
 
     @Test

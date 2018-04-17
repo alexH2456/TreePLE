@@ -1,18 +1,18 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Button, Divider, Header, Icon, Input, Form, Grid, Modal, Flag, Segment, Dropdown} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import {createTree} from "./Requests";
-import {getSpeciesSelectable, getMunicipalitySelectable, getLatLngBorders, formatDate} from './Utils';
-import {gmapsKey, huDates, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
+import {createTree, getAllSpecies, getAllMunicipalities} from "./Requests";
+import {getSelectable, getError, formatDate} from './Utils';
+import {gmapsKey, huDates, landSelectable, statusSelectable, ownershipSelectable, flags} from '../constants';
 
 class CreateTreeModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      user: '',
+      user: localStorage.getItem('username'),
       tree: {
         height: null,
         diameter: null,
@@ -28,20 +28,29 @@ class CreateTreeModal extends PureComponent {
       location: props.location,
       language: 'en',
       speciesSelectable: [],
-      municipalitySelectable: []
+      municipalitySelectable: [],
+      error: ''
     };
   }
 
   componentWillMount() {
-    this.setState({
-      user: localStorage.getItem('username'),
-      speciesSelectable: getSpeciesSelectable(),
-      municipalitySelectable: getMunicipalitySelectable()
-    });
+    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data)
+    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data)
+
+    Promise.all([speciesProm, municipalityProm])
+      .then(([species, municipalities]) => {
+        this.setState({
+          speciesSelectable: getSelectable(species),
+          municipalitySelectable: getSelectable(municipalities)
+        })
+      })
+      .catch(() => {
+        this.setState({error: 'Unable to retrieve list of Species/Municipalities!'});
+      });
   }
 
   onCreateTree = () => {
-    const newTree = {
+    const treeParams = {
       user: this.state.user,
       tree: {
         ...this.state.tree,
@@ -49,12 +58,12 @@ class CreateTreeModal extends PureComponent {
       }
     };
 
-    createTree(newTree)
+    createTree(treeParams)
       .then(({data}) => {
         this.props.onClose(null, true);
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message})
       });
   }
 
@@ -73,11 +82,7 @@ class CreateTreeModal extends PureComponent {
 
   render() {
     const {tree} = this.state;
-
-    const flags = [
-      {key: 'en', value: 'en', text: <Flag name='ca'/>},
-      {key: 'hu', value: 'hu', text: <Flag name='hu'/>}
-    ];
+    const errors = getError(this.state.error);
 
     const dayPickerProps = {
       locale: this.state.language,
@@ -98,31 +103,37 @@ class CreateTreeModal extends PureComponent {
           <Modal.Description>
             <Form>
               <Form.Group widths='equal'>
-                <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' onChange={this.onHeightChange}/>
-                <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' onChange={this.onDiameterChange}/>
-                <Form.Input label='Date Planted'>
+                <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' error={errors.height} onChange={this.onHeightChange}/>
+                <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' error={errors.diameter} onChange={this.onDiameterChange}/>
+                <Form.Input label='Date Planted' error={errors.date}>
                   <DayPickerInput placeholder='YYYY-MM-DD' format='YYYY-M-D' value={tree.datePlanted} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
                   <Dropdown compact selection options={flags} defaultValue={flags[0].key} onChange={this.onFlagChange}/>
                 </Form.Input>
               </Form.Group>
               <Form.Group widths='equal'>
-                <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' onChange={this.onSpeciesChange}/>
-                <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' onChange={this.onStatusChange}/>
+                <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' error={errors.species} onChange={this.onSpeciesChange}/>
+                <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' error={errors.status} onChange={this.onStatusChange}/>
               </Form.Group>
               <Form.Group widths='equal'>
-                <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' onChange={this.onMunicipalityChange}/>
-                <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' onChange={this.onOwnershipChange}/>
-                <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' onChange={this.onLandChange} />
+                <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' error={errors.municipality} onChange={this.onMunicipalityChange}/>
+                <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' error={errors.ownership} onChange={this.onOwnershipChange}/>
+                <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' error={errors.land} onChange={this.onLandChange}/>
               </Form.Group>
               <Form.Group widths='equal'>
-                <Form.Input fluid readOnly label='Latitude' placeholder='Latitude' type='number' min='-90' max='90' value={tree.latitude}/>
-                <Form.Input fluid readOnly label='Longitude' placeholder='Longitude' type='number' min='-180' max='180' value={tree.longitude}/>
+                <Form.Input fluid readOnly label='Latitude' placeholder='Latitude' type='number' min='-90' max='90' value={tree.latitude} error={errors.location}/>
+                <Form.Input fluid readOnly label='Longitude' placeholder='Longitude' type='number' min='-180' max='180' value={tree.longitude} error={errors.location}/>
               </Form.Group>
             </Form>
 
             <Divider hidden/>
             <GMap location={this.state.location} onDrag={this.onTreeDrag} onDragEnd={this.onTreeDragEnd}/>
             <Divider hidden/>
+
+            {this.state.error ? (
+              <Message error>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
+            ) : null}
 
             <Grid centered>
               <Grid.Row>

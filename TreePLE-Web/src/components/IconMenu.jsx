@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import {Sidebar, Segment, Button, Menu, Image, Icon, Header} from 'semantic-ui-react';
+import {Sidebar, Segment, Button, Menu} from 'semantic-ui-react';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
 import TreeMap from './TreeMap';
@@ -29,6 +29,7 @@ class IconMenu extends PureComponent {
   toggleSignIn = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
   toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
   toggleRegister = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
+
   toggleMyForecasts = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts}));
   toggleCreateForecast = () => this.setState(prevState => ({showCreateForecast: !prevState.showCreateForecast}));
   toggleForecast = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
@@ -42,7 +43,7 @@ class IconMenu extends PureComponent {
     return (
       <div>
         <Sidebar.Pushable as={Segment}>
-          <Sidebar as={Menu} animation='push' width='thin' visible={this.state.showMenu} icon='labeled' size='tiny' vertical>
+          <Sidebar vertical as={Menu} size='tiny' icon='labeled' animation='push' width='thin' visible={this.state.showMenu}>
             {!this.state.user ? (
               <div>
                 <Menu.Item link name='signin'>

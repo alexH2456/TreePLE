@@ -8,29 +8,31 @@ class NavigationBar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      activeItem: '',
       showSidebar: false,
       sustainability: {
         stormwater: {factor: 0, worth: 0},
         co2Reduced: {factor: 0, worth: 0},
         biodiversity: {factor: 0, worth: 0},
         energyConserved: {factor: 0, worth: 0}
-      }
+      },
+      error: ''
     };
   }
 
   componentWillMount() {
     getTreePLESustainability()
       .then(({data}) => {
-        this.setState({sustainability: {
-          stormwater: data.stormwater,
-          co2Reduced: data.co2Reduced,
-          biodiversity: data.biodiversity,
-          energyConserved: data.energyConserved
-        }});
+        this.setState({
+          sustainability: {
+            stormwater: data.stormwater,
+            co2Reduced: data.co2Reduced,
+            biodiversity: data.biodiversity,
+            energyConserved: data.energyConserved
+          }
+        });
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message})
       });
   }
 

@@ -1,17 +1,17 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Button, Divider, Header, Icon, Form, Grid, Modal} from 'semantic-ui-react';
+import {Button, Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
-import {updateTree} from "./Requests";
-import {getSpeciesSelectable, getMunicipalitySelectable, getLatLngBorders} from './Utils';
+import {getAllSpecies, getAllMunicipalities, updateTree} from "./Requests";
+import {getSelectable, getLatLngBorders, getError} from './Utils';
 import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 
 class TreeModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      user: '',
+      user: localStorage.getItem('username'),
       updatedTree: {
         treeId: props.tree.treeId,
         height: props.tree.height,
@@ -25,16 +25,25 @@ class TreeModal extends PureComponent {
       update: false,
       showReports: false,
       speciesSelectable: [],
-      municipalitySelectable: []
+      municipalitySelectable: [],
+      error: '',
     }
   }
 
   componentWillMount() {
-    this.setState({
-      user: localStorage.getItem('username'),
-      speciesSelectable: getSpeciesSelectable(),
-      municipalitySelectable: getMunicipalitySelectable()
-    });
+    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data)
+    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data)
+
+    Promise.all([speciesProm, municipalityProm])
+      .then(([species, municipalities]) => {
+        this.setState({
+          speciesSelectable: getSelectable(species),
+          municipalitySelectable: getSelectable(municipalities)
+        })
+      })
+      .catch(() => {
+        this.setState({error: 'Unable to retrieve list of Species/Municipalities!'});
+      });
   }
 
   onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
@@ -47,10 +56,10 @@ class TreeModal extends PureComponent {
 
     updateTree(treeParams)
       .then(({data}) => {
-        this.props.onClose(null, null);
+        this.props.onClose(null, true);
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       })
   }
 
@@ -68,6 +77,8 @@ class TreeModal extends PureComponent {
   render() {
     const {tree} = this.props;
     const {updatedTree} = this.state;
+
+    const errors = getError(this.state.error);
 
     return (
       <Modal open size='small' dimmer='blurring'>
@@ -189,24 +200,34 @@ class TreeModal extends PureComponent {
                   <Form.Input readOnly fluid label='Date Planted' value={tree.datePlanted}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' value={updatedTree.height} onChange={this.onHeightChange}/>
-                  <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' value={updatedTree.diameter} onChange={this.onDiameterChange}/>
+                  <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' value={updatedTree.height} error={errors.height} onChange={this.onHeightChange}/>
+                  <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' value={updatedTree.diameter} error={errors.diameter} onChange={this.onDiameterChange}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' value={updatedTree.species} onChange={this.onSpeciesChange}/>
-                  <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' value={updatedTree.status} onChange={this.onStatusChange}/>
+                  <Form.Select fluid options={this.state.speciesSelectable} label='Species' placeholder='Species' value={updatedTree.species} error={errors.species} onChange={this.onSpeciesChange}/>
+                  <Form.Select fluid options={statusSelectable} label='Status' placeholder='Status' value={updatedTree.status} error={errors.status} onChange={this.onStatusChange}/>
                 </Form.Group>
                 <Form.Group widths='equal'>
-                  <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' value={updatedTree.municipality} onChange={this.onMunicipalityChange}/>
-                  <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' value={updatedTree.ownership} onChange={this.onOwnershipChange}/>
-                  <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' value={updatedTree.land} onChange={this.onLandChange} />
+                  <Form.Select fluid options={this.state.municipalitySelectable} label='Municipality' placeholder='Municipality' value={updatedTree.municipality} error={errors.municipality} onChange={this.onMunicipalityChange}/>
+                  <Form.Select fluid options={ownershipSelectable} label='Ownership' placeholder='Ownership' value={updatedTree.ownership} error={errors.ownership} onChange={this.onOwnershipChange}/>
+                  <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' value={updatedTree.land} error={errors.land} onChange={this.onLandChange}/>
                 </Form.Group>
+                <Form.Group widths='equal'>
+                  <Form.Input fluid readOnly label='Latitude' placeholder='Latitude' type='number' min='-90' max='90' value={tree.location.latitude}/>
+                  <Form.Input fluid readOnly label='Longitude' placeholder='Longitude' type='number' min='-180' max='180' value={tree.location.longitude}/>
+              </Form.Group>
               </Form>
             )}
 
             <Divider hidden/>
             <GMap tree={tree}/>
             <Divider hidden/>
+
+            {this.state.error && this.state.update ? (
+              <Message error size='tiny'>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
+            ) : null}
 
             <Grid centered>
               <Grid.Row>
@@ -218,7 +239,7 @@ class TreeModal extends PureComponent {
                     <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
                   </div>
                 )}
-                <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, null)}>Close</Button>
+                <Button inverted color='red' size='small' onClick={() => this.props.onClose(null, false)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>

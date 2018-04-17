@@ -27,7 +27,8 @@ public class TreePLEService {
     private String gmapsKey;
     private final String[] gmapsKeyList = new String[]{
         "AIzaSyDzb0p2lAcypZ2IbhVyhJYu6rTQLPncY5g",
-        "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk"
+        "AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk",
+        "AIzaSyC2kAeJiONkZEJCcFRcO_esNEqchbuub7o"
     };
     private final String sRoleKey = "i<3tr33s";
     private final String dbKey = "ih8tr33s";
@@ -73,7 +74,7 @@ public class TreePLEService {
                 throw new InvalidInputException("Entered password is incorrect!");
             }
         } else {
-            throw new InvalidInputException("That username doesn't exist!");
+            throw new InvalidInputException("No User with that username exists!");
         }
     }
 
@@ -135,13 +136,13 @@ public class TreePLEService {
         Species speciesObj;
         Municipality municipalityObj;
         if ((userObj = sql.getUser(username)) == null)
-            throw new InvalidInputException("User does not exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyAddresses(), address))
             throw new InvalidInputException("You cannot plant on someone else's property!");
         if ((speciesObj = sql.getSpecies(species)) == null)
-            throw new InvalidInputException("Species does not exist!");
+            throw new InvalidInputException("No Species with that name exists!");
         if ((municipalityObj = sql.getMunicipality(municipality)) == null)
-            throw new InvalidInputException("Municipality does not exist!");
+            throw new InvalidInputException("No Municipality with that name exists!");
 
         Location locationObj = new Location(latitude, longitude);
         SurveyReport surveyReportObj = new SurveyReport(Date.valueOf(datePlanted), username);
@@ -180,7 +181,7 @@ public class TreePLEService {
 
     // Create a new User
     public User createUser(JSONObject jsonParams) throws Exception {
-        String username = jsonParams.getString("username");
+        String username = jsonParams.getString("username").trim();
         String password = jsonParams.getString("password");
         String role = jsonParams.getString("role");
         String scientistKey = jsonParams.optString("scientistKey");
@@ -298,7 +299,7 @@ public class TreePLEService {
         if (fcTrees == null || fcTrees.length() < 1)
             throw new InvalidInputException("Forecast requires minimum 1 tree!");
         if (sql.getUser(fcUser) == null)
-            throw new InvalidInputException("User does not exist!");
+            throw new InvalidInputException("No User with that username exists!");
 
         ArrayList<Tree> treeList = new ArrayList<Tree>();
         ArrayList<Integer> treeIdList = new ArrayList<Integer>();
@@ -398,7 +399,7 @@ public class TreePLEService {
         } else {
             User user;
             if ((user = sql.getUser(username)) == null)
-                throw new InvalidInputException("That username doesn't exist!");
+                throw new InvalidInputException("No User with that username exists!");
 
             return user;
         }
@@ -407,7 +408,7 @@ public class TreePLEService {
     // Get a specific Species
     public Species getSpeciesByName(String name) throws Exception {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Name cannot be empty!");
+            throw new InvalidInputException("Species name cannot be empty!");
 
         if (Species.hasWithName(name)) {
             return Species.getWithName(name);
@@ -435,7 +436,7 @@ public class TreePLEService {
     // Get a specific Municipality
     public Municipality getMunicipalityByName(String name) throws Exception {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Name cannot be empty!");
+            throw new InvalidInputException("Municipality name cannot be empty!");
 
         if (Municipality.hasWithName(name)) {
             return Municipality.getWithName(name);
@@ -558,7 +559,7 @@ public class TreePLEService {
     // Get trees of a specific species
     public List<Tree> getTreesOfSpecies(String name) throws Exception {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Name cannot be empty!");
+            throw new InvalidInputException("Species name cannot be empty!");
         if (!Species.hasWithName(name) && sql.getSpecies(name) == null)
             throw new InvalidInputException("No Species with that name exists!");
 
@@ -568,7 +569,7 @@ public class TreePLEService {
     // Get trees of a specific municipality
     public List<Tree> getTreesOfMunicipality(String name) throws Exception {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Name cannot be empty!");
+            throw new InvalidInputException("Municipality name cannot be empty!");
         if (!Municipality.hasWithName(name) && sql.getMunicipality(name) == null)
             throw new InvalidInputException("No Municipality with that name exists!");
 
@@ -580,7 +581,7 @@ public class TreePLEService {
         if (username == null || username.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Username cannot be empty!");
         if (!User.hasWithUsername(username) && sql.getUser(username) == null)
-            throw new InvalidInputException("That username doesn't exist!");
+            throw new InvalidInputException("No User with that username exists!");
 
         return Collections.unmodifiableList(sql.getAllForecastsOfUser(username));
     }
@@ -628,13 +629,13 @@ public class TreePLEService {
         if ((treeObj = sql.getTree(treeId)) == null)
             throw new InvalidInputException("No Tree with that ID exists!");
         if ((userObj = sql.getUser(username)) == null)
-            throw new InvalidInputException("User does not exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (userObj.getRole() == UserRole.Resident && !ArrayUtils.contains(userObj.getMyTrees(), treeId))
             throw new InvalidInputException("You cannot update someone else's tree!");
         if ((speciesObj = sql.getSpecies(species)) == null)
-            throw new InvalidInputException("Species does not exist!");
+            throw new InvalidInputException("No Species with that name exists!");
         if ((municipalityObj = sql.getMunicipality(municipality)) == null)
-            throw new InvalidInputException("Municipality does not exist!");
+            throw new InvalidInputException("No Municipality with that name exists!");
 
         SurveyReport surveyReportObj = new SurveyReport(new Date(Calendar.getInstance().getTimeInMillis()), username);
 
@@ -684,7 +685,7 @@ public class TreePLEService {
         if (!username.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Username must be alphanumeric!");
         if ((user = sql.getUser(username)) == null)
-            throw new InvalidInputException("Username does not exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (password.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
@@ -727,7 +728,7 @@ public class TreePLEService {
         if (!username.matches("[a-zA-Z0-9]+"))
             throw new InvalidInputException("Username must be alphanumeric!");
         if ((user = sql.getUser(username)) == null)
-            throw new InvalidInputException("Username does not exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (newPass.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("New password cannot be empty!");
 
@@ -755,7 +756,7 @@ public class TreePLEService {
         if (name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Species name cannot be empty!");
         if ((speciesObj = sql.getSpecies(name)) == null)
-            throw new InvalidInputException("Species does not exist!");
+            throw new InvalidInputException("No Species with that name exists!");
 
         speciesObj.setGenus(genus);
         speciesObj.setSpecies(species);
@@ -784,7 +785,7 @@ public class TreePLEService {
         if (name == null || name.replaceAll("\\s", "").isEmpty())
             throw new InvalidInputException("Municipality cannot be empty!");
         if ((municipalityObj = sql.getMunicipality(name)) == null)
-            throw new InvalidInputException("Municipality does not exist!");
+            throw new InvalidInputException("No Municipality with that name exists!");
         if (borders.length() > 0 && borders.length() < 3)
             throw new InvalidInputException("Municipality requires minimum 3 borders!");
 
@@ -847,7 +848,7 @@ public class TreePLEService {
         if (tree == null)
             throw new InvalidInputException("No Tree with that ID exists!");
         if (user == null)
-            throw new InvalidInputException("That username doesn't exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (UserRole.Resident == user.getRole() && !ArrayUtils.contains(user.getMyTrees(), tree.getTreeId()))
             throw new InvalidInputException("This Tree wasn't planted by you!");
 
@@ -871,7 +872,7 @@ public class TreePLEService {
         User user = sql.getUser(username);
 
         if (user == null)
-            throw new InvalidInputException("That username doesn't exist!");
+            throw new InvalidInputException("No User with that username exists!");
 
         user.delete();
         if (!sql.deleteUser(username))
@@ -885,7 +886,7 @@ public class TreePLEService {
         String name = jsonParams.getString("name");
 
         if (name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Species' name is missing!");
+            throw new InvalidInputException("Species name cannot be empty!");
 
         Species species = sql.getSpecies(name);
 
@@ -922,7 +923,7 @@ public class TreePLEService {
         String name = jsonParams.getString("name");
 
         if (name.replaceAll("\\s", "").isEmpty())
-            throw new InvalidInputException("Municipality's name is missing!");
+            throw new InvalidInputException("Municipality name cannot be empty!");
 
         Municipality municipality = sql.getMunicipality(name);
 
@@ -952,7 +953,7 @@ public class TreePLEService {
         if (forecast == null)
             throw new InvalidInputException("No Forecast with that ID exists!");
         if (user == null)
-            throw new InvalidInputException("That username doesn't exist!");
+            throw new InvalidInputException("No User with that username exists!");
         if (!forecast.getFcUser().equals(user.getUsername()))
             throw new InvalidInputException("This Forecast wasn't created by you!");
 

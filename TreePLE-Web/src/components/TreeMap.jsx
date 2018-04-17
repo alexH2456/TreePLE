@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Grid, Icon, Loader, Container} from 'semantic-ui-react';
+import {Container, Grid, Icon, Loader} from 'semantic-ui-react';
 import {GoogleMap, InfoWindow, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import TreeModal from './TreeModal';
 import CreateTreeModal from './CreateTreeModal';
@@ -9,7 +9,6 @@ import MunicipalityModal from './MunicipalityModal';
 import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability, getTreeSustainability} from './Requests';
 import {getLatLngBorders, getMapBounds, getTreeIcons} from './Utils';
 import {gmapsKey, mtlCenter} from '../constants';
-import Logo from '../images/favicon.ico';
 
 export class TreeMap extends PureComponent {
   constructor(props) {
@@ -65,27 +64,25 @@ export class TreeMap extends PureComponent {
         this.setState({trees: data});
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       });
   }
 
   loadMunicipalities = () => {
     getAllMunicipalities()
       .then(({data}) => {
-        let municipalities = [];
-
-        data.map(municipality => {
-          municipalities.push({
+        let municipalities = data.map(municipality => {
+          return {
             name: municipality.name,
             totalTrees: municipality.totalTrees,
             borders: getLatLngBorders(municipality.borders)
-          });
+          };
         });
 
         this.setState({municipalities: municipalities});
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       });
   }
 
@@ -93,7 +90,6 @@ export class TreeMap extends PureComponent {
     if (success) {
       this.loadTrees()
     }
-
     this.setState({createTreeModal: 'latLng' in e ? e.latLng : null});
   }
 
@@ -113,7 +109,7 @@ export class TreeMap extends PureComponent {
         this.props.onSustainabilityChange(sustainability);
       })
       .catch(({response: {data}}) => {
-        console.log(data);
+        this.setState({error: data.message});
       });
   }
 
@@ -147,12 +143,17 @@ export class TreeMap extends PureComponent {
           this.props.onSustainabilityChange(sustainability);
         })
         .catch(({response: {data}}) => {
-          console.log(data);
+          this.setState({error: data.message});
         })
     }
   }
 
-  onTreeDblClick = (tree) => this.setState({treeModal: tree});
+  onTreeDblClick = (tree, success) => {
+    if (success) {
+      this.loadTrees()
+    }
+    this.setState({treeModal: tree});
+  }
 
   render() {
     const TreeInfoWindow = ({tree, icons}) => (
@@ -183,8 +184,8 @@ export class TreeMap extends PureComponent {
     return (Object.keys(this.state.center).length !== 0) ? (<div>
       <GoogleMap
         ref='map'
-        zoom={this.state.zoom}
-        center={this.state.center}
+        defaultZoom={14}
+        defaultCenter={this.state.center}
         options={{scrollwheel: true}}
         onRightClick={e => this.onMapClick(e, false)}
       >
@@ -200,8 +201,6 @@ export class TreeMap extends PureComponent {
           );
         })}
         {this.state.trees.map(tree => {
-          let icons = getTreeIcons(tree);
-
           return (
             <Marker
               key={tree.treeId}
@@ -209,10 +208,10 @@ export class TreeMap extends PureComponent {
               onMouseOver={() => this.onTreeHover(tree)}
               onMouseOut={() => this.onTreeHover(null)}
               onClick={() => this.onTreeClick(tree)}
-              onDblClick={() => this.onTreeDblClick(tree)}
+              onDblClick={() => this.onTreeDblClick(tree, false)}
             >
               {((!!this.state.treeHover || this.state.treeInfo) && this.state.treeHover == tree) ? (
-                <TreeInfoWindow tree={tree} icons={icons}/>
+                <TreeInfoWindow tree={tree} icons={getTreeIcons(tree)}/>
               ) : null}
             </Marker>
           );

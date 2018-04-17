@@ -1,6 +1,16 @@
 import {getAllSpecies, getAllMunicipalities} from "./Requests";
 import {lands, statuses, ownerships} from '../constants';
 
+function getSelectable(data) {
+  return data.map((item, idx) => {
+    return {
+      key: idx,
+      text: item.name,
+      value: item.name
+    };
+  });
+}
+
 function getSpeciesSelectable() {
   let speciesSelectable = [];
 
@@ -15,7 +25,7 @@ function getSpeciesSelectable() {
       });
     })
     .catch(({response: {data}}) => {
-      console.log(data);
+      console.log(data.message);
     });
 
   return speciesSelectable;
@@ -35,7 +45,7 @@ function getMunicipalitySelectable() {
       });
     })
     .catch(({response: {data}}) => {
-      console.log(data);
+      console.log(data.message);
     });
 
   return municipalitySelectable;
@@ -125,15 +135,42 @@ function getTreeIcons(tree) {
   return icons;
 }
 
+function getError(error) {
+  error = error.toLowerCase();
+
+  const errorList = {
+    height: error.includes('height'),
+    diameter: error.includes('diameter'),
+    address: error.includes('address'),
+    date: error.includes('date'),
+    land: error.includes('land'),
+    status: error.includes('status'),
+    ownership: error.includes('ownership'),
+    species: error.includes('species'),
+    municipality: error.includes('municipality'),
+    report: error.includes('report'),
+    username: error.includes('username'),
+    password: error.includes('password'),
+    role: error.includes('role'),
+    location: error.includes('location'),
+    borders: error.includes('borders'),
+    key: error.includes('key')
+  }
+
+  return errorList;
+}
+
 function formatDate(date) {
   return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 }
 
 export {
+  getSelectable,
   getSpeciesSelectable,
   getMunicipalitySelectable,
   getLatLngBorders,
   getMapBounds,
   getTreeIcons,
+  getError,
   formatDate
 };

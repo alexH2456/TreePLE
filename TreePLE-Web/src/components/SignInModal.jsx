@@ -1,8 +1,9 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import sha512 from 'sha512';
-import {Button, Divider, Grid, Header, Icon, Modal, Form} from 'semantic-ui-react';
+import {Button, Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {login} from './Requests';
+import {getError} from './Utils';
 
 class SignInModal extends PureComponent {
   constructor(props) {
@@ -10,8 +11,7 @@ class SignInModal extends PureComponent {
     this.state = {
       username: '',
       password: '',
-      error: false,
-      errorMsg: ''
+      error: ''
     };
   }
 
@@ -19,27 +19,24 @@ class SignInModal extends PureComponent {
   onPasswordChange = (e, {value}) => this.setState({password: value});
 
   onSignIn = () => {
-    const loginInfo = {
+    const loginParams = {
       username: this.state.username,
       password: sha512(this.state.password).toString('hex')
     };
 
-    login(loginInfo)
-      .then(({data, status}) => {
-        if (status == 200) {
-          localStorage.setItem('username', data.username);
-          this.props.onClose();
-        }
+    login(loginParams)
+      .then(({data}) => {
+        localStorage.setItem('username', data.username);
+        this.props.onClose();
       })
       .catch(({response: {data}}) => {
-        this.setState({
-          error: true,
-          errorMsg: data.message
-        });
+        this.setState({error: data.message});
       });
   }
 
   render() {
+    const errors = getError(this.state.error);
+
     return (
       <Modal open size='mini' dimmer='blurring'>
         <Modal.Content>
@@ -51,10 +48,18 @@ class SignInModal extends PureComponent {
           </Modal.Header>
           <Modal.Description>
             <Form>
-              <Form.Input fluid placeholder='Username' error={this.state.error} onChange={this.onUsernameChange}/>
-              <Form.Input fluid type='password' placeholder='Password' error={this.state.error} onChange={this.onPasswordChange}/>
+              <Form.Input fluid placeholder='Username' error={errors.username} onChange={this.onUsernameChange}/>
+              <Form.Input fluid type='password' placeholder='Password' error={errors.password} onChange={this.onPasswordChange}/>
             </Form>
+
             <Divider hidden/>
+
+            {this.state.error ? (
+              <Message error size='tiny'>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
+            ) : null}
+
             <Grid centered>
               <Grid.Row>
                 <Form.Button inverted color='green' size='small' onClick={this.onSignIn}>Sign In</Form.Button>
