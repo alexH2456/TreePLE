@@ -18,6 +18,6 @@ In order to create a user with the role of Scientist, we require an extra passwo
 
 ## URLs
 
-Backend: ecse321-11.ece.mcgill.ca:8080
+Backend: [ecse321-11.ece.mcgill.ca:8080](ecse321-11.ece.mcgill.ca:8080)
 
-Web Frontend: ecse321-11.ece.mcgill.ca:8087
+Web Frontend: [ecse321-11.ece.mcgill.ca:8087](ecse321-11.ece.mcgill.ca:8087)
