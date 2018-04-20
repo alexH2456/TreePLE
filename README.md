@@ -15,3 +15,8 @@ TreePLE enables forecasting to analyze sustainability attributes in what-if scen
 ## Notes on creating users
 
 In order to create a user with the role of Scientist, we require an extra password for security purposes. For testing purposes, this password is "i<3tr33s".
+
+## URLs
+
+Backend: ecse321-11.ece.mcgill.ca:8080
+Web Frontend: ecse321-11.ece.mcgill.ca:8087
