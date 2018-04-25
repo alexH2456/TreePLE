@@ -52,10 +52,10 @@ class HelpModal extends PureComponent {
                     {iconDef[2*i].def}
                   </Grid.Column>
                   <Grid.Column textAlign='center' width={2}>
-                    {2*i+1 < iconDef.length ? <Icon name={iconDef[2*i+1].icon}/> : null}
+                    {2*i+1 in iconDef ? <Icon name={iconDef[2*i+1].icon}/> : null}
                   </Grid.Column>
                   <Grid.Column width={6}>
-                    {2*i+1 < iconDef.length ? iconDef[2*i+1].def : null}
+                    {2*i+1 in iconDef ? iconDef[2*i+1].def : null}
                   </Grid.Column>
                 </Grid.Row>
               ))}
@@ -87,12 +87,10 @@ class HelpModal extends PureComponent {
                     {colorDef[2*i].def}
                   </Grid.Column>
                   <Grid.Column textAlign='center' width={2}>
-                    {2*i+1 < colorDef.length ? (
-                      <span style={{color: colorDef[2*i+1].color}}>{colorDef[2*i+1].color.toUpperCase()}</span>
-                    ) : null}
+                    {2*i+1 in colorDef ? <span style={{color: colorDef[2*i+1].color}}>{colorDef[2*i+1].color.toUpperCase()}</span> : null}
                   </Grid.Column>
                   <Grid.Column width={6}>
-                    {2*i+1 < colorDef.length ? colorDef[2*i+1].def : null}
+                    {2*i+1 in colorDef ? colorDef[2*i+1].def : null}
                   </Grid.Column>
                 </Grid.Row>
               ))}

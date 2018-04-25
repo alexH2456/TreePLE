@@ -7,7 +7,7 @@ import TreeModal from './TreeModal';
 import CreateTreeModal from './CreateTreeModal';
 import MunicipalityModal from './MunicipalityModal';
 import {getAllTrees, getAllMunicipalities, getMunicipalitySustainability, getTreeSustainability} from './Requests';
-import {getLatLngBorders, getMapBounds, getTreeIcons} from './Utils';
+import {getLatLng, getLatLngBorders, getMapBounds, getTreeIcons, getTreeMarker} from './Utils';
 import {gmapsKey, mtlCenter} from '../constants';
 
 export class TreeMap extends PureComponent {
@@ -71,13 +71,11 @@ export class TreeMap extends PureComponent {
   loadMunicipalities = () => {
     getAllMunicipalities()
       .then(({data}) => {
-        let municipalities = data.map(municipality => {
-          return {
-            name: municipality.name,
-            totalTrees: municipality.totalTrees,
-            borders: getLatLngBorders(municipality.borders)
-          };
-        });
+        let municipalities = data.map(municipality => ({
+          name: municipality.name,
+          totalTrees: municipality.totalTrees,
+          borders: getLatLngBorders(municipality.borders)
+        }));
 
         this.setState({municipalities: municipalities});
       })
@@ -122,12 +120,10 @@ export class TreeMap extends PureComponent {
   }
 
   onTreeClick = (tree) => {
-    this.setState(prevState => {
-      return {
-        treeHover: tree,
-        treeInfo: tree == prevState.treeHover ? !prevState.treeInfo : tree !== null ? prevState.treeInfo : false
-      }
-    });
+    this.setState(prevState => ({
+      treeHover: tree,
+      treeInfo: tree == prevState.treeHover ? !prevState.treeInfo : tree !== null ? prevState.treeInfo : false
+    }));
 
     if (tree !== null) {
       getTreeSustainability(tree.treeId)
@@ -209,7 +205,12 @@ export class TreeMap extends PureComponent {
         {this.state.trees.map(tree => (
             <Marker
               key={tree.treeId}
-              position={{lat: tree.location.latitude, lng: tree.location.longitude}}
+              icon={{
+                url: getTreeMarker(tree.status),
+                anchor: new google.maps.Point(23,45),
+                scaledSize: new google.maps.Size(40, 60)
+              }}
+              position={getLatLng(tree.location)}
               onMouseOver={() => this.onTreeHover(tree)}
               onMouseOut={() => this.onTreeHover(null)}
               onClick={() => this.onTreeClick(tree)}

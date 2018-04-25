@@ -1,14 +1,12 @@
 import {getAllSpecies, getAllMunicipalities} from "./Requests";
-import {lands, statuses, ownerships} from '../constants';
+import {lands, statuses, ownerships, blackTree, blueTree, greenTree, yellowTree, orangeTree, redTree} from '../constants';
 
 function getSelectable(data) {
-  return data.map((item, idx) => {
-    return {
-      key: idx,
-      text: item.name,
-      value: item.name
-    };
-  });
+  return data.map((item, idx) => ({
+    key: idx,
+    text: item.name,
+    value: item.name
+  }));
 }
 
 function getSpeciesSelectable() {
@@ -16,13 +14,11 @@ function getSpeciesSelectable() {
 
   getAllSpecies()
     .then(({data}) => {
-      data.forEach((species, idx) => {
-        speciesSelectable.push({
-          key: idx,
-          text: species.name,
-          value: species.name
-        });
-      });
+      speciesSelectable = data.map((species, idx) => ({
+        key: idx,
+        text: species.name,
+        value: species.name
+      }));
     })
     .catch(({response: {data}}) => {
       console.log(data.message);
@@ -36,13 +32,11 @@ function getMunicipalitySelectable() {
 
   getAllMunicipalities()
     .then(({data}) => {
-      data.forEach((municipality, idx) => {
-        municipalitySelectable.push({
-          key: idx,
-          text: municipality.name,
-          value: municipality.name
-        });
-      });
+      municipalitySelectable = data.map((municipality, idx) => ({
+        key: idx,
+        text: municipality.name,
+        value: municipality.name
+      }));
     })
     .catch(({response: {data}}) => {
       console.log(data.message);
@@ -51,18 +45,16 @@ function getMunicipalitySelectable() {
   return municipalitySelectable;
 }
 
+function getLatLng(location) {
+  return {
+    id: location.locationId,
+    lat: location.latitude,
+    lng: location.longitude
+  };
+}
+
 function getLatLngBorders(borders) {
-  let latLngBorders = [];
-
-  borders.map(location => {
-    latLngBorders.push({
-      id: location.locationId,
-      lat: location.latitude,
-      lng: location.longitude
-    });
-  });
-
-  return latLngBorders;
+  return borders.map(location => getLatLng(location));
 }
 
 function getMapBounds(locations) {
@@ -135,6 +127,23 @@ function getTreeIcons(tree) {
   return icons;
 }
 
+function getTreeMarker(status) {
+  switch (status) {
+    case statuses.planted.enum:
+      return greenTree;
+    case statuses.diseased.enum:
+      return yellowTree;
+    case statuses.markedForCutdown.enum:
+      return orangeTree;
+    case statuses.cutdown.enum:
+      return redTree;
+    case 'selected':
+      return blueTree;
+    default:
+      return blackTree;
+  }
+}
+
 function getError(error) {
   error = error.toLowerCase();
 
@@ -168,9 +177,11 @@ export {
   getSelectable,
   getSpeciesSelectable,
   getMunicipalitySelectable,
+  getLatLng,
   getLatLngBorders,
   getMapBounds,
   getTreeIcons,
+  getTreeMarker,
   getError,
   formatDate
 };

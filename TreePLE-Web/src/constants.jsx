@@ -1,5 +1,18 @@
 import React from 'react';
 import {Flag} from 'semantic-ui-react';
+import BlackTree from './images/blackTree.svg';
+import BlueTree from './images/blueTree.svg';
+import GreenTree from './images/greenTree.svg';
+import YellowTree from './images/yellowTree.svg';
+import OrangeTree from './images/orangeTree.svg';
+import RedTree from './images/redTree.svg';
+
+export const blackTree = BlackTree;
+export const blueTree = BlueTree;
+export const greenTree = GreenTree;
+export const yellowTree = YellowTree;
+export const orangeTree = OrangeTree;
+export const redTree = RedTree;
 
 export const gmapsKey = 'AIzaSyDeo4TnWCcvE-yZlpmsv9FAEyYogAzzcBk';
 

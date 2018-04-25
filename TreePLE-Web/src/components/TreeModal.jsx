@@ -4,7 +4,7 @@ import {compose, withProps} from 'recompose';
 import {Button, Divider, Form, Grid, Header, Icon, Message, Modal, Popup} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {getAllSpecies, getAllMunicipalities, updateTree} from "./Requests";
-import {getSelectable, getLatLngBorders, getError} from './Utils';
+import {getSelectable, getLatLng, getLatLngBorders, getError, getTreeMarker} from './Utils';
 import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable, treeHelp} from '../constants';
 
 class TreeModal extends PureComponent {
@@ -294,14 +294,19 @@ const GMap = compose(
   withGoogleMap
 )(({tree}) => {
   let borders = getLatLngBorders(tree.municipality.borders);
-  let location = {
-    lat: tree.location.latitude,
-    lng: tree.location.longitude
-  };
+  let location = getLatLng(tree.location);
 
   return (
     <GoogleMap zoom={15} center={location} options={{scrollwheel: false}}>
-      <Marker key={tree.treeId} position={location}/>
+      <Marker
+        key={tree.treeId}
+        icon={{
+          url: getTreeMarker(tree.status),
+          anchor: new google.maps.Point(23,45),
+          scaledSize: new google.maps.Size(40, 60)
+        }}
+        position={location}
+      />
       <Polygon key={tree.municipality.name} paths={borders} options={{fillOpacity: 0.1}}/>
     </GoogleMap>
   );

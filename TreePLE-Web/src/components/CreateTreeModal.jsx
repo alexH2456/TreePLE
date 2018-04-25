@@ -5,7 +5,7 @@ import {Button, Divider, Dropdown, Form, Grid, Header, Icon, Message, Modal} fro
 import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import {createTree, getAllSpecies, getAllMunicipalities} from "./Requests";
-import {getSelectable, getError, formatDate} from './Utils';
+import {getSelectable, getError, getTreeMarker, formatDate} from './Utils';
 import {gmapsKey, huDates, landSelectable, statusSelectable, ownershipSelectable, flags} from '../constants';
 
 class CreateTreeModal extends PureComponent {
@@ -60,7 +60,7 @@ class CreateTreeModal extends PureComponent {
 
     createTree(treeParams)
       .then(({data}) => {
-        this.props.onClose(null, true);
+        this.props.onClose({}, true);
       })
       .catch(({response: {data}}) => {
         this.setState({error: data.message})
@@ -106,7 +106,7 @@ class CreateTreeModal extends PureComponent {
                 <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' error={errors.height} onChange={this.onHeightChange}/>
                 <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' error={errors.diameter} onChange={this.onDiameterChange}/>
                 <Form.Input label='Date Planted' error={errors.date}>
-                  <DayPickerInput placeholder='YYYY-MM-DD' format='YYYY-M-D' value={tree.datePlanted} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
+                  <DayPickerInput placeholder='YYYY-MM-DD' value={tree.datePlanted} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
                   <Dropdown compact selection options={flags} defaultValue={flags[0].key} onChange={this.onFlagChange}/>
                 </Form.Input>
               </Form.Group>
@@ -160,7 +160,17 @@ const GMap = compose(
 )(({location, onDrag, onDragEnd}) => {
   return (
     <GoogleMap zoom={15} center={location} options={{scrollwheel: false}}>
-      <Marker draggable position={location} onDrag={onDrag} onDragEnd={onDragEnd}/>
+      <Marker
+        draggable
+        icon={{
+          url: getTreeMarker(null),
+          anchor: new google.maps.Point(23,45),
+          scaledSize: new google.maps.Size(40, 60)
+        }}
+        position={location}
+        onDrag={onDrag}
+        onDragEnd={onDragEnd}
+      />
     </GoogleMap>
   );
 });
