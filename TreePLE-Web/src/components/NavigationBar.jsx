@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, Statistic, Table} from 'semantic-ui-react';
+import {Icon, Image, Statistic, Table} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
 import Logo from "../images/treeple_logo.png";
@@ -56,10 +56,21 @@ class NavigationBar extends PureComponent {
               <Table.HeaderCell rowSpan={2}>
                 <Image centered size='small' src={Logo} onClick={this.toggleSidebar}/>
               </Table.HeaderCell>
-              <Table.HeaderCell colSpan={1}><Statistic label='Biodiversity Index'/></Table.HeaderCell>
-              <Table.HeaderCell colSpan={2}><Statistic label='Stormwater Intercepted'/></Table.HeaderCell>
-              <Table.HeaderCell colSpan={2}><Statistic label='CO2 Reduced'/></Table.HeaderCell>
-              <Table.HeaderCell colSpan={2}><Statistic label='Energy Conserved'/></Table.HeaderCell>
+              <Table.HeaderCell colSpan={1}>
+                <Icon name='tree' size='large'/>
+                <Statistic label='Biodiversity Index'/></Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}>
+                <Icon name='tint' size='large'/>
+                <Statistic label='Stormwater Intercepted'/>
+              </Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}>
+                <Icon name='cloud' size='large'/>
+                <Statistic label='CO2 Reduced'/>
+              </Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}>
+                <Icon name='lightning' size='large'/>
+                <Statistic label='Energy Conserved'/>
+              </Table.HeaderCell>
             </Table.Row>
             <Table.Row>
               <Table.HeaderCell>
