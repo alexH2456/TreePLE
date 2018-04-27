@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Divider, Image, Menu, Segment, Statistic} from 'semantic-ui-react';
+import {Image, Statistic, Table} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
 import Logo from "../images/treeple_logo.png";
@@ -8,13 +8,13 @@ class NavigationBar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      showSidebar: false,
       sustainability: {
         stormwater: {factor: 0, worth: 0},
         co2Reduced: {factor: 0, worth: 0},
         biodiversity: {factor: 0, worth: 0},
         energyConserved: {factor: 0, worth: 0}
       },
+      showSidebar: false,
       error: ''
     };
   }
@@ -50,55 +50,45 @@ class NavigationBar extends PureComponent {
 
     return (
       <div>
-        <Menu size='small' stackable fluid widths={5}>
-
-          <Menu.Item onClick={this.toggleSidebar}>
-            <Image circular size='small' src={Logo}/>
-          </Menu.Item>
-
-          <Menu.Item name='biodiversity' fitted='vertically'>
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>Biodiversity Index</Segment>
-              <Segment>
+        <Table basic fixed size='small' textAlign='center'>
+          <Table.Header>
+            <Table.Row verticalAlign='middle'>
+              <Table.HeaderCell rowSpan={2}>
+                <Image centered size='small' src={Logo} onClick={this.toggleSidebar}/>
+              </Table.HeaderCell>
+              <Table.HeaderCell colSpan={1}><Statistic label='Biodiversity Index'/></Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}><Statistic label='Stormwater Intercepted'/></Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}><Statistic label='CO2 Reduced'/></Table.HeaderCell>
+              <Table.HeaderCell colSpan={2}><Statistic label='Energy Conserved'/></Table.HeaderCell>
+            </Table.Row>
+            <Table.Row>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' value={biodiversity.factor.toFixed(5)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
+              </Table.HeaderCell>
 
-          <Menu.Item name='stormwater' fitted='vertically'>
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>Stormwater Intercepted</Segment>
-              <Segment>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='L/year' value={stormwater.factor.toFixed(2)}/>
-                <Divider fitted/>
+              </Table.HeaderCell>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='$' value={stormwater.worth.toFixed(2)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
+              </Table.HeaderCell>
 
-          <Menu.Item name='co2Reduced' fitted='vertically'>
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>CO2 Reduced</Segment>
-              <Segment>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='kg/year' value={co2Reduced.factor.toFixed(2)}/>
-                <Divider fitted/>
+              </Table.HeaderCell>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='$' value={co2Reduced.worth.toFixed(2)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
+              </Table.HeaderCell>
 
-          <Menu.Item name='energyConserved' fitted='vertically'>
-            <Segment.Group horizontal size='mini'>
-              <Segment style={{display: 'flex', alignItems: 'center'}}>Energy Conserved</Segment>
-              <Segment>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='kWh/year' value={energyConserved.factor.toFixed(2)}/>
-                <Divider fitted/>
+              </Table.HeaderCell>
+              <Table.HeaderCell>
                 <Statistic horizontal size='mini' label='$' value={energyConserved.worth.toFixed(2)}/>
-              </Segment>
-            </Segment.Group>
-          </Menu.Item>
-
-        </Menu>
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+        </Table>
         <IconMenu show={this.state.showSidebar} onSustainabilityChange={this.onSustainabilityChange}/>
       </div>
     );
