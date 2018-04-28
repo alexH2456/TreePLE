@@ -169,6 +169,10 @@ function getError(error) {
   return errorList;
 }
 
+function getTreeAge(tree) {
+  return 6 * tree.diameter / 2.54;
+}
+
 function formatDate(date) {
   return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 }
@@ -183,5 +187,6 @@ export {
   getTreeIcons,
   getTreeMarker,
   getError,
+  getTreeAge,
   formatDate
 };

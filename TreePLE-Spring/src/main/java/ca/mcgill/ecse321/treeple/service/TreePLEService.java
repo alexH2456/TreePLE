@@ -1119,11 +1119,11 @@ public class TreePLEService {
         if (landType == Land.Park) {
             energyCoefficient = 0.9510;
         } else if (landType == Land.Residential) {
-            energyCoefficient = 0.8874;
+            energyCoefficient = 0.9074;
         } else if (landType == Land.Institutional) {
-            energyCoefficient = 0.8005;
+            energyCoefficient = 0.8905;
         } else if (landType == Land.Municipal) {
-            energyCoefficient = 0.8894;
+            energyCoefficient = 0.9194;
         }
 
         // Average diameter of a tree is 50

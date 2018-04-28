@@ -34,15 +34,15 @@ class CreateTreeModal extends PureComponent {
   }
 
   componentWillMount() {
-    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data)
-    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data)
+    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data);
+    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data);
 
     Promise.all([speciesProm, municipalityProm])
       .then(([species, municipalities]) => {
         this.setState({
           speciesSelectable: getSelectable(species),
           municipalitySelectable: getSelectable(municipalities)
-        })
+        });
       })
       .catch(() => {
         this.setState({error: 'Unable to retrieve Species/Municipality list!'});
@@ -106,7 +106,7 @@ class CreateTreeModal extends PureComponent {
                 <Form.Input fluid label='Height (cm)' placeholder='Height' type='number' min='1' error={errors.height} onChange={this.onHeightChange}/>
                 <Form.Input fluid label='Diameter (cm)' placeholder='Diameter' type='number' min='1' error={errors.diameter} onChange={this.onDiameterChange}/>
                 <Form.Input label='Date Planted' error={errors.date}>
-                  <DayPickerInput placeholder='YYYY-MM-DD' value={tree.datePlanted} dayPickerProps={dayPickerProps} onDayChange={this.onDateChange}/>
+                  <DayPickerInput placeholder='YYYY-MM-DD' dayPickerProps={dayPickerProps} value={tree.datePlanted} onDayChange={this.onDateChange}/>
                   <Dropdown compact selection options={flags} defaultValue={flags[0].key} onChange={this.onFlagChange}/>
                 </Form.Input>
               </Form.Group>
