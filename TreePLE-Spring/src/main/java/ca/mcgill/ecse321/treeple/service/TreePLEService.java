@@ -1008,14 +1008,14 @@ public class TreePLEService {
 
     // Returns the biodiversity index for a list of trees
     public double forecastBiodiversityIndex(List<Tree> trees) {
-        int totalTrees = trees.size();
-        int totalSpecies = getUniqueSpecies(trees).size();
+        double totalTrees = trees.size();
+        double totalSpecies = getUniqueSpecies(trees).size();
 
         if (totalTrees == 0) {
             return 0;
         }
 
-        return (double) totalSpecies/totalTrees;
+        return totalSpecies/totalTrees;
     }
 
     // Returns the amount of CO2 reduced for a list of trees (in kg/yr)
