@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.mcgill.ca/ECSE321-2018-Winter/Project-11.git"
+    "url": "git+https://github.com/theGirrafish/TreePLE.git"
   },
   "author": "Abbas Yadollahi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.mcgill.ca/ECSE321-2018-Winter/Project-11/issues"
+    "url": "https://github.com/theGirrafish/TreePLE/issues"
   },
-  "homepage": "https://github.mcgill.ca/ECSE321-2018-Winter/Project-11#readme",
+  "homepage": "https://github.com/theGirrafish/TreePLE#readme",
   "babel": {
     "presets": [
       "es2015",
