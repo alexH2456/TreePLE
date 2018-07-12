@@ -4,7 +4,7 @@ import {compose, withProps} from 'recompose';
 import {Button, Divider, Dropdown, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import {createTree, getAllSpecies, getAllMunicipalities} from "./Requests";
+import {createTree, getAllSpecies, getAllMunicipalities} from './Requests';
 import {getSelectable, getError, getTreeMarker, formatDate} from './Utils';
 import {gmapsKey, huDates, landSelectable, statusSelectable, ownershipSelectable, flags} from '../constants';
 
@@ -59,25 +59,25 @@ class CreateTreeModal extends PureComponent {
     };
 
     createTree(treeParams)
-      .then(({data}) => {
+      .then(() => {
         this.props.onClose({}, true);
       })
       .catch(({response: {data}}) => {
-        this.setState({error: data.message})
+        this.setState({error: data.message});
       });
   }
 
-  onHeightChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, height: value}}));
-  onDiameterChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, diameter: value}}));
-  onDateChange = (day, {selected}) => this.setState(prevState => ({tree: {...prevState.tree, datePlanted: day}}));
+  onHeightChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, height: value}}));
+  onDiameterChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, diameter: value}}));
+  onDateChange = (day) => this.setState((prevState) => ({tree: {...prevState.tree, datePlanted: day}}));
   onFlagChange = (e, {value}) => this.setState({language: value});
-  onSpeciesChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, species: value}}));
-  onStatusChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, status: value}}));
-  onMunicipalityChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, municipality: value}}));
-  onOwnershipChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, ownership: value}}));
-  onLandChange = (e, {value}) => this.setState(prevState => ({tree: {...prevState.tree, land: value}}));
+  onSpeciesChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, species: value}}));
+  onStatusChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, status: value}}));
+  onMunicipalityChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, municipality: value}}));
+  onOwnershipChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, ownership: value}}));
+  onLandChange = (e, {value}) => this.setState((prevState) => ({tree: {...prevState.tree, land: value}}));
 
-  onTreeDrag = ({latLng}) => this.setState(prevState => ({tree: {...prevState.tree, latitude: latLng.lat(), longitude: latLng.lng()}}));
+  onTreeDrag = ({latLng}) => this.setState((prevState) => ({tree: {...prevState.tree, latitude: latLng.lat(), longitude: latLng.lng()}}));
   onTreeDragEnd = ({latLng}) => this.setState({location: latLng});
 
   render() {
@@ -86,9 +86,9 @@ class CreateTreeModal extends PureComponent {
 
     const dayPickerProps = {
       locale: this.state.language,
-      weekdaysShort: this.state.language == 'hu' ? huDates.weekShort : undefined,
-      weekdaysLong: this.state.language == 'hu' ? huDates.weekLong : undefined,
-      months: this.state.language == 'hu' ? huDates.months : undefined
+      weekdaysShort: this.state.language === 'hu' ? huDates.weekShort : undefined,
+      weekdaysLong: this.state.language === 'hu' ? huDates.weekLong : undefined,
+      months: this.state.language === 'hu' ? huDates.months : undefined
     };
 
     return (
@@ -138,7 +138,7 @@ class CreateTreeModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onCreateTree}>Create</Button>
-                <Button inverted color='red' size='small' onClick={e => this.props.onClose(e, false)}>Close</Button>
+                <Button inverted color='red' size='small' onClick={(e) => this.props.onClose(e, false)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
@@ -153,31 +153,29 @@ const GMap = compose(
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
     containerElement: <div style={{height: '40vh'}}/>,
-    mapElement: <div style={{height: '40vh'}}/>,
+    mapElement: <div style={{height: '40vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
-)(({location, onDrag, onDragEnd}) => {
-  return (
-    <GoogleMap zoom={15} center={location} options={{scrollwheel: false}}>
-      <Marker
-        draggable
-        icon={{
-          url: getTreeMarker(null),
-          anchor: new google.maps.Point(23,45),
-          scaledSize: new google.maps.Size(40, 60)
-        }}
-        position={location}
-        onDrag={onDrag}
-        onDragEnd={onDragEnd}
-      />
-    </GoogleMap>
-  );
-});
+)(({location, onDrag, onDragEnd}) => (
+  <GoogleMap zoom={15} center={location} options={{scrollwheel: false}}>
+    <Marker
+      draggable
+      icon={{
+        url: getTreeMarker(null),
+        anchor: new google.maps.Point(23, 45),
+        scaledSize: new google.maps.Size(40, 60)
+      }}
+      position={location}
+      onDrag={onDrag}
+      onDragEnd={onDragEnd}
+    />
+  </GoogleMap>
+));
 
 CreateTreeModal.propTypes = {
   location: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default CreateTreeModal;

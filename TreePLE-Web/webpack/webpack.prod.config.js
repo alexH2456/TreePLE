@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var parentDir = path.join(__dirname, '../');
+const parentDir = path.join(__dirname, '../');
 
 module.exports = {
   entry: [
@@ -22,7 +22,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015', 'react', 'stage-0']
+          presets: ['env', 'react', 'stage-0']
         }
       }, {
         test: /\.less$/,

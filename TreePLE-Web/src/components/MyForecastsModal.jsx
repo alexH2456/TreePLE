@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Divider, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
-import {getUserForecasts, deleteForecast} from "./Requests";
+import {getUserForecasts, deleteForecast} from './Requests';
 
 class MyForecastsModal extends PureComponent {
   constructor(props) {
@@ -24,7 +24,7 @@ class MyForecastsModal extends PureComponent {
         });
       })
       .catch(({response: {data}}) => {
-        this.setState({error: data.message})
+        this.setState({error: data.message});
       });
   }
 
@@ -38,19 +38,19 @@ class MyForecastsModal extends PureComponent {
     };
 
     deleteForecast(fcParams)
-      .then(({data}) => {
+      .then(() => {
         let forecasts = this.state.forecasts.slice();
 
         forecasts.some(({forecastId}, idx) => {
-          if (fcId == forecastId) {
+          if (forecastId === fcId) {
             forecasts.splice(idx, 1);
             this.setState({forecasts: forecasts});
             return true;
           }
-        })
+        });
       })
       .catch(({response: {data}}) => {
-        this.setState({error: data.message})
+        this.setState({error: data.message});
       });
   }
 
@@ -108,16 +108,14 @@ class MyForecastsModal extends PureComponent {
                   </Grid.Row>
                 ))}
               </Grid>
+            ) : this.state.error ? (
+              <Message error>
+                <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
+              </Message>
             ) : (
-              this.state.error ? (
-                <Message error>
-                  <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>
-                </Message>
-              ) : (
-                <Message info>
-                  <Message.Header style={{textAlign: 'center'}}>Looks like you haven't created any forecasts yet!</Message.Header>
-                </Message>
-              )
+              <Message info>
+                <Message.Header style={{textAlign: 'center'}}>Looks like you haven't created any forecasts yet!</Message.Header>
+              </Message>
             )}
 
             <Divider hidden/>
@@ -138,6 +136,6 @@ class MyForecastsModal extends PureComponent {
 MyForecastsModal.propTypes = {
   onForecast: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default MyForecastsModal;

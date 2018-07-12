@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {GoogleMap, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {Button, Divider, Header, Icon, Grid, Modal} from 'semantic-ui-react';
-import {getLatLngBorders, getMapBounds} from './Utils';
+import {getMapBounds} from './Utils';
 import {gmapsKey} from '../constants';
 
 class MunicipalityModal extends PureComponent {
@@ -14,17 +14,17 @@ class MunicipalityModal extends PureComponent {
       update: false,
       showBorders: true,
       error: ''
-    }
+    };
   }
 
-  onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
+  onToggleEdit = () => this.setState((prevState) => ({update: !prevState.update}));
 
   onShowBorders = () => {
-    this.setState({showBorders: !this.state.showBorders})
+    this.setState({showBorders: !this.state.showBorders});
   }
 
   onUpdateMunicipality = () => {
-    this.setState({update: !this.state.update})
+    this.setState({update: !this.state.update});
   }
 
   onGMapLoaded = () => {
@@ -80,15 +80,13 @@ class MunicipalityModal extends PureComponent {
                 </Grid>
                 <Divider/>
                 <Grid textAlign='center' columns={3}>
-                  {municipality.borders.map(({id, lat, lng}) => {
-                    return (
-                      <Grid.Row key={id}>
-                        <Grid.Column>{id}</Grid.Column>
-                        <Grid.Column>{lat}</Grid.Column>
-                        <Grid.Column>{lng}</Grid.Column>
-                      </Grid.Row>
-                    );
-                  })}
+                  {municipality.borders.map(({id, lat, lng}) => (
+                    <Grid.Row key={id}>
+                      <Grid.Column>{id}</Grid.Column>
+                      <Grid.Column>{lat}</Grid.Column>
+                      <Grid.Column>{lng}</Grid.Column>
+                    </Grid.Row>
+                  ))}
                 </Grid>
               </div>
             ) : null}
@@ -128,21 +126,19 @@ const GMap = compose(
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
     containerElement: <div style={{height: '40vh'}}/>,
-    mapElement: <div style={{height: '40vh'}}/>,
+    mapElement: <div style={{height: '40vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
-)(({municipality}) => {
-  return (
-    <GoogleMap options={{scrollwheel: false}}>
-      <Polygon key={municipality.name} paths={municipality.borders}/>
-    </GoogleMap>
-  );
-});
+)(({municipality}) => (
+  <GoogleMap options={{scrollwheel: false}}>
+    <Polygon key={municipality.name} paths={municipality.borders}/>
+  </GoogleMap>
+));
 
 MunicipalityModal.propTypes = {
   municipality: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default MunicipalityModal;

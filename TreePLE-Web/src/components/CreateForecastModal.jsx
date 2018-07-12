@@ -5,9 +5,9 @@ import {Button, Divider, Dropdown, Form, Grid, Header, Icon, List, Message, Moda
 import {GoogleMap, InfoWindow, Marker, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {DrawingManager} from 'react-google-maps/lib/components/drawing/DrawingManager';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import {getAllTrees, getAllSpecies, getAllMunicipalities, getUserTrees, createForecast} from "./Requests";
+import {getAllTrees, getAllSpecies, getAllMunicipalities, getUserTrees, createForecast} from './Requests';
 import {getLatLng, getError, getSelectable, getTreeMarker, getTreeAge, formatDate} from './Utils';
-import {gmapsKey, mtlCenter, huDates, flags, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
+import {gmapsKey, mtlCenter, huDates, flags, landSelectable, statusSelectable} from '../constants';
 
 
 class CreateForecastModal extends PureComponent {
@@ -80,12 +80,12 @@ class CreateForecastModal extends PureComponent {
     };
 
     createForecast(fcParams)
-      .then(({data}) => {
+      .then(() => {
         this.props.onForecast();
       })
       .catch(({response: {data}}) => {
         this.setState({error: data.message});
-      })
+      });
   }
 
   onRemoveTree = (treeIdx) => {
@@ -103,7 +103,7 @@ class CreateForecastModal extends PureComponent {
   }
 
   onTreeRightClick = (tree) => {
-    const hover = tree == null ? null : tree.treeId == this.state.hover ? null : tree.treeId;
+    const hover = tree === null ? null : tree.treeId === this.state.hover ? null : tree.treeId;
     this.setState({hover: hover});
   }
 
@@ -115,14 +115,10 @@ class CreateForecastModal extends PureComponent {
 
       if (fcTrees.includes(treeId)) {
         return;
-      } else {
-        if ('latLngs' in area) {
-          if (google.maps.geometry.poly.containsLocation(latLng, area)) {
-              fcTrees.push(treeId);
-          }
-        } else if (area.getBounds().contains(latLng)) {
-          fcTrees.push(treeId)
-        }
+      } else if ('latLngs' in area && google.maps.geometry.poly.containsLocation(latLng, area)) {
+        fcTrees.push(treeId);
+      } else if ('getBounds' in area && area.getBounds().contains(latLng)) {
+        fcTrees.push(treeId);
       }
     });
     area.setMap(null);
@@ -135,8 +131,8 @@ class CreateForecastModal extends PureComponent {
   onMaxHeightFilter = (e, {value}) => this.onFilterChange({...this.state.filters, height: {...this.state.filters.height, max: value}});
   onMinDiameterFilter = (e, {value}) => this.onFilterChange({...this.state.filters, diameter: {...this.state.filters.diameter, min: value}});
   onMaxDiameterFilter = (e, {value}) => this.onFilterChange({...this.state.filters, diameter: {...this.state.filters.diameter, max: value}});
-  onMinDateFilter = (day, {selected}) => this.onFilterChange({...this.state.filters, date: {...this.state.filters.date, min: day}});
-  onMaxDateFilter = (day, {selected}) => this.onFilterChange({...this.state.filters, date: {...this.state.filters.date, max: day}});
+  onMinDateFilter = (day) => this.onFilterChange({...this.state.filters, date: {...this.state.filters.date, min: day}});
+  onMaxDateFilter = (day) => this.onFilterChange({...this.state.filters, date: {...this.state.filters.date, max: day}});
   onSpeciesFilter = (e, {value}) => this.onFilterChange({...this.state.filters, species: value});
   onMunicipalityFilter = (e, {value}) => this.onFilterChange({...this.state.filters, municipality: value});
   onStatusFilter = (e, {value}) => this.onFilterChange({...this.state.filters, status: value});
@@ -147,7 +143,7 @@ class CreateForecastModal extends PureComponent {
     let filteredTrees = [];
     let trees = filters.myTrees ? this.state.myTrees : this.state.allTrees;
 
-    trees.forEach(tree => {
+    trees.forEach((tree) => {
       if ((!filters.age.min || getTreeAge(tree) > filters.age.min) &&
           (!filters.age.max || getTreeAge(tree) < filters.age.max) &&
           (!filters.height.min || tree.height > filters.height.min) &&
@@ -156,10 +152,10 @@ class CreateForecastModal extends PureComponent {
           (!filters.diameter.max || tree.diameter < filters.diameter.max) &&
           (!filters.date.min || new Date(tree.datePlanted) > filters.date.min) &&
           (!filters.date.max || new Date(tree.datePlanted) < filters.date.max) &&
-          (!filters.species || tree.species.name == filters.species) &&
-          (!filters.municipality || tree.municipality.name == filters.municipality) &&
-          (!filters.status || tree.status == filters.status) &&
-          (!filters.land || tree.land == filters.land)) {
+          (!filters.species || tree.species.name === filters.species) &&
+          (!filters.municipality || tree.municipality.name === filters.municipality) &&
+          (!filters.status || tree.status === filters.status) &&
+          (!filters.land || tree.land === filters.land)) {
         filteredTrees.push(tree);
       }
     });
@@ -171,7 +167,7 @@ class CreateForecastModal extends PureComponent {
   }
 
   onResetFilter = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       mapTrees: prevState.allTrees,
       filters: {
         age: {min: '', max: ''},
@@ -188,10 +184,10 @@ class CreateForecastModal extends PureComponent {
     }));
   }
 
-  onDateChange = (day, {selected}) => this.setState({fcDate: day});
+  onDateChange = (day) => this.setState({fcDate: day});
   onFlagChange = (e, {value}) => this.setState({language: value});
-  onShowTrees = () => this.setState(prevState => ({showTrees: !prevState.showTrees}));
-  onShowFilters = () => this.setState(prevState => ({showFilters: !prevState.showFilters}));
+  onShowTrees = () => this.setState((prevState) => ({showTrees: !prevState.showTrees}));
+  onShowFilters = () => this.setState((prevState) => ({showFilters: !prevState.showFilters}));
 
   render() {
     const {mapTrees, fcTrees, filters} = this.state;
@@ -201,9 +197,9 @@ class CreateForecastModal extends PureComponent {
 
     const dayPickerProps = {
       locale: this.state.language,
-      weekdaysShort: this.state.language == 'hu' ? huDates.weekShort : undefined,
-      weekdaysLong: this.state.language == 'hu' ? huDates.weekLong : undefined,
-      months: this.state.language == 'hu' ? huDates.months : undefined
+      weekdaysShort: this.state.language === 'hu' ? huDates.weekShort : undefined,
+      weekdaysLong: this.state.language === 'hu' ? huDates.weekLong : undefined,
+      months: this.state.language === 'hu' ? huDates.months : undefined
     };
 
     return (
@@ -235,7 +231,7 @@ class CreateForecastModal extends PureComponent {
                 <Divider/>
                 {this.state.showTrees ? (
                   <Grid columns={8}>
-                    {treeIter.map(i => (
+                    {treeIter.map((i) => (
                       <Grid.Row key={i} verticalAlign='middle'>
                         <Grid.Column textAlign='center' width={2}>
                           <Button inverted circular size='mini' color='red' content={fcTrees[8*i]} icon='delete' onClick={() => this.onRemoveTree(8*i)}/>
@@ -330,7 +326,7 @@ const GMap = compose(
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '60vh'}}/>,
     containerElement: <div style={{height: '60vh'}}/>,
-    mapElement: <div style={{height: '60vh'}}/>,
+    mapElement: <div style={{height: '60vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
@@ -354,19 +350,19 @@ const GMap = compose(
         onPolygonComplete={onAreaComplete}
         onRectangleComplete={onAreaComplete}
       />
-      {trees.map(tree => (
+      {trees.map((tree) => (
         <Marker
           key={tree.treeId}
           icon={{
             url: getTreeMarker(fcTrees.includes(tree.treeId) ? 'selected' : tree.status),
-            anchor: new google.maps.Point(23,45),
+            anchor: new google.maps.Point(23, 45),
             scaledSize: new google.maps.Size(40, 60)
           }}
           position={getLatLng(tree.location)}
           onClick={() => onTreeClick(tree)}
           onRightClick={() => onTreeRightClick(tree)}
         >
-          {(hover && hover == tree.treeId) ? (
+          {hover && hover === tree.treeId ? (
             <InfoWindow onCloseClick={() => onTreeRightClick(null)}>
               <List horizontal>
                 <List.Item icon='tree'/>
@@ -383,6 +379,6 @@ const GMap = compose(
 CreateForecastModal.propTypes = {
   onForecast: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default CreateForecastModal;

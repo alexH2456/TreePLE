@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const backendUrl = 'http://' + serverHost + ':' + serverPort + '/';
-const frontendUrl = 'http://' +  serverHost + ':8087/';
+const frontendUrl = 'http://' + serverHost + ':8087/';
 
 
 const AXIOS = axios.create({
@@ -20,32 +20,32 @@ const AXIOS = axios.create({
 // ==============================
 
 function getAllTrees() {
-  const url = `/trees/`;
+  const url = '/trees/';
   return getRequest(url);
 }
 
 function getAllUsers() {
-  const url = `/users/`;
+  const url = '/users/';
   return getRequest(url);
 }
 
 function getAllSpecies() {
-  const url = `/species/`;
+  const url = '/species/';
   return getRequest(url);
 }
 
 function getAllLocations() {
-  const url = `/locations/`;
+  const url = '/locations/';
   return getRequest(url);
 }
 
 function getAllMunicipalities() {
-  const url = `/municipalities/`;
+  const url = '/municipalities/';
   return getRequest(url);
 }
 
 function getAllForecasts() {
-  const url = `/forecasts/`;
+  const url = '/forecasts/';
   return getRequest(url);
 }
 
@@ -54,7 +54,7 @@ function getAllForecasts() {
 // ==============================
 
 function login(params) {
-  const url = `/login/`;
+  const url = '/login/';
   return postRequestWithParams(url, params);
 }
 
@@ -79,12 +79,12 @@ function getUserForecasts(username) {
 }
 
 function getSustainability(params) {
-  const url = `/sustainability/`;
+  const url = '/sustainability/';
   return postRequestWithParams(url, params);
 }
 
 function getTreePLESustainability() {
-  const url = `/sustainability/treeple/`;
+  const url = '/sustainability/treeple/';
   return getRequest(url);
 }
 
@@ -104,22 +104,22 @@ function getMunicipalitySustainability(municipality) {
 // ==============================
 
 function createTree(params) {
-  const url = `/tree/new/`;
+  const url = '/tree/new/';
   return postRequestWithParams(url, params);
 }
 
 function createUser(params) {
-  const url = `/user/new/`;
+  const url = '/user/new/';
   return postRequestWithParams(url, params);
 }
 
 function createForecast(params) {
-  const url = `/forecast/new/`;
+  const url = '/forecast/new/';
   return postRequestWithParams(url, params);
 }
 
 function deleteForecast(params) {
-  const url = `/forecast/delete/`;
+  const url = '/forecast/delete/';
   return postRequestWithParams(url, params);
 }
 
@@ -129,7 +129,7 @@ function deleteForecast(params) {
 // ==============================
 
 function updateTree(params) {
-  const url = `/tree/update/`;
+  const url = '/tree/update/';
   return patchRequestWithParams(url, params);
 }
 

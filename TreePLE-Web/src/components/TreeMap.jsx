@@ -34,7 +34,7 @@ export class TreeMap extends PureComponent {
   getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        position => {
+        (position) => {
           this.setState({
             center: {
               lat: position.coords.latitude,
@@ -42,7 +42,7 @@ export class TreeMap extends PureComponent {
             }
           });
         },
-        error => {
+        () => {
           this.setState({center: mtlCenter});
           alert('Unable to find your location.');
         }, {
@@ -71,7 +71,7 @@ export class TreeMap extends PureComponent {
   loadMunicipalities = () => {
     getAllMunicipalities()
       .then(({data}) => {
-        let municipalities = data.map(municipality => ({
+        let municipalities = data.map((municipality) => ({
           name: municipality.name,
           totalTrees: municipality.totalTrees,
           borders: getLatLngBorders(municipality.borders)
@@ -86,22 +86,20 @@ export class TreeMap extends PureComponent {
 
   onMapClick = (e, success) => {
     if (success) {
-      this.loadTrees()
+      this.loadTrees();
     }
     this.setState({createTreeModal: 'latLng' in e ? e.latLng : null});
   }
 
   onMunicipalityClick = (municipality) => {
     getMunicipalitySustainability(municipality.name)
-      .then(({data}) => {
-        return {
-          stormwater: data.stormwater,
-          co2Reduced: data.co2Reduced,
-          biodiversity: data.biodiversity,
-          energyConserved: data.energyConserved
-        };
-      })
-      .then(sustainability => {
+      .then(({data}) => ({
+        stormwater: data.stormwater,
+        co2Reduced: data.co2Reduced,
+        biodiversity: data.biodiversity,
+        energyConserved: data.energyConserved
+      }))
+      .then((sustainability) => {
         let viewport = getMapBounds(municipality.borders);
         this.refs.map.fitBounds(viewport);
         this.props.onSustainabilityChange(sustainability);
@@ -120,33 +118,31 @@ export class TreeMap extends PureComponent {
   }
 
   onTreeClick = (tree) => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       treeHover: tree,
-      treeInfo: tree == prevState.treeHover ? !prevState.treeInfo : tree !== null ? prevState.treeInfo : false
+      treeInfo: tree === prevState.treeHover ? !prevState.treeInfo : tree !== null ? prevState.treeInfo : false
     }));
 
     if (tree !== null) {
       getTreeSustainability(tree.treeId)
-        .then(({data}) => {
-          return {
-            stormwater: data.stormwater,
-            co2Reduced: data.co2Reduced,
-            biodiversity: data.biodiversity,
-            energyConserved: data.energyConserved
-          };
-        })
-        .then(sustainability => {
+        .then(({data}) => ({
+          stormwater: data.stormwater,
+          co2Reduced: data.co2Reduced,
+          biodiversity: data.biodiversity,
+          energyConserved: data.energyConserved
+        }))
+        .then((sustainability) => {
           this.props.onSustainabilityChange(sustainability);
         })
         .catch(({response: {data}}) => {
           this.setState({error: data.message});
-        })
+        });
     }
   }
 
   onTreeDblClick = (tree, success) => {
     if (success) {
-      this.loadTrees()
+      this.loadTrees();
     }
     this.setState({
       treeHover: null,
@@ -185,49 +181,49 @@ export class TreeMap extends PureComponent {
       </InfoWindow>
     );
 
-    return (Object.keys(this.state.center).length !== 0) ? (
+    return Object.keys(this.state.center).length !== 0 ? (
       <GoogleMap
         ref='map'
         defaultZoom={14}
         defaultCenter={this.state.center}
         options={{scrollwheel: true}}
-        onRightClick={e => this.onMapClick(e, false)}
+        onRightClick={(e) => this.onMapClick(e, false)}
       >
-        {this.state.municipalities.map(municipality => (
+        {this.state.municipalities.map((municipality) => (
           <Polygon
             key={municipality.name}
             paths={municipality.borders}
             onClick={() => this.onMunicipalityClick(municipality)}
             onDblClick={() => this.onMunicipalityDblClick(municipality)}
-            onRightClick={e => this.onMapClick(e, false)}
+            onRightClick={(e) => this.onMapClick(e, false)}
           />
         ))}
-        {this.state.trees.map(tree => (
-            <Marker
-              key={tree.treeId}
-              icon={{
-                url: getTreeMarker(tree.status),
-                anchor: new google.maps.Point(23,45),
-                scaledSize: new google.maps.Size(40, 60)
-              }}
-              position={getLatLng(tree.location)}
-              onMouseOver={() => this.onTreeHover(tree)}
-              onMouseOut={() => this.onTreeHover(null)}
-              onClick={() => this.onTreeClick(tree)}
-              onDblClick={() => this.onTreeDblClick(tree, false)}
-            >
-              {((!!this.state.treeHover || this.state.treeInfo) && this.state.treeHover == tree) ? (
-                <TreeInfoWindow tree={tree} icons={getTreeIcons(tree)}/>
-              ) : null}
-            </Marker>
+        {this.state.trees.map((tree) => (
+          <Marker
+            key={tree.treeId}
+            icon={{
+              url: getTreeMarker(tree.status),
+              anchor: new google.maps.Point(23, 45),
+              scaledSize: new google.maps.Size(40, 60)
+            }}
+            position={getLatLng(tree.location)}
+            onMouseOver={() => this.onTreeHover(tree)}
+            onMouseOut={() => this.onTreeHover(null)}
+            onClick={() => this.onTreeClick(tree)}
+            onDblClick={() => this.onTreeDblClick(tree, false)}
+          >
+            {(this.state.treeHover || this.state.treeInfo) && this.state.treeHover === tree ? (
+              <TreeInfoWindow tree={tree} icons={getTreeIcons(tree)}/>
+            ) : null}
+          </Marker>
         ))}
-        {!!this.state.treeModal ? (
+        {this.state.treeModal ? (
           <TreeModal tree={this.state.treeModal} onClose={this.onTreeDblClick}/>
         ) : null}
-        {!!this.state.createTreeModal ? (
+        {this.state.createTreeModal ? (
           <CreateTreeModal location={this.state.createTreeModal} onClose={this.onMapClick}/>
         ) : null}
-        {!!this.state.municipalityModal ? (
+        {this.state.municipalityModal ? (
           <MunicipalityModal municipality={this.state.municipalityModal} onClose={this.onMunicipalityDblClick}/>
         ) : null}
       </GoogleMap>
@@ -239,15 +235,15 @@ export class TreeMap extends PureComponent {
 
 TreeMap.propTypes = {
   onSustainabilityChange: PropTypes.func.isRequired
-}
+};
 
 export default compose(
   withProps({
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '100vh'}}/>,
     containerElement: <div style={{height: '80vh'}}/>,
-    mapElement: <div style={{height: '80vh'}}/>,
+    mapElement: <div style={{height: '80vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
-)(props => <TreeMap {...props}/>)
+)((props) => <TreeMap {...props}/>);

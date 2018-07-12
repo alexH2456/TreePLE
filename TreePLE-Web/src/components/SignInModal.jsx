@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import sha512 from 'sha512';
-import {Button, Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
+import {Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {login} from './Requests';
 import {getError} from './Utils';
 
@@ -77,6 +77,6 @@ class SignInModal extends PureComponent {
 SignInModal.propTypes = {
   onRegister: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default SignInModal;

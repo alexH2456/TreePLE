@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Divider, Grid, Header, Icon, Message, Modal, Statistic, Container} from 'semantic-ui-react';
+import {Button, Divider, Grid, Header, Icon, Modal} from 'semantic-ui-react';
 import {iconDef, colorDef} from '../constants';
 
 class HelpModal extends PureComponent {
@@ -43,7 +43,7 @@ class HelpModal extends PureComponent {
             </Grid>
             <Divider/>
             <Grid columns={4}>
-              {iconIter.map(i => (
+              {iconIter.map((i) => (
                 <Grid.Row key={i} verticalAlign='middle'>
                   <Grid.Column textAlign='center' width={2}>
                     <Icon name={iconDef[2*i].icon}/>
@@ -78,7 +78,7 @@ class HelpModal extends PureComponent {
             </Grid>
             <Divider/>
             <Grid columns={2}>
-              {colorIter.map(i => (
+              {colorIter.map((i) => (
                 <Grid.Row key={i} verticalAlign='middle'>
                   <Grid.Column textAlign='center' width={2}>
                     <span style={{color: colorDef[2*i].color}}>{colorDef[2*i].color.toUpperCase()}</span>
@@ -112,6 +112,6 @@ class HelpModal extends PureComponent {
 
 HelpModal.propTypes = {
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default HelpModal;

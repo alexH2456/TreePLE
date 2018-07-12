@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {Icon, Image, Statistic, Table} from 'semantic-ui-react';
 import IconMenu from './IconMenu';
 import {getTreePLESustainability} from './Requests';
-import Logo from "../images/treeple_logo.png";
+import Logo from '../images/treeple_logo.png';
 
 class NavigationBar extends PureComponent {
   constructor(props) {
@@ -32,7 +32,7 @@ class NavigationBar extends PureComponent {
         });
       })
       .catch(({response: {data}}) => {
-        this.setState({error: data.message})
+        this.setState({error: data.message});
       });
   }
 
@@ -43,10 +43,10 @@ class NavigationBar extends PureComponent {
   render() {
     const {sustainability} = this.state;
 
-    const stormwater = !!sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
-    const co2Reduced = !!sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};
-    const biodiversity = !!sustainability.biodiversity ? sustainability.biodiversity : {factor: '--'};
-    const energyConserved = !!sustainability.energyConserved ? sustainability.energyConserved : {factor: '--', worth: '--'};
+    const stormwater = sustainability.stormwater ? sustainability.stormwater : {factor: '--', worth: '--'};
+    const co2Reduced = sustainability.co2Reduced ? sustainability.co2Reduced : {factor: '--', worth: '--'};
+    const biodiversity = sustainability.biodiversity ? sustainability.biodiversity : {factor: '--'};
+    const energyConserved = sustainability.energyConserved ? sustainability.energyConserved : {factor: '--', worth: '--'};
 
     return (
       <div>

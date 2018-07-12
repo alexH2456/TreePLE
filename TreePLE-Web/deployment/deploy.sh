@@ -25,4 +25,3 @@ exitStatus $?
 echo "systemctl start httpd"
 systemctl start httpd
 exitStatus $?
-

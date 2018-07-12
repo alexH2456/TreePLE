@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
-import {Button, Divider, Form, Grid, Header, Icon, Message, Modal, Popup} from 'semantic-ui-react';
+import {Button, Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {GoogleMap, Marker, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
-import {getAllSpecies, getAllMunicipalities, updateTree} from "./Requests";
+import {getAllSpecies, getAllMunicipalities, updateTree} from './Requests';
 import {getSelectable, getLatLng, getLatLngBorders, getError, getTreeMarker} from './Utils';
-import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable, treeHelp} from '../constants';
+import {gmapsKey, landSelectable, statusSelectable, ownershipSelectable} from '../constants';
 
 class TreeModal extends PureComponent {
   constructor(props) {
@@ -26,27 +26,27 @@ class TreeModal extends PureComponent {
       showReports: false,
       speciesSelectable: [],
       municipalitySelectable: [],
-      error: '',
-    }
+      error: ''
+    };
   }
 
   componentWillMount() {
-    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data)
-    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data)
+    const speciesProm = getAllSpecies().then(({data}) => data).catch(({response: {data}}) => data);
+    const municipalityProm = getAllMunicipalities().then(({data}) => data).catch(({response: {data}}) => data);
 
     Promise.all([speciesProm, municipalityProm])
       .then(([species, municipalities]) => {
         this.setState({
           speciesSelectable: getSelectable(species),
           municipalitySelectable: getSelectable(municipalities)
-        })
+        });
       })
       .catch(() => {
         this.setState({error: 'Unable to retrieve Species/Municipality list!'});
       });
   }
 
-  onToggleEdit = () => this.setState(prevState => ({update: !prevState.update}));
+  onToggleEdit = () => this.setState((prevState) => ({update: !prevState.update}));
 
   onUpdateTree = () => {
     const treeParams = {
@@ -55,23 +55,23 @@ class TreeModal extends PureComponent {
     };
 
     updateTree(treeParams)
-      .then(({data}) => {
+      .then(() => {
         this.props.onClose(null, true);
       })
       .catch(({response: {data}}) => {
         this.setState({error: data.message});
-      })
+      });
   }
 
-  onShowReports = () => this.setState(prevState => ({showReports: !prevState.showReports}));
+  onShowReports = () => this.setState((prevState) => ({showReports: !prevState.showReports}));
 
-  onHeightChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, height: value}}));
-  onDiameterChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, diameter: value}}));
-  onSpeciesChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, species: value}}));
-  onStatusChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, status: value}}));
-  onMunicipalityChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, municipality: value}}));
-  onOwnershipChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, ownership: value}}));
-  onLandChange = (e, {value}) => this.setState(prevState => ({updatedTree: {...prevState.updatedTree, land: value}}));
+  onHeightChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, height: value}}));
+  onDiameterChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, diameter: value}}));
+  onSpeciesChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, species: value}}));
+  onStatusChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, status: value}}));
+  onMunicipalityChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, municipality: value}}));
+  onOwnershipChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, ownership: value}}));
+  onLandChange = (e, {value}) => this.setState((prevState) => ({updatedTree: {...prevState.updatedTree, land: value}}));
 
 
   render() {
@@ -202,12 +202,12 @@ class TreeModal extends PureComponent {
                     label='Height (cm)'
                     fluid placeholder='Height' type='number' min='1' value={updatedTree.height} error={errors.height} onChange={this.onHeightChange}
                     // label={<span><Popup trigger={<Icon name='help'/>} content={treeHelp.height}/>Height (cm)</span>}
-                    />
+                  />
                   <Form.Input
                     label='Diameter (cm)'
                     fluid placeholder='Diameter' type='number' min='1' value={updatedTree.diameter} error={errors.diameter} onChange={this.onDiameterChange}
                     // label={<span><Popup trigger={<Icon name='help'/>} content={treeHelp.diameter}/>Diameter (cm)</span>}
-                    />
+                  />
                 </Form.Group>
                 <Form.Group widths='equal'>
                   <Form.Select
@@ -249,7 +249,7 @@ class TreeModal extends PureComponent {
                     fluid readOnly placeholder='Longitude' type='number' min='-180' max='180' value={tree.location.longitude}
                     // label={<span><Popup trigger={<Icon name='help'/>} content={treeHelp.longitude}/>Longitude</span>}
                   />
-              </Form.Group>
+                </Form.Group>
               </Form>
             )}
 
@@ -288,7 +288,7 @@ const GMap = compose(
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
     containerElement: <div style={{height: '40vh'}}/>,
-    mapElement: <div style={{height: '40vh'}}/>,
+    mapElement: <div style={{height: '40vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
@@ -302,7 +302,7 @@ const GMap = compose(
         key={tree.treeId}
         icon={{
           url: getTreeMarker(tree.status),
-          anchor: new google.maps.Point(23,45),
+          anchor: new google.maps.Point(23, 45),
           scaledSize: new google.maps.Size(40, 60)
         }}
         position={location}
@@ -315,6 +315,6 @@ const GMap = compose(
 TreeModal.propTypes = {
   tree: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default TreeModal;

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
-var parentDir = path.join(__dirname, '../');
+const parentDir = path.join(__dirname, '../');
 
 module.exports = {
   entry: [
@@ -19,7 +19,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015', 'react', 'stage-0']
+          presets: ['env', 'react', 'stage-0']
         }
       }, {
         test: /\.less$/,

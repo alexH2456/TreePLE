@@ -1,7 +1,10 @@
-# Compiled class file
+# Mac OS files
+*.DS_Store
+
+# Compiled class files
 *.class
 
-# Log file
+# Log files
 *.log
 
 # Virtual machine crash logs

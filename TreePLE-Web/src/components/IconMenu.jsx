@@ -28,15 +28,15 @@ class IconMenu extends PureComponent {
     }
   }
 
-  toggleSignIn = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
-  toggleSignUp = () => this.setState(prevState => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
-  toggleRegister = () => this.setState(prevState => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
+  toggleSignIn = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
+  toggleSignUp = () => this.setState((prevState) => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
+  toggleRegister = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
 
-  toggleMyForecasts = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts}));
-  toggleCreateForecast = () => this.setState(prevState => ({showCreateForecast: !prevState.showCreateForecast}));
-  toggleForecast = () => this.setState(prevState => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
+  toggleMyForecasts = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts}));
+  toggleCreateForecast = () => this.setState((prevState) => ({showCreateForecast: !prevState.showCreateForecast}));
+  toggleForecast = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
 
-  toggleHelp = () => this.setState(prevState => ({showHelp: !prevState.showHelp}));
+  toggleHelp = () => this.setState((prevState) => ({showHelp: !prevState.showHelp}));
 
   onLogOut = () => {
     localStorage.clear();
@@ -104,13 +104,13 @@ class IconMenu extends PureComponent {
           <HelpModal onClose={this.toggleHelp}/>
         ) : null}
       </div>
-    )
+    );
   }
 }
 
 IconMenu.propTypes = {
   show: PropTypes.bool.isRequired,
   onSustainabilityChange: PropTypes.func.isRequired
-}
+};
 
 export default IconMenu;

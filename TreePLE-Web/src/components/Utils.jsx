@@ -1,4 +1,3 @@
-import {getAllSpecies, getAllMunicipalities} from "./Requests";
 import {lands, statuses, ownerships, blackTree, blueTree, greenTree, yellowTree, orangeTree, redTree} from '../constants';
 
 function getSelectable(data) {
@@ -7,43 +6,7 @@ function getSelectable(data) {
     text: item.name,
     value: item.name
   }));
-}
-
-function getSpeciesSelectable() {
-  let speciesSelectable = [];
-
-  getAllSpecies()
-    .then(({data}) => {
-      speciesSelectable = data.map((species, idx) => ({
-        key: idx,
-        text: species.name,
-        value: species.name
-      }));
-    })
-    .catch(({response: {data}}) => {
-      console.log(data.message);
-    });
-
-  return speciesSelectable;
-}
-
-function getMunicipalitySelectable() {
-  let municipalitySelectable = [];
-
-  getAllMunicipalities()
-    .then(({data}) => {
-      municipalitySelectable = data.map((municipality, idx) => ({
-        key: idx,
-        text: municipality.name,
-        value: municipality.name
-      }));
-    })
-    .catch(({response: {data}}) => {
-      console.log(data.message);
-    });
-
-  return municipalitySelectable;
-}
+};
 
 function getLatLng(location) {
   return {
@@ -51,17 +14,17 @@ function getLatLng(location) {
     lat: location.latitude,
     lng: location.longitude
   };
-}
+};
 
 function getLatLngBorders(borders) {
-  return borders.map(location => getLatLng(location));
-}
+  return borders.map((location) => getLatLng(location));
+};
 
 function getMapBounds(locations) {
   let lat = [];
   let lng = [];
 
-  locations.map(location => {
+  locations.forEach((location) => {
     lat.push(location.lat);
     lng.push(location.lng);
   });
@@ -74,7 +37,7 @@ function getMapBounds(locations) {
   };
 
   return bounds;
-}
+};
 
 function getTreeIcons(tree) {
   let icons = {};
@@ -94,7 +57,7 @@ function getTreeIcons(tree) {
       break;
     default:
       icons.land = 'question';
-  }
+  };
 
   switch (tree.ownership) {
     case ownerships.public.enum:
@@ -105,7 +68,7 @@ function getTreeIcons(tree) {
       break;
     default:
       icons.ownership = 'question';
-  }
+  };
 
   switch (tree.status) {
     case statuses.planted.enum:
@@ -122,10 +85,10 @@ function getTreeIcons(tree) {
       break;
     default:
       icons.color = 'black';
-  }
+  };
 
   return icons;
-}
+};
 
 function getTreeMarker(status) {
   switch (status) {
@@ -142,7 +105,7 @@ function getTreeMarker(status) {
     default:
       return blackTree;
   }
-}
+};
 
 function getError(error) {
   error = error.toLowerCase();
@@ -164,23 +127,21 @@ function getError(error) {
     location: error.includes('location'),
     borders: error.includes('borders'),
     key: error.includes('key')
-  }
+  };
 
   return errorList;
-}
+};
 
 function getTreeAge(tree) {
   return 6 * tree.diameter / 2.54;
-}
+};
 
 function formatDate(date) {
   return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-}
+};
 
 export {
   getSelectable,
-  getSpeciesSelectable,
-  getMunicipalitySelectable,
   getLatLng,
   getLatLngBorders,
   getMapBounds,

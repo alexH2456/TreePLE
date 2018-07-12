@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import sha512 from 'sha512';
-import {Button, Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
+import {Divider, Form, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
 import {createUser} from './Requests';
 import {getError} from './Utils';
 import {roleSelectable} from '../constants';
@@ -28,7 +28,7 @@ class SignUpModal extends PureComponent {
   onPostalChange = (e, {value}) => this.setState({postalCode: value});
 
   onSignUp = () => {
-    if (this.state.password1 == this.state.password2) {
+    if (this.state.password1 === this.state.password2) {
       const signupParams = {
         username: this.state.username,
         password: sha512(this.state.password1).toString('hex'),
@@ -54,7 +54,7 @@ class SignUpModal extends PureComponent {
     const errors = getError(this.state.error);
 
     return (
-      <Modal open size="mini" dimmer='blurring'>
+      <Modal open size='mini' dimmer='blurring'>
         <Modal.Content>
           <Modal.Header>
             <Header as='h1' icon textAlign='center'>
@@ -68,7 +68,7 @@ class SignUpModal extends PureComponent {
               <Form.Input fluid type='password' placeholder='Password' error={errors.password} onChange={this.onPasswordChange1}/>
               <Form.Input fluid type='password' placeholder='Confirm Password' error={errors.password} onChange={this.onPasswordChange2}/>
               <Form.Select fluid options={roleSelectable} placeholder='Role' error={errors.role} onChange={this.onRoleChange}/>
-              {this.state.role == 'Scientist' ? (
+              {this.state.role === 'Scientist' ? (
                 <Form.Input fluid type='password' placeholder='Scientist Access Key' error={errors.key} onChange={this.onKeyChange}/>
               ) : null}
               <Form.Input fluid placeholder='Postal Code' error={errors.address} onChange={this.onPostalChange}/>
@@ -99,6 +99,6 @@ class SignUpModal extends PureComponent {
 SignUpModal.propTypes = {
   onRegister: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
-}
+};
 
 export default SignUpModal;
