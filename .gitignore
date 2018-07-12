@@ -1,5 +1,6 @@
 # Mac OS files
 *.DS_Store
+.java-version
 
 # Compiled class files
 *.class

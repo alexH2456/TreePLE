@@ -1,0 +1,83 @@
+[
+    {
+        "name": "Weeping Willow",
+        "species": "Salix Babylonica",
+        "genus": "Salix"
+    }, {
+        "name": "Pacific Silver Fir",
+        "species": "Abies Amabilis",
+        "genus": "Abies"
+    }, {
+        "name": "Monkey-Puzzle",
+        "species": "Araucaria Araucana",
+        "genus": "Araucaria"
+    }, {
+        "name": "Atlas Cedar",
+        "species": "Cedrus Atlantica",
+        "genus": "Cedrus"
+    }, {
+        "name": "Lawson's Cypress",
+        "species": "Chamaecyparis Lawsoniana",
+        "genus": "Chamaecyparis"
+    }, {
+        "name": "Sugi",
+        "species": "Cryptomeria Japonica",
+        "genus": "Cryptomeria"
+    }, {
+        "name": "Arizona Cypress",
+        "species": "Cupressus Arizonica",
+        "genus": "Cupressus"
+    }, {
+        "name": "Chinese Juniper",
+        "species": "Juniperus Chinensis",
+        "genus": "Juniperus"
+    }, {
+        "name": "European Larch",
+        "species": "Larix Decidua",
+        "genus": "Larix"
+    }, {
+        "name": "Dawn Redwood",
+        "species": "Metasequoia Glyptostroboides",
+        "genus": "Metasequoia"
+    }, {
+        "name": "Norway Spruce",
+        "species": "Picea Abies",
+        "genus": "Picea"
+    }, {
+        "name": "Whitebark Pine",
+        "species": "Pinus Albicaulis",
+        "genus": "Pinus"
+    }, {
+        "name": "Chinese Arborvitae",
+        "species": "Platycladus Orientalis",
+        "genus": "Platycladus"
+    }, {
+        "name": "Coast Douglas-fir",
+        "species": "Pseudotsuga Menziesii",
+        "genus": "Pseudotsuga"
+    }, {
+        "name": "Umbrella-pine",
+        "species": "Sequoia Sempervirens",
+        "genus": "Sequoia"
+    }, {
+        "name": "Giant Sequoia",
+        "species": "Sequoiadendron Giganteum",
+        "genus": "Sequoiadendron"
+    }, {
+        "name": "Baldcypress",
+        "species": "Taxodium Distichum",
+        "genus": "Taxodium"
+    }, {
+        "name": "English Yew",
+        "species": "Taxus Baccata",
+        "genus": "Taxus"
+    }, {
+        "name": "Eastern Arborvitae",
+        "species": "Thuja Occidentalis",
+        "genus": "Thuja"
+    }, {
+        "name": "Eastern Hemlock",
+        "species": "Tsuga Canadensis",
+        "genus": "Tsuga"
+    }
+]

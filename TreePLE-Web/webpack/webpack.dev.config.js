@@ -50,11 +50,15 @@ module.exports = {
     new webpack.DefinePlugin({
       serverHost: JSON.stringify('localhost'),
       serverPort: JSON.stringify('8088')
-    // }),
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: false,
+      mangle: false
+    })
     // new HtmlWebpackPlugin({
     //   title: 'TreePLE',
     //   favicon: '/src/images/favicon.ico'
-    })
+    // })
   ],
   resolve: {
     extensions: ['.js', '.jsx', '.css']
