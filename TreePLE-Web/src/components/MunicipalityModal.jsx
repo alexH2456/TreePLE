@@ -19,13 +19,9 @@ class MunicipalityModal extends PureComponent {
 
   onToggleEdit = () => this.setState((prevState) => ({update: !prevState.update}));
 
-  onShowBorders = () => {
-    this.setState({showBorders: !this.state.showBorders});
-  }
+  onShowBorders = () => this.setState((prevState) => ({showBorders: !prevState.showBorders}));
 
-  onUpdateMunicipality = () => {
-    this.setState({update: !this.state.update});
-  }
+  onUpdateMunicipality = () => this.setState((prevState) => ({update: !prevState.update}));
 
   onGMapLoaded = () => {
     let viewport = getMapBounds(this.props.municipality.borders);

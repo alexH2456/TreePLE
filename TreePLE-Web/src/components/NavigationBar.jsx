@@ -36,7 +36,7 @@ class NavigationBar extends PureComponent {
       });
   }
 
-  toggleSidebar = () => this.setState({showSidebar: !this.state.showSidebar});
+  toggleSidebar = () => this.setState((prevState) => ({showSidebar: !prevState.showSidebar}));
 
   onSustainabilityChange = (sustainability) => this.setState({sustainability: sustainability});
 

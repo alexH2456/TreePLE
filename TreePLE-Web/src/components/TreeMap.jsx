@@ -14,7 +14,6 @@ export class TreeMap extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      zoom: 14,
       center: {},
       trees: [],
       municipalities: [],
@@ -22,7 +21,8 @@ export class TreeMap extends PureComponent {
       createTreeModal: null,
       treeHover: null,
       treeInfo: false,
-      municipalityModal: null
+      municipalityModal: null,
+      error: ''
     };
   }
 
