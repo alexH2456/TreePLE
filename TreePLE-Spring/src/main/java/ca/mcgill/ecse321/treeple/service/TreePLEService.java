@@ -78,6 +78,23 @@ public class TreePLEService {
         }
     }
 
+    // Check if User is a scientist
+    public Map<String, Boolean> authenticated(JSONObject jsonParams) throws Exception {
+        String username = jsonParams.getString("username");
+
+        if (username.replaceAll("\\s", "").isEmpty())
+            throw new InvalidInputException("Username cannot be empty!");
+
+        User user = null;
+        if ((user = User.getWithUsername(username)) != null || (user = sql.getUser(username)) != null) {
+            Map<String, Boolean> authenticated = new HashMap<String, Boolean>();
+            authenticated.put("authenticated", user.getRole() == UserRole.Scientist);
+            return authenticated;
+        } else {
+            throw new InvalidInputException("No User with that username exists!");
+        }
+    }
+
     // Create a new Tree
     public Tree createTree(JSONObject jsonParams) throws Exception {
         // User data
@@ -198,9 +215,9 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && myAddresses.length() == 0)
+        if (role.equals(UserRole.Resident) && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
-        if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
+        if (role.equals(UserRole.Scientist) && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
         password = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -691,9 +708,9 @@ public class TreePLEService {
             throw new InvalidInputException("Password cannot be empty!");
         if (!EnumUtils.isValidEnum(UserRole.class, role))
             throw new InvalidInputException("That role doesn't exist!");
-        if (role.equals("Resident") && myAddresses.length() == 0)
+        if (role.equals(UserRole.Resident) && myAddresses.length() == 0)
             throw new InvalidInputException("Address cannot be empty!");
-        if (role.equals("Scientist") && !sRoleKey.equals(scientistKey))
+        if (role.equals(UserRole.Scientist) && !sRoleKey.equals(scientistKey))
             throw new InvalidInputException("Authorization key for Scientist role is invalid!");
 
         password = BCrypt.hashpw(password, BCrypt.gensalt());

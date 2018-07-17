@@ -1,25 +1,34 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {Sidebar, Segment, Button, Menu} from 'semantic-ui-react';
+import TreeMap from './TreeMap';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
-import TreeMap from './TreeMap';
 import MyForecastsModal from './MyForecastsModal';
 import CreateForecastModal from './CreateForecastModal';
+import CreateSpeciesModal from './CreateSpeciesModal';
 import HelpModal from './HelpModal';
+import {authenticated} from './Requests';
 
-class IconMenu extends PureComponent {
+class SideBar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       user: localStorage.getItem('username'),
+      scientist: '',
       showMenu: false,
       showSignIn: false,
       showSignUp: false,
       showMyForecasts: false,
       showCreateForecast: false,
-      showHelp: false
+      showCreateSpecies: false,
+      showHelp: false,
+      error: ''
     };
+  }
+
+  componentWillMount() {
+    this.authenticatedUser(localStorage.getItem('username'));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -28,19 +37,40 @@ class IconMenu extends PureComponent {
     }
   }
 
-  toggleSignIn = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, user: localStorage.getItem('username')}));
-  toggleSignUp = () => this.setState((prevState) => ({showSignUp: !prevState.showSignUp, user: localStorage.getItem('username')}));
+  authenticatedUser = (username) => {
+    if (username) {
+      const user = {username: username};
+      authenticated(user)
+        .then(({data}) => this.setState({scientist: data.authenticated}))
+        .catch(({response: {data}}) => this.setState({error: data.message, scientist: false}));
+    } else {
+      this.setState({scientist: false});
+    }
+  }
+
+  toggleSignIn = () => {
+    const user = localStorage.getItem('username');
+    this.authenticatedUser(user);
+    this.setState((prevState) => ({showSignIn: !prevState.showSignIn, user: user}));
+  }
+  toggleSignUp = () => {
+    const user = localStorage.getItem('username');
+    this.authenticatedUser(user);
+    this.setState((prevState) => ({showSignUp: !prevState.showSignUp, user: user}));
+  }
   toggleRegister = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
 
   toggleMyForecasts = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts}));
   toggleCreateForecast = () => this.setState((prevState) => ({showCreateForecast: !prevState.showCreateForecast}));
   toggleForecast = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
 
+  toggleCreateSpecies = () => this.setState((prevState) => ({showCreateSpecies: !prevState.showCreateSpecies}));
+
   toggleHelp = () => this.setState((prevState) => ({showHelp: !prevState.showHelp}));
 
   onLogOut = () => {
     localStorage.clear();
-    this.setState({user: localStorage.getItem('username')});
+    this.setState({user: localStorage.getItem('username'), scientist: false});
   }
 
   render() {
@@ -68,6 +98,13 @@ class IconMenu extends PureComponent {
                     Forecasts
                   </Button>
                 </Menu.Item>
+                {this.state.scientist ? (
+                  <Menu.Item link name='createspecies'>
+                    <Button basic fluid color='black' name='createspecies' onClick={this.toggleCreateSpecies}>
+                      Species
+                    </Button>
+                  </Menu.Item>
+                ) : null}
                 <Menu.Item link name='logout'>
                   <Button basic fluid color='black' name='logout' onClick={this.onLogOut}>
                     Log Out
@@ -100,6 +137,9 @@ class IconMenu extends PureComponent {
         {this.state.showCreateForecast ? (
           <CreateForecastModal onClose={this.toggleCreateForecast} onForecast={this.toggleForecast}/>
         ) : null}
+        {this.state.showCreateSpecies ? (
+          <CreateSpeciesModal onClose={this.toggleCreateSpecies}/>
+        ) : null}
         {this.state.showHelp ? (
           <HelpModal onClose={this.toggleHelp}/>
         ) : null}
@@ -108,9 +148,9 @@ class IconMenu extends PureComponent {
   }
 }
 
-IconMenu.propTypes = {
+SideBar.propTypes = {
   show: PropTypes.bool.isRequired,
   onSustainabilityChange: PropTypes.func.isRequired
 };
 
-export default IconMenu;
+export default SideBar;

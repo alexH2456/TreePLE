@@ -241,12 +241,12 @@ class TreeModal extends PureComponent {
                 <Form.Group widths='equal'>
                   <Form.Input
                     label='Latitude'
-                    fluid readOnly placeholder='Latitude' type='number' min='-90' max='90' value={tree.location.latitude}
+                    fluid readOnly placeholder='Latitude' type='number' step='any' min='-90' max='90' value={tree.location.latitude}
                     // label={<span><Popup trigger={<Icon name='help'/>} content={treeHelp.latitude}/>Latitude</span>}
                   />
                   <Form.Input
                     label='Longitude'
-                    fluid readOnly placeholder='Longitude' type='number' min='-180' max='180' value={tree.location.longitude}
+                    fluid readOnly placeholder='Longitude' type='number' step='any' min='-180' max='180' value={tree.location.longitude}
                     // label={<span><Popup trigger={<Icon name='help'/>} content={treeHelp.longitude}/>Longitude</span>}
                   />
                 </Form.Group>

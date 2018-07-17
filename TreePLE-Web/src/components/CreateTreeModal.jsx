@@ -120,8 +120,8 @@ class CreateTreeModal extends PureComponent {
                 <Form.Select fluid options={landSelectable} label='Land' placeholder='Land' error={errors.land} onChange={this.onLandChange}/>
               </Form.Group>
               <Form.Group widths='equal'>
-                <Form.Input fluid readOnly label='Latitude' placeholder='Latitude' type='number' min='-90' max='90' value={tree.latitude} error={errors.location}/>
-                <Form.Input fluid readOnly label='Longitude' placeholder='Longitude' type='number' min='-180' max='180' value={tree.longitude} error={errors.location}/>
+                <Form.Input fluid readOnly label='Latitude' placeholder='Latitude' type='number' step='any' min='-90' max='90' value={tree.latitude} error={errors.location}/>
+                <Form.Input fluid readOnly label='Longitude' placeholder='Longitude' type='number' step='any' min='-180' max='180' value={tree.longitude} error={errors.location}/>
               </Form.Group>
             </Form>
 

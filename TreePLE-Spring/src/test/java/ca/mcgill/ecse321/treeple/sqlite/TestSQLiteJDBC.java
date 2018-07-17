@@ -14,10 +14,9 @@ import ca.mcgill.ecse321.treeple.service.TreePLEService;
 public class TestSQLiteJDBC {
 
     private static SQLiteJDBC sql;
-    private static File dbFile;
+    private static TreePLEService service;
     private static final String dbPath = "/output/treeple_test.db";
 
-    private static TreePLEService service;
 
     private static JSONObject defaultUser;
     private static JSONObject defaultSpecies;
@@ -33,9 +32,7 @@ public class TestSQLiteJDBC {
     @BeforeClass
     public static void setUpBeforeClass() {
         sql = new SQLiteJDBC(dbPath);
-        dbFile = (new File(System.getProperty("user.dir") + dbPath)).getAbsoluteFile();
         sql.connect();
-
         service = new TreePLEService(sql);
     }
 
@@ -90,10 +87,10 @@ public class TestSQLiteJDBC {
 
     @Test
     public void testDeleteDB() {
+        File dbFile = (new File(System.getProperty("user.dir") + dbPath)).getAbsoluteFile();
         assertEquals(true, dbFile.exists());
         assertEquals(true, sql.deleteDB());
         assertEquals(false, dbFile.exists());
-        assertEquals(true, sql.connect());
     }
 
     // ======================
@@ -1051,29 +1048,29 @@ public class TestSQLiteJDBC {
 
         assertEquals(0, sql.getAllTrees().size());
     }
-    
+
     //TODO
     // ======================
     // SURVEY REPORT TESTS
     // ======================
-    
+
     //TODO
     // ======================
     // FORECASTING TESTS
     // ======================
-    
+
     @Test
     public void testInsertForecast() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId1 = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId1 = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1102,23 +1099,23 @@ public class TestSQLiteJDBC {
             success = sql.insertTree(treeId1 + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
             assertEquals(true, success);
         }
-        
+
         success = sql.insertForecast(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
     }
-    
+
     @Test
     public void testGetAllForecast() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1147,24 +1144,24 @@ public class TestSQLiteJDBC {
             success = sql.insertTree(treeId + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
             assertEquals(true, success);
         }
-        
+
         success = sql.insertForecast(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
         success = sql.insertForecast(forecastId+1, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
-        
+
         int i = 0;
         for(Forecast forecast: sql.getAllForecasts()) {
-        	assertEquals(forecast.getForecastId(), forecastId + i);
-        	assertEquals(forecast.getFcDate().toString(), fcDate);
-        	assertEquals(forecast.getFcUser(), fcUser);
-        	assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
-        	assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
-        	assertEquals(forecast.getStormwater(), stormwater, 0.01);
-        	assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
-        	int j = 0;
-        	for(Tree tree: forecast.getFcTrees()){
-        		assertEquals(tree.getTreeId(), treeId + j);
+            assertEquals(forecast.getForecastId(), forecastId + i);
+            assertEquals(forecast.getFcDate().toString(), fcDate);
+            assertEquals(forecast.getFcUser(), fcUser);
+            assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
+            assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
+            assertEquals(forecast.getStormwater(), stormwater, 0.01);
+            assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
+            int j = 0;
+            for(Tree tree: forecast.getFcTrees()){
+                assertEquals(tree.getTreeId(), treeId + j);
                 assertEquals(tree.getHeight(), height);
                 assertEquals(tree.getDiameter(), diameter);
                 assertEquals(tree.getAddress(), address);
@@ -1176,23 +1173,23 @@ public class TestSQLiteJDBC {
                 assertEquals(tree.getLocation().getLocationId(), location1);
                 assertEquals(tree.getMunicipality().getName(), municipality);
                 j++;
-        	}
-        	i++;
+            }
+            i++;
         }
     }
-    
+
     @Test
     public void testGetForecast() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1221,31 +1218,31 @@ public class TestSQLiteJDBC {
             success = sql.insertTree(treeId + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
             assertEquals(true, success);
         }
-        
+
         success = sql.insertForecast(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
         Forecast forecast = sql.getForecast(forecastId);
         assertEquals(forecast.getForecastId(), forecastId);
-    	assertEquals(forecast.getFcDate().toString(), fcDate);
-    	assertEquals(forecast.getFcUser(), fcUser);
-    	assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
-    	assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
-    	assertEquals(forecast.getStormwater(), stormwater, 0.01);
-    	assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
+        assertEquals(forecast.getFcDate().toString(), fcDate);
+        assertEquals(forecast.getFcUser(), fcUser);
+        assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
+        assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
+        assertEquals(forecast.getStormwater(), stormwater, 0.01);
+        assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
     }
-    
+
     @Test
     public void testGetForecastMaxId() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1275,23 +1272,23 @@ public class TestSQLiteJDBC {
             assertEquals(true, success);
         }
         for(int i = 0; i < numTrees; i++) {
-	        success = sql.insertForecast(forecastId + i, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
-	        assertEquals(true, success);
+            success = sql.insertForecast(forecastId + i, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
+            assertEquals(true, success);
         }
         assertEquals(numTrees + forecastId - 1, sql.getMaxForecastId());
     }
     @Test
     public void testGetAllForecastsOfUser() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1320,26 +1317,26 @@ public class TestSQLiteJDBC {
             success = sql.insertTree(treeId + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
             assertEquals(true, success);
         }
-        
+
         success = sql.insertForecast(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
         success = sql.insertForecast(forecastId+1, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
         success = sql.insertForecast(forecastId+2, fcDate, "Gareth", co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
-        
+
         int i = 0;
         for(Forecast forecast: sql.getAllForecastsOfUser(defaultUser.getString("username"))) {
-        	assertEquals(forecast.getForecastId(), forecastId + i);
-        	assertEquals(forecast.getFcDate().toString(), fcDate);
-        	assertEquals(forecast.getFcUser(), fcUser);
-        	assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
-        	assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
-        	assertEquals(forecast.getStormwater(), stormwater, 0.01);
-        	assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
-        	int j = 0;
-        	for(Tree tree: forecast.getFcTrees()){
-        		assertEquals(tree.getTreeId(), treeId + j);
+            assertEquals(forecast.getForecastId(), forecastId + i);
+            assertEquals(forecast.getFcDate().toString(), fcDate);
+            assertEquals(forecast.getFcUser(), fcUser);
+            assertEquals(forecast.getCo2Reduced(), co2Reduced, 0.01);
+            assertEquals(forecast.getEnergyConserved(), energyConserved, 0.01);
+            assertEquals(forecast.getStormwater(), stormwater, 0.01);
+            assertEquals(forecast.getBiodiversity(), biodiversity, 0.01);
+            int j = 0;
+            for(Tree tree: forecast.getFcTrees()){
+                assertEquals(tree.getTreeId(), treeId + j);
                 assertEquals(tree.getHeight(), height);
                 assertEquals(tree.getDiameter(), diameter);
                 assertEquals(tree.getAddress(), address);
@@ -1351,24 +1348,24 @@ public class TestSQLiteJDBC {
                 assertEquals(tree.getLocation().getLocationId(), location1);
                 assertEquals(tree.getMunicipality().getName(), municipality);
                 j++;
-        	}
-        	i++;
+            }
+            i++;
         }
         assertEquals(i, 2);
     }
-    
+
     @Test
     public void testDeleteForecast() {
-    	int forecastId = 1;
-    	String fcDate = "2001-12-22";
-    	String fcUser = defaultUser.getString("username");
-    	double co2Reduced = 1.0;
-    	double stormwater = 2.0;
-    	double energyConserved = 3.0;
-    	double biodiversity = 0.5;
-    	String fcTrees = "1,2,3,4";
-    	
-    	int treeId = 1;
+        int forecastId = 1;
+        String fcDate = "2001-12-22";
+        String fcUser = defaultUser.getString("username");
+        double co2Reduced = 1.0;
+        double stormwater = 2.0;
+        double energyConserved = 3.0;
+        double biodiversity = 0.5;
+        String fcTrees = "1,2,3,4";
+
+        int treeId = 1;
         int height = 10;
         int diameter = 20;
         String address = defaultUser.getString("addresses");
@@ -1397,13 +1394,13 @@ public class TestSQLiteJDBC {
             success = sql.insertTree(treeId + i, height, diameter, address, datePlanted, land, status, ownership, species, location1, municipality, reports);
             assertEquals(true, success);
         }
-        
+
         success = sql.insertForecast(forecastId, fcDate, fcUser, co2Reduced, biodiversity, stormwater, energyConserved, fcTrees);
         assertEquals(true, success);
-        
+
         success = sql.deleteForecast(forecastId);
         assertEquals(true, success);
-        
+
         assertEquals(0, sql.getAllForecasts().size());
     }
 }

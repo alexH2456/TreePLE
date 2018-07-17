@@ -58,6 +58,11 @@ function login(params) {
   return postRequestWithParams(url, params);
 }
 
+function authenticated(params) {
+  const url = '/authenticated/';
+  return postRequestWithParams(url, params);
+}
+
 function getTree(treeId) {
   const url = `/trees/${treeId}/`;
   return getRequest(url);
@@ -113,6 +118,11 @@ function createUser(params) {
   return postRequestWithParams(url, params);
 }
 
+function createSpecies(params) {
+  const url = '/species/new/';
+  return postRequestWithParams(url, params);
+}
+
 function createForecast(params) {
   const url = '/forecast/new/';
   return postRequestWithParams(url, params);
@@ -142,10 +152,6 @@ function getRequest(url) {
   return AXIOS.get(url);
 }
 
-function postRequest(url) {
-  return AXIOS.post(url);
-}
-
 function postRequestWithParams(url, params) {
   return AXIOS.post(url, params);
 }
@@ -157,10 +163,10 @@ function patchRequestWithParams(url, params) {
 export {
   getAllTrees, getTree, createTree, updateTree,
   getAllUsers, getUser, getUserTrees, getUserForecasts, createUser,
-  getAllSpecies,
+  getAllSpecies, createSpecies,
   getAllLocations,
   getAllMunicipalities,
   getAllForecasts, createForecast, deleteForecast,
   getSustainability, getTreePLESustainability, getTreeSustainability, getMunicipalitySustainability,
-  login
+  login, authenticated
 };

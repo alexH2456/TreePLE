@@ -230,6 +230,11 @@ public class TreePLERestController {
         return convertToDto(user);
     }
 
+    @PostMapping(value = {"/authenticated/"})
+    public Map<String, Boolean> authenticated(@RequestBody String jsonBody) throws Exception {
+        return service.authenticated(new JSONObject(jsonBody));
+    }
+
     @PostMapping(value = {"/tree/new/"})
     public TreeDto createTree(@RequestBody String jsonBody) throws Exception {
         Tree tree = service.createTree(new JSONObject(jsonBody));

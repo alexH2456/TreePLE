@@ -89,9 +89,6 @@ class CreateForecastModal extends PureComponent {
   }
 
   onRemoveTree = (treeIdx) => {
-    // let fcTrees = this.state.fcTrees.slice();
-    // fcTrees.splice(treeIdx, 1);
-    // this.setState({fcTrees: fcTrees});
     this.setState((prevState) => ({fcTrees: prevState.fcTrees.splice(treeIdx, 1)}));
   }
 
@@ -104,7 +101,6 @@ class CreateForecastModal extends PureComponent {
   }
 
   onTreeRightClick = (tree) => {
-    // const hover = tree === null ? null : tree.treeId === this.state.hover ? null : tree.treeId;
     this.setState((prevState) => ({hover: tree === null ? null : tree.treeId === prevState.hover ? null : tree.treeId}));
   }
 

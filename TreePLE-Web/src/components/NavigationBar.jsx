@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Icon, Image, Statistic, Table} from 'semantic-ui-react';
-import IconMenu from './IconMenu';
+import SideBar from './SideBar';
 import {getTreePLESustainability} from './Requests';
 import Logo from '../images/treeple_logo.png';
 
@@ -100,7 +100,7 @@ class NavigationBar extends PureComponent {
             </Table.Row>
           </Table.Header>
         </Table>
-        <IconMenu show={this.state.showSidebar} onSustainabilityChange={this.onSustainabilityChange}/>
+        <SideBar show={this.state.showSidebar} onSustainabilityChange={this.onSustainabilityChange}/>
       </div>
     );
   }
