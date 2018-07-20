@@ -59,8 +59,6 @@ class CreateSpeciesModal extends PureComponent {
               </Form.Group>
             </Form>
 
-            <Divider/>
-
             {this.state.error ? (
               <Message error>
                 <Message.Header style={{textAlign: 'center'}}>{this.state.error}</Message.Header>

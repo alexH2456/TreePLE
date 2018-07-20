@@ -1,34 +1,42 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Divider, Grid, Header, Icon, Message, Modal} from 'semantic-ui-react';
+import CreateForecastModal from './CreateForecastModal';
 import {getUserForecasts, deleteForecast} from './Requests';
 
 class MyForecastsModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      user: '',
+      user: localStorage.getItem('username'),
       forecasts: [],
+      createFcModal: false,
+      analysisModal: false,
       error: ''
     };
   }
 
   componentWillMount() {
-    const user = localStorage.getItem('username');
-
-    getUserForecasts(user)
-      .then(({data}) => {
-        this.setState({
-          user: user,
-          forecasts: data
-        });
-      })
-      .catch(({response: {data}}) => {
-        this.setState({error: data.message});
-      });
+    this.loadForecasts();
   }
 
-  onAnalysisForecast = (forecastId) => {
+  loadForecasts = () => {
+    const user = this.state.user;
+
+    getUserForecasts(user)
+      .then(({data}) => this.setState({forecasts: data}))
+      .catch(({response: {data}}) => this.setState({error: data.message}));
+  }
+
+  onToggleCreate = (success) => {
+    if (success) {
+      this.loadForecasts();
+    }
+
+    this.setState((prevState) => ({createFcModal: !prevState.createFcModal}));
+  }
+
+  onToggleAnalysis = (fcId) => {
   }
 
   onDeleteForecast = (fcId) => {
@@ -38,24 +46,12 @@ class MyForecastsModal extends PureComponent {
     };
 
     deleteForecast(fcParams)
-      .then(() => {
-        let forecasts = this.state.forecasts.slice();
-
-        forecasts.some(({forecastId}, idx) => {
-          if (forecastId === fcId) {
-            forecasts.splice(idx, 1);
-            this.setState({forecasts: forecasts});
-            return true;
-          }
-        });
-      })
-      .catch(({response: {data}}) => {
-        this.setState({error: data.message});
-      });
+      .then(() => this.loadForecasts())
+      .catch(({response: {data}}) => this.setState({error: data.message}));
   }
 
   render() {
-    return (
+    return !this.state.createFcModal ? (
       <Modal open size='large' dimmer='blurring'>
         <Modal.Content>
           <Modal.Header>
@@ -91,8 +87,8 @@ class MyForecastsModal extends PureComponent {
 
             <Divider/>
 
-            {this.state.forecasts.length !== 0 ? (
-              <Grid textAlign='center' columns={7}>
+            {!this.state.error && this.state.forecasts.length !== 0 ? (
+              <Grid textAlign='center' verticalAlign='middle' columns={7}>
                 {this.state.forecasts.map(({forecastId, fcDate, biodiversity, stormwater, co2Reduced, energyConserved}) => (
                   <Grid.Row key={forecastId}>
                     <Grid.Column>{forecastId}</Grid.Column>
@@ -102,7 +98,7 @@ class MyForecastsModal extends PureComponent {
                     <Grid.Column>{co2Reduced.toFixed(2)}</Grid.Column>
                     <Grid.Column>{energyConserved.toFixed(2)}</Grid.Column>
                     <Grid.Column>
-                      <Button inverted circular size='mini' content='Analysis' color='blue' onClick={() => this.onAnalysisForecast(forecastId)}/>
+                      <Button inverted circular size='mini' content='Analysis' color='blue' onClick={() => this.onToggleAnalysis(forecastId)}/>
                       <Button inverted circular size='mini' icon='delete' color='red' disabled={!this.state.user} onClick={() => this.onDeleteForecast(forecastId)}/>
                     </Grid.Column>
                   </Grid.Row>
@@ -122,19 +118,20 @@ class MyForecastsModal extends PureComponent {
 
             <Grid centered>
               <Grid.Row>
-                <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.props.onForecast}>Create</Button>
+                <Button inverted color='green' size='small' disabled={!this.state.user} onClick={() => this.onToggleCreate(false)}>Create</Button>
                 <Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
         </Modal.Content>
       </Modal>
+    ) : (
+      <CreateForecastModal onClose={this.onToggleCreate}/>
     );
   }
 }
 
 MyForecastsModal.propTypes = {
-  onForecast: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 };
 

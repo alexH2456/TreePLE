@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -52,14 +53,15 @@ module.exports = {
       serverHost: JSON.stringify('localhost'),
       serverPort: JSON.stringify('8088')
     }),
+    new webpack.ProvidePlugin({
+      _: 'lodash',
+      C: 'constants',
+      U: 'Utils'
+    }),
     new webpack.optimize.UglifyJsPlugin({
       compress: false,
       mangle: false
     })
-    // new HtmlWebpackPlugin({
-    //   title: 'TreePLE',
-    //   favicon: '/src/images/favicon.ico'
-    // })
   ],
   resolve: {
     extensions: ['.js', '.jsx', '.css']

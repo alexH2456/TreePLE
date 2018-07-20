@@ -81,7 +81,7 @@ class CreateForecastModal extends PureComponent {
 
     createForecast(fcParams)
       .then(() => {
-        this.props.onForecast();
+        this.props.onClose(true);
       })
       .catch(({response: {data}}) => {
         this.setState({error: data.message});
@@ -307,8 +307,7 @@ class CreateForecastModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 <Button inverted color='green' size='small' disabled={!this.state.user} onClick={this.onCreateForecast}>Create</Button>
-                <Button inverted color='orange' size='small' onClick={this.props.onForecast}>Back</Button>
-                <Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Button>
+                <Button inverted color='red' size='small' onClick={() => this.props.onClose(false)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
@@ -374,7 +373,6 @@ const GMap = compose(
 });
 
 CreateForecastModal.propTypes = {
-  onForecast: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired
 };
 

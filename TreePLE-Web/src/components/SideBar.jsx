@@ -4,8 +4,8 @@ import {Sidebar, Segment, Button, Menu} from 'semantic-ui-react';
 import TreeMap from './TreeMap';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
+import MyTreesModal from './MyTreesModal';
 import MyForecastsModal from './MyForecastsModal';
-import CreateForecastModal from './CreateForecastModal';
 import CreateSpeciesModal from './CreateSpeciesModal';
 import HelpModal from './HelpModal';
 import {authenticated} from './Requests';
@@ -19,8 +19,8 @@ class SideBar extends PureComponent {
       showMenu: false,
       showSignIn: false,
       showSignUp: false,
+      showMyTrees: false,
       showMyForecasts: false,
-      showCreateForecast: false,
       showCreateSpecies: false,
       showHelp: false,
       error: ''
@@ -41,8 +41,15 @@ class SideBar extends PureComponent {
     if (username) {
       const user = {username: username};
       authenticated(user)
-        .then(({data}) => this.setState({scientist: data.authenticated}))
-        .catch(({response: {data}}) => this.setState({error: data.message, scientist: false}));
+        .then(({data}) => {
+          this.setState({scientist: data.authenticated});
+        })
+        .catch(({response: {data}}) => {
+          this.setState({
+            error: data.message,
+            scientist: false
+          });
+        });
     } else {
       this.setState({scientist: false});
     }
@@ -60,9 +67,9 @@ class SideBar extends PureComponent {
   }
   toggleRegister = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
 
+  toggleMyTrees = () => this.setState((prevState) => ({showMyTrees: !prevState.showMyTrees}))
+
   toggleMyForecasts = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts}));
-  toggleCreateForecast = () => this.setState((prevState) => ({showCreateForecast: !prevState.showCreateForecast}));
-  toggleForecast = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts, showCreateForecast: !prevState.showCreateForecast}));
 
   toggleCreateSpecies = () => this.setState((prevState) => ({showCreateSpecies: !prevState.showCreateSpecies}));
 
@@ -70,7 +77,10 @@ class SideBar extends PureComponent {
 
   onLogOut = () => {
     localStorage.clear();
-    this.setState({user: localStorage.getItem('username'), scientist: false});
+    this.setState({
+      user: localStorage.getItem('username'),
+      scientist: false
+    });
   }
 
   render() {
@@ -93,6 +103,11 @@ class SideBar extends PureComponent {
               </div>
             ) : (
               <div>
+                <Menu.Item link name='mytrees'>
+                  <Button basic fluid color='black' name='mytrees' onClick={this.toggleMyTrees}>
+                    Trees
+                  </Button>
+                </Menu.Item>
                 <Menu.Item link name='myforecasts'>
                   <Button basic fluid color='black' name='myforecasts' onClick={this.toggleMyForecasts}>
                     Forecasts
@@ -131,11 +146,11 @@ class SideBar extends PureComponent {
         {this.state.showSignUp ? (
           <SignUpModal onClose={this.toggleSignUp} onRegister={this.toggleRegister}/>
         ) : null}
-        {this.state.showMyForecasts ? (
-          <MyForecastsModal onClose={this.toggleMyForecasts} onForecast={this.toggleForecast}/>
+        {this.state.showMyTrees ? (
+          <MyTreesModal onClose={this.toggleMyTrees}/>
         ) : null}
-        {this.state.showCreateForecast ? (
-          <CreateForecastModal onClose={this.toggleCreateForecast} onForecast={this.toggleForecast}/>
+        {this.state.showMyForecasts ? (
+          <MyForecastsModal onClose={this.toggleMyForecasts}/>
         ) : null}
         {this.state.showCreateSpecies ? (
           <CreateSpeciesModal onClose={this.toggleCreateSpecies}/>

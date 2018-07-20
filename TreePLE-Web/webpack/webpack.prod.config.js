@@ -53,7 +53,11 @@ module.exports = {
       serverHost: JSON.stringify('ecse321-11.ece.mcgill.ca'),
       serverPort: JSON.stringify('8080')
     }),
-    new ExtractTextPlugin('bundle.css', {allChunks: false}),
+    new webpack.ProvidePlugin({
+      _: 'lodash',
+      C: 'constants',
+      U: 'Utils'
+    }),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
@@ -72,6 +76,7 @@ module.exports = {
       exclude: [/\.min\.js$/gi]
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
+    new ExtractTextPlugin('bundle.css', {allChunks: false}),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',

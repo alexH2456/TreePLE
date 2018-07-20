@@ -12,7 +12,7 @@ class MunicipalityModal extends PureComponent {
     this.state = {
       user: localStorage.getItem('username'),
       update: false,
-      showBorders: true,
+      showBorders: false,
       error: ''
     };
   }
@@ -58,7 +58,7 @@ class MunicipalityModal extends PureComponent {
 
             <Header as='h3' textAlign='center'>
               <Header.Content>
-                <Icon name='point' onClick={this.onShowBorders}/>Borders
+                <Icon name='map marker alternate' onClick={this.onShowBorders}/>Borders
               </Header.Content>
             </Header>
             {this.state.showBorders ? (
