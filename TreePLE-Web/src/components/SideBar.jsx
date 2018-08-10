@@ -7,6 +7,7 @@ import SignUpModal from './SignUpModal';
 import MyTreesModal from './MyTreesModal';
 import MyForecastsModal from './MyForecastsModal';
 import CreateSpeciesModal from './CreateSpeciesModal';
+import CreateMunicipalityModal from './CreateMunicipalityModal';
 import HelpModal from './HelpModal';
 import {authenticated} from './Requests';
 
@@ -22,6 +23,7 @@ class SideBar extends PureComponent {
       showMyTrees: false,
       showMyForecasts: false,
       showCreateSpecies: false,
+      showCreateMunicipality: false,
       showHelp: false,
       error: ''
     };
@@ -73,6 +75,8 @@ class SideBar extends PureComponent {
 
   toggleCreateSpecies = () => this.setState((prevState) => ({showCreateSpecies: !prevState.showCreateSpecies}));
 
+  toggleCreateMunicipality = () => this.setState((prevState) => ({showCreateMunicipality: !prevState.showCreateMunicipality}));
+
   toggleHelp = () => this.setState((prevState) => ({showHelp: !prevState.showHelp}));
 
   onLogOut = () => {
@@ -120,6 +124,13 @@ class SideBar extends PureComponent {
                     </Button>
                   </Menu.Item>
                 ) : null}
+                {this.state.scientist ? (
+                  <Menu.Item link name='createmunicipality'>
+                    <Button basic fluid color='black' name='createmunicipality' onClick={this.toggleCreateMunicipality}>
+                      Municipalities
+                    </Button>
+                  </Menu.Item>
+                ) : null}
                 <Menu.Item link name='logout'>
                   <Button basic fluid color='black' name='logout' onClick={this.onLogOut}>
                     Log Out
@@ -154,6 +165,9 @@ class SideBar extends PureComponent {
         ) : null}
         {this.state.showCreateSpecies ? (
           <CreateSpeciesModal onClose={this.toggleCreateSpecies}/>
+        ) : null}
+        {this.state.showCreateMunicipality ? (
+          <CreateMunicipalityModal onClose={this.toggleCreateMunicipality}/>
         ) : null}
         {this.state.showHelp ? (
           <HelpModal onClose={this.toggleHelp}/>

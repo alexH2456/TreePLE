@@ -123,6 +123,11 @@ function createSpecies(params) {
   return postRequestWithParams(url, params);
 }
 
+function createMunicipality(params) {
+  const url = '/municipality/new/';
+  return postRequestWithParams(url, params);
+}
+
 function createForecast(params) {
   const url = '/forecast/new/';
   return postRequestWithParams(url, params);
@@ -165,7 +170,7 @@ export {
   getAllUsers, getUser, getUserTrees, getUserForecasts, createUser,
   getAllSpecies, createSpecies,
   getAllLocations,
-  getAllMunicipalities,
+  getAllMunicipalities, createMunicipality,
   getAllForecasts, createForecast, deleteForecast,
   getSustainability, getTreePLESustainability, getTreeSustainability, getMunicipalitySustainability,
   login, authenticated
