@@ -48,7 +48,7 @@ class CreateMunicipalityModal extends PureComponent {
 
     createMunicipality(municipalityParams)
       .then(() => {
-        this.props.onClose();
+        this.props.onClose(true);
       })
       .catch(({response: {data}}) => {
         this.setState({error: data.message});
@@ -76,7 +76,7 @@ class CreateMunicipalityModal extends PureComponent {
     const errors = getError(this.state.error);
 
     return (
-      <Modal open size='large' dimmer='blurring'>
+      <Modal open size='fullscreen' dimmer='blurring'>
         <Modal.Content>
           <Modal.Header>
             <Header as='h1' icon textAlign='center'>

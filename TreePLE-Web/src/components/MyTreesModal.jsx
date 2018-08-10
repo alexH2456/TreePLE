@@ -14,6 +14,7 @@ class MyTreesModal extends PureComponent {
       tree: null,
       treeModal: false,
       analysisModal: false,
+      refreshMap: false,
       error: ''
     };
   }
@@ -33,6 +34,7 @@ class MyTreesModal extends PureComponent {
   onToggleView = (treeId, success) => {
     if (success) {
       this.loadTrees();
+      this.setState({refreshMap: true});
     }
 
     if (treeId) {
@@ -161,7 +163,7 @@ class MyTreesModal extends PureComponent {
             <Grid centered>
               <Grid.Row>
                 <Button inverted color='blue' size='small' onClick={() => this.onToggleAnalysis(this.state.trees)}>Analysis</Button>
-                <Button inverted color='red' size='small' onClick={this.props.onClose}>Close</Button>
+                <Button inverted color='red' size='small' onClick={() => this.props.onClose(this.state.refreshMap)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>

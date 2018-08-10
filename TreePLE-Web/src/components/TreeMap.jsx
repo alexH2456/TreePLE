@@ -31,6 +31,12 @@ export class TreeMap extends PureComponent {
     this.loadMap();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.refreshMap === true) {
+      this.loadMap();
+    }
+  }
+
   getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -234,6 +240,7 @@ export class TreeMap extends PureComponent {
 }
 
 TreeMap.propTypes = {
+  refreshMap: PropTypes.bool.isRequired,
   onSustainabilityChange: PropTypes.func.isRequired
 };
 

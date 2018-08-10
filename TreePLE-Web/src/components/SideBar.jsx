@@ -25,6 +25,7 @@ class SideBar extends PureComponent {
       showCreateSpecies: false,
       showCreateMunicipality: false,
       showHelp: false,
+      refreshMap: false,
       error: ''
     };
   }
@@ -36,6 +37,12 @@ class SideBar extends PureComponent {
   componentWillReceiveProps(nextProps) {
     if (this.props.show !== nextProps.show) {
       this.setState({showMenu: nextProps.show});
+    }
+  }
+
+  componentDidUpdate(nextProps, nextState) {
+    if (nextState.refreshMap === true) {
+      this.setState({refreshMap: false});
     }
   }
 
@@ -69,13 +76,13 @@ class SideBar extends PureComponent {
   }
   toggleRegister = () => this.setState((prevState) => ({showSignIn: !prevState.showSignIn, showSignUp: !prevState.showSignUp}));
 
-  toggleMyTrees = () => this.setState((prevState) => ({showMyTrees: !prevState.showMyTrees}))
+  toggleMyTrees = (refreshMap) => this.setState((prevState) => ({showMyTrees: !prevState.showMyTrees, refreshMap: refreshMap}));
 
   toggleMyForecasts = () => this.setState((prevState) => ({showMyForecasts: !prevState.showMyForecasts}));
 
   toggleCreateSpecies = () => this.setState((prevState) => ({showCreateSpecies: !prevState.showCreateSpecies}));
 
-  toggleCreateMunicipality = () => this.setState((prevState) => ({showCreateMunicipality: !prevState.showCreateMunicipality}));
+  toggleCreateMunicipality = (refreshMap) => this.setState((prevState) => ({showCreateMunicipality: !prevState.showCreateMunicipality, refreshMap: refreshMap}));
 
   toggleHelp = () => this.setState((prevState) => ({showHelp: !prevState.showHelp}));
 
@@ -108,7 +115,7 @@ class SideBar extends PureComponent {
             ) : (
               <div>
                 <Menu.Item link name='mytrees'>
-                  <Button basic fluid color='black' name='mytrees' onClick={this.toggleMyTrees}>
+                  <Button basic fluid color='black' name='mytrees' onClick={() => this.toggleMyTrees(false)}>
                     Trees
                   </Button>
                 </Menu.Item>
@@ -126,7 +133,7 @@ class SideBar extends PureComponent {
                 ) : null}
                 {this.state.scientist ? (
                   <Menu.Item link name='createmunicipality'>
-                    <Button basic fluid color='black' name='createmunicipality' onClick={this.toggleCreateMunicipality}>
+                    <Button basic fluid color='black' name='createmunicipality' onClick={() => this.toggleCreateMunicipality(false)}>
                       Municipalities
                     </Button>
                   </Menu.Item>
@@ -146,7 +153,7 @@ class SideBar extends PureComponent {
           </Sidebar>
           <Sidebar.Pusher>
             <Segment basic>
-              <TreeMap onSustainabilityChange={this.props.onSustainabilityChange} random={5}/>
+              <TreeMap refreshMap={this.state.refreshMap} onSustainabilityChange={this.props.onSustainabilityChange}/>
             </Segment>
           </Sidebar.Pusher>
         </Sidebar.Pushable>
