@@ -45,7 +45,6 @@ class MunicipalityModal extends PureComponent {
   onUpdateMunicipality = () => {
     const municipalityParams = {
       name: this.props.municipality.name,
-      totalTrees: this.props.municipality.totalTrees,
       borders: this.state.borders.map((location) => [location.lat(), location.lng()])
     };
 
