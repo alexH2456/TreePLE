@@ -295,8 +295,8 @@ public class TreePLERestController {
     }
 
     @PatchMapping(value = {"/municipality/update/"})
-    public MunicipalityDto updateMunicipality(@RequestBody String jsonBody) throws Exception {
-        Municipality municipality = service.updateMunicipality(new JSONObject(jsonBody));
+    public MunicipalityDto updateMunicipalityBorders(@RequestBody String jsonBody) throws Exception {
+        Municipality municipality = service.updateMunicipalityBorders(new JSONObject(jsonBody));
         return convertToDto(municipality);
     }
 

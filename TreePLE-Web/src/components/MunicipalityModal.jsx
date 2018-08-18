@@ -3,36 +3,66 @@ import PropTypes from 'prop-types';
 import {compose, withProps} from 'recompose';
 import {GoogleMap, Polygon, withScriptjs, withGoogleMap} from 'react-google-maps';
 import {Button, Divider, Header, Icon, Grid, Modal} from 'semantic-ui-react';
-import {getMapBounds} from './Utils';
-import {gmapsKey} from '../constants';
+import {getAllMunicipalities, updateMunicipality} from './Requests';
+import {getLatLngBorders, getMapBounds} from './Utils';
+import {gmapsKey, mtlCenter} from '../constants';
 
 class MunicipalityModal extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       user: localStorage.getItem('username'),
+      municipalities: [],
+      borders: [],
       update: false,
       showBorders: false,
       error: ''
     };
   }
 
+  componentWillMount() {
+    getAllMunicipalities()
+      .then(({data}) => {
+        let municipalities = data.map((municipality) => ({
+          name: municipality.name,
+          totalTrees: municipality.totalTrees,
+          borders: getLatLngBorders(municipality.borders)
+        })).filter((municipality) => municipality.name !== this.props.municipality.name);
+
+        this.setState({municipalities: municipalities});
+      })
+      .catch(({response: {data}}) => {
+        this.setState({error: data.message});
+      });
+  }
+
   onToggleEdit = () => this.setState((prevState) => ({update: !prevState.update}));
 
   onShowBorders = () => this.setState((prevState) => ({showBorders: !prevState.showBorders}));
 
-  onUpdateMunicipality = () => this.setState((prevState) => ({update: !prevState.update}));
+  onEdit = (polygon) => this.setState({borders: polygon.getPaths().b[0].b});
 
-  onGMapLoaded = () => {
-    let viewport = getMapBounds(this.props.municipality.borders);
-    this.refs.map.fitBounds(viewport);
+  onUpdateMunicipality = () => {
+    const municipalityParams = {
+      name: this.props.municipality.name,
+      totalTrees: this.props.municipality.totalTrees,
+      borders: this.state.borders.map((location) => [location.lat(), location.lng()])
+    };
+
+    updateMunicipality(municipalityParams)
+      .then(() => {
+        this.props.onClose(null, true);
+      })
+      .catch(({response: {data}}) => {
+        this.setState({error: data.message});
+      });
   }
 
   render() {
     const {municipality} = this.props;
 
     return (
-      <Modal open size='small' dimmer='blurring'>
+      <Modal open size='large' dimmer='blurring'>
         <Modal.Content>
           <Modal.Header>
             <Header as='h1' icon textAlign='center'>
@@ -88,7 +118,7 @@ class MunicipalityModal extends PureComponent {
             ) : null}
 
             <Divider hidden/>
-            <GMap municipality={municipality}/>
+            <GMap municipality={municipality} municipalities={this.state.municipalities} update={this.state.update} onEdit={this.onEdit}/>
             <Divider hidden/>
 
             {this.state.error ? (
@@ -107,7 +137,7 @@ class MunicipalityModal extends PureComponent {
                     <Button inverted color='orange' size='small' onClick={this.onToggleEdit}>Back</Button>
                   </div>
                 )}
-                <Button inverted color='red' size='small' onClick={() => this.props.onClose(null)}>Close</Button>
+                <Button inverted color='red' size='small' onClick={() => this.props.onClose(null, false)}>Close</Button>
               </Grid.Row>
             </Grid>
           </Modal.Description>
@@ -120,17 +150,45 @@ class MunicipalityModal extends PureComponent {
 const GMap = compose(
   withProps({
     googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${gmapsKey}&v=3.exp&libraries=geometry,drawing,places`,
-    loadingElement: <div style={{width: '100vw', height: '40vh'}}/>,
-    containerElement: <div style={{height: '40vh'}}/>,
-    mapElement: <div style={{height: '40vh'}}/>
+    loadingElement: <div style={{width: '100vw', height: '60vh'}}/>,
+    containerElement: <div style={{height: '60vh'}}/>,
+    mapElement: <div style={{height: '60vh'}}/>
   }),
   withScriptjs,
   withGoogleMap
-)(({municipality}) => (
-  <GoogleMap options={{scrollwheel: false}}>
-    <Polygon key={municipality.name} paths={municipality.borders}/>
-  </GoogleMap>
-));
+)(({municipality, municipalities, update, onEdit}) => {
+  let gmap;
+  let polygon;
+  let init = true;
+
+  const onGMapLoaded = () => {
+    if (init) {
+      let viewport = getMapBounds(municipality.borders);
+      gmap.fitBounds(viewport);
+      init = false;
+    }
+  };
+
+  return update ? (
+    <GoogleMap ref={(ref) => gmap = ref} zoom={13} center={mtlCenter} options={{scrollwheel: true}}>
+      <Polygon
+        editable
+        ref={(ref) => polygon = ref}
+        key={'#EDIT#' + municipality.name}
+        paths={municipality.borders}
+        options={{fillColor: '#8BDFB9'}}
+        onMouseUp={() => onEdit(polygon)}
+      />
+      {municipalities.map((muni) => (
+        <Polygon key={muni.name} paths={muni.borders}/>
+      ))}
+    </GoogleMap>
+  ) : (
+    <GoogleMap ref={(ref) => gmap = ref} zoom={13} center={mtlCenter} options={{scrollwheel: true}} onIdle={onGMapLoaded}>
+      <Polygon key={municipality.name} paths={municipality.borders}/>
+    </GoogleMap>
+  );
+});
 
 MunicipalityModal.propTypes = {
   municipality: PropTypes.object.isRequired,

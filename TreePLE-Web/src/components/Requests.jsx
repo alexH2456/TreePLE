@@ -148,6 +148,16 @@ function updateTree(params) {
   return patchRequestWithParams(url, params);
 }
 
+function updateUser(params) {
+  const url = '/user/update/';
+  return patchRequestWithParams(url, params);
+}
+
+function updateMunicipality(params) {
+  const url = '/municipality/update/';
+  return patchRequestWithParams(url, params);
+}
+
 
 // ==============================
 // REQUEST API
@@ -167,10 +177,10 @@ function patchRequestWithParams(url, params) {
 
 export {
   getAllTrees, getTree, createTree, updateTree,
-  getAllUsers, getUser, getUserTrees, getUserForecasts, createUser,
+  getAllUsers, getUser, getUserTrees, getUserForecasts, createUser, updateUser,
   getAllSpecies, createSpecies,
   getAllLocations,
-  getAllMunicipalities, createMunicipality,
+  getAllMunicipalities, createMunicipality, updateMunicipality,
   getAllForecasts, createForecast, deleteForecast,
   getSustainability, getTreePLESustainability, getTreeSustainability, getMunicipalitySustainability,
   login, authenticated

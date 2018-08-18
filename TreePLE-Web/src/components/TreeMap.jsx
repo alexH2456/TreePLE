@@ -107,7 +107,7 @@ export class TreeMap extends PureComponent {
       }))
       .then((sustainability) => {
         let viewport = getMapBounds(municipality.borders);
-        this.refs.map.fitBounds(viewport);
+        this.refs.gmap.fitBounds(viewport);
         this.props.onSustainabilityChange(sustainability);
       })
       .catch(({response: {data}}) => {
@@ -115,7 +115,12 @@ export class TreeMap extends PureComponent {
       });
   }
 
-  onMunicipalityDblClick = (municipality) => this.setState({municipalityModal: municipality});
+  onMunicipalityDblClick = (municipality, success) => {
+    if (success) {
+      this.loadMap();
+    }
+    this.setState({municipalityModal: municipality});
+  }
 
   onTreeHover = (tree) => {
     if (!this.state.treeInfo) {
@@ -189,7 +194,7 @@ export class TreeMap extends PureComponent {
 
     return Object.keys(this.state.center).length !== 0 ? (
       <GoogleMap
-        ref='map'
+        ref='gmap'
         defaultZoom={14}
         defaultCenter={this.state.center}
         options={{scrollwheel: true}}
@@ -200,7 +205,7 @@ export class TreeMap extends PureComponent {
             key={municipality.name}
             paths={municipality.borders}
             onClick={() => this.onMunicipalityClick(municipality)}
-            onDblClick={() => this.onMunicipalityDblClick(municipality)}
+            onDblClick={() => this.onMunicipalityDblClick(municipality, false)}
             onRightClick={(e) => this.onMapClick(e, false)}
           />
         ))}

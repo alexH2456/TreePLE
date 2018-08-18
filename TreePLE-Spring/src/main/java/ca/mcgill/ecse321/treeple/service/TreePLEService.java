@@ -788,16 +788,9 @@ public class TreePLEService {
     }
 
     // Update a Municipality
-    public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
-        return null;
-    }
-
-    /*
-    public Municipality updateMunicipality(JSONObject jsonParams) throws Exception {
+    public Municipality updateMunicipalityBorders(JSONObject jsonParams) throws Exception {
         String name = jsonParams.getString("name").trim();
-        int totalTrees = jsonParams.getInt("totalTrees");
         JSONArray borders = jsonParams.getJSONArray("borders");
-
 
         Municipality municipalityObj;
         if (name == null || name.replaceAll("\\s", "").isEmpty())
@@ -808,26 +801,17 @@ public class TreePLEService {
             throw new InvalidInputException("Municipality requires minimum 3 borders!");
 
         ArrayList<Location> prevLocations = new ArrayList<Location>(municipalityObj.getBorders());
-        municipalityObj.getBorders().clear();
+        municipalityObj.clearBorders();
 
-        int prevLength = prevLocations.size();
-        int nextLocationId = Location.getNextLocationId();
-        Location.setNextLocationId(prevLocations.get(0).getLocationId());
-
-        int iteration = 0;
         ArrayList<Integer> locationIdList = new ArrayList<>();
         borders.forEach(border -> {
             JSONArray locationJSON = (JSONArray) border;
-            Location location = new Location(locationJSON.getdouble(0), locationJSON.getdouble(1));
+            Location location = new Location(locationJSON.getDouble(0), locationJSON.getDouble(1));
             municipalityObj.addBorder(location);
             locationIdList.add(location.getLocationId());
-            if(iteration == prevLength) {
-                Location.setNextLocationId(nextLocationId);
-            }
         });
 
-
-        if (!sql.updateMunicipality(name, totalTrees, locationIdList.toString().replaceAll("(\\[)|(\\])", ""))) {
+        if (!sql.updateMunicipalityBorders(name, locationIdList.toString().replaceAll("(\\[)|(\\])", ""))) {
             Location.setNextLocationId(Location.getNextLocationId() - municipalityObj.numberOfBorders());
             municipalityObj.delete();
             throw new SQLException("SQL Municipality insert query failed!");
@@ -836,14 +820,20 @@ public class TreePLEService {
         for (Location location : municipalityObj.getBorders()) {
             if (!sql.insertLocation(location.getLocationId(), location.getLatitude(), location.getLongitude())) {
                 Location.setNextLocationId(Location.getNextLocationId() - municipalityObj.numberOfBorders());
+                for (int mlId = municipalityObj.getBorder(0).getLocationId(); mlId < location.getLocationId(); mlId++) {
+                    sql.deleteLocation(mlId);
+                }
                 municipalityObj.delete();
                 throw new SQLException("SQL Location insert query failed!");
             }
         }
 
+        for (Location location : prevLocations) {
+            sql.deleteLocation(location.getLocationId());
+        }
+
         return municipalityObj;
     }
-    */
 
 
     // ==============================
@@ -876,6 +866,7 @@ public class TreePLEService {
         Municipality municipality = tree.getMunicipality();
         municipality.setTotalTrees(municipality.getTotalTrees() - 1);
         sql.updateMunicipalityIncDecTotalTrees(municipality.getName(), -1);
+        sql.deleteLocation(tree.getLocation().getLocationId());
 
         return tree;
     }
@@ -951,6 +942,10 @@ public class TreePLEService {
         municipality.deleteKeepBorders();
         if (!sql.deleteMunicipality(name))
             throw new SQLException("SQL Municipality delete query failed!");
+
+        for (Location location : municipality.getBorders()) {
+            sql.deleteLocation(location.getLocationId());
+        }
 
         return municipality;
     }
